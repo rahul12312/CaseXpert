@@ -1,0 +1,126 @@
+{
+  "cases": [
+    {
+      "id": "c1",
+      "title": "Acme vs. Doe",
+      "status": "open",
+      "description": "Contract dispute regarding delivery terms.",
+      "createdAt": 1759685101767
+    },
+    {
+      "id": "c3",
+      "title": "Aisha Divorce Petition",
+      "status": "drafting",
+      "description": "Family law case regarding mutual consent.",
+      "createdAt": 1759761501767
+    },
+    {
+      "id": "9a8eb711-a1e6-4e3f-b50b-0a8f93dce101",
+      "title": "hah vs hah ",
+      "status": "hearing",
+      "description": "dhsdj",
+      "createdAt": 1759773632749
+    },
+    {
+      "id": "c5c4ac77-6ff1-4d48-9b68-10faafa1533e",
+      "title": "hs vs hs ",
+      "status": "closed",
+      "description": "wsqwsqws",
+      "clientEmail": "honeycrispy69@gmail.com",
+      "lawyerId": "l2",
+      "attachments": [],
+      "createdAt": 1759775329741
+    },
+    {
+      "id": "8ec5dfbb-e3db-4c2a-bb8e-7f08d37bb81a",
+      "title": "sq vs hs ",
+      "status": "open",
+      "description": "xyz ",
+      "clientEmail": "honeycrispy69@gmail.com",
+      "lawyerId": "",
+      "attachments": [],
+      "createdAt": 1759776020102
+    },
+    {
+      "id": "ac45205a-9efb-413d-b050-6a4d078e1de5",
+      "title": " sv vs df",
+      "status": "open",
+      "description": "",
+      "clientEmail": "",
+      "lawyerId": "l1",
+      "attachments": [],
+      "createdAt": 1759776037284
+    }
+  ],
+  "lawyers": [
+    {
+      "id": "l1",
+      "name": "Ananya Sharma",
+      "expertise": [
+        "Civil",
+        "Family"
+      ],
+      "rating": 4.5,
+      "city": "Pune"
+    },
+    {
+      "id": "l2",
+      "name": "Rahul Verma",
+      "expertise": [
+        "Criminal",
+        "Cyber"
+      ],
+      "rating": 4.5,
+      "city": "Delhi"
+    },
+    {
+      "id": "l3",
+      "name": "Aisha Khan",
+      "expertise": [
+        "Corporate",
+        "IP"
+      ],
+      "rating": 4.8,
+      "city": "Mumbai"
+    }
+  ],
+  "users": [
+    {
+      "id": "u-admin",
+      "email": "admin@casexpert.app",
+      "name": "Admin",
+      "role": "admin"
+    },
+    {
+      "id": "u-lawyer1",
+      "email": "rahul@lawfirm.com",
+      "name": "Rahul Verma",
+      "role": "lawyer",
+      "lawyerId": "l2"
+    },
+    {
+      "id": "u-user1",
+      "email": "client1@example.com",
+      "name": "Client One",
+      "role": "user"
+    },
+    {
+      "id": "97bb2499-9017-47a2-9cee-ba247f8ac203",
+      "email": "honeycrispy69@gmail.com",
+      "name": "honeycrispy69",
+      "role": "user"
+    },
+    {
+      "id": "18ebc5df-6a11-40b4-a5c7-2ad9af32e9c0",
+      "email": "rahul@casexpert.app",
+      "name": "rahul",
+      "role": "user"
+    },
+    {
+      "id": "e5573cbe-830b-4c17-8949-038f81d90e6d",
+      "email": "swdwdwqdd@gmail.com",
+      "name": "swdwdwqdd",
+      "role": "user"
+    }
+  ]
+}
