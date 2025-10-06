@@ -22,8 +22,8 @@ $env:PORT='4001'; npm run --prefix backend dev
 ```
 
 Open the app:
-- http://localhost:4001 (or your chosen PORT)
-- Health: http://localhost:4001/api/health
+- http://localhost:4000 (or your chosen PORT)
+- Health: http://localhost:4000/api/health
 
 ## Folder Structure
 
