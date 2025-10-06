@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login • CaseXpert</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="container bar">
+      <div class="brand"><div class="logo">⚖️</div><span class="name">Case<span class="accent">X</span>pert</span></div>
+      <nav class="nav">
+        <a class="btn ghost" href="/index.html">Home</a>
+        <a class="btn primary" href="/cases.html">Case Tracker</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="login-hero">
+    <div class="container">
+      <div class="login-card panel">
+        <div class="login-header">
+          <div class="logo" style="width:48px;height:48px;border-radius:12px;display:grid;place-items:center">⚖️</div>
+          <h2 style="margin:8px 0 0">Welcome Back</h2>
+          <p class="muted" style="margin:0">Sign in to access your CaseXpert account</p>
+        </div>
+
+        <form id="loginForm">
+          <div class="field">
+            <label>Email Address</label>
+            <input type="email" id="email" placeholder="you@example.com" required />
+          </div>
+          <div class="field">
+            <label>Password</label>
+            <input type="password" id="password" placeholder="••••••••" required />
+          </div>
+          <div class="row" style="justify-content:space-between">
+            <label class="row" style="gap:6px"><input type="checkbox" /> Remember me</label>
+            <a class="link" href="#">Forgot password?</a>
+          </div>
+          <div class="row" style="margin-top:10px">
+            <button class="btn primary" type="submit" style="width:100%">Sign In</button>
+          </div>
+        </form>
+
+        <div class="row" style="margin:12px 0; justify-content:center; color:#94a3b8">— or continue with —</div>
+        <div class="row actions" style="justify-content:space-between">
+          <button class="btn" id="oauthGoogle" style="flex:1">G Google</button>
+          <button class="btn" id="oauthGitHub" style="flex:1"> GitHub</button>
+        </div>
+        <p class="muted" style="text-align:center;margin-top:12px">Don't have an account? <a class="link" href="#">Sign up for free</a></p>
+
+        <div id="output" class="output" aria-live="polite"></div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer rich">
+    <div class="container copy">© <span id="year"></span> CaseXpert</div>
+  </footer>
+
+  <script src="/login.js" type="module"></script>
+</body>
+</html>

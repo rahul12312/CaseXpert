@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Get Started • CaseXpert</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="container bar">
+      <div class="brand"><div class="logo">⚖️</div><span class="name">Case<span class="accent">X</span>pert</span></div>
+      <nav class="nav fancy-nav">
+        <a class="btn ghost" href="/index.html">Home</a>
+        <a class="btn" href="/login.html" id="loginNav">Login</a>
+        <button class="btn" id="logoutNav" style="display:none" onclick="CaseXAuth.logout()">Logout</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page container grid two">
+    <section class="panel">
+      <h2>Welcome to CaseXpert</h2>
+      <p class="muted">Follow these steps to get value fast.</p>
+      <ol>
+        <li>Create your first case in the <a href="/cases.html" data-auth="protected">Case Tracker</a>.</li>
+        <li>Add at least two <a href="/lawyers.html" data-auth="protected">Lawyers</a> to your directory.</li>
+        <li>Try <a href="/drafting.html" data-auth="protected">Document Drafting</a> with our templates.</li>
+        <li>Ask the <a href="/index.html#assistant">AI Assistant</a> a legal question.</li>
+      </ol>
+      <div class="row" style="margin-top:10px">
+        <a class="btn primary" data-auth="protected" href="/cases.html">Open Case Tracker</a>
+      </div>
+      <div id="output" class="output"></div>
+    </section>
+
+    <section class="panel">
+      <h2>Tips</h2>
+      <ul>
+        <li>Use search in Cases to quickly find similar matters.</li>
+        <li>Hash documents for integrity checks via API.</li>
+        <li>Keep notes concise and action-oriented.</li>
+      </ul>
+      <div class="panel" style="margin-top:12px">
+        <h3 style="margin:0 0 8px">Resources</h3>
+        <div class="grid two">
+          <a class="btn" href="#">Knowledge Hub</a>
+          <a class="btn" href="#">Support</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer rich"><div class="container copy">© <span id="year"></span> CaseXpert</div></footer>
+  <script src="/auth.js"></script>
+  <script src="/get-started.js" type="module"></script>
+</body>
+</html>

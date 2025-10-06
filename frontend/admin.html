@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Panel • CaseXpert</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="container bar">
+      <a class="brand" href="/index.html"><div class="logo">⚖️</div><span class="name">Case<span class="accent">X</span>pert</span></a>
+      <nav class="nav fancy-nav">
+        <a class="btn" href="/cases.html">Cases</a>
+        <button class="btn" id="logoutNav" onclick="CaseXAuth.logout()">Logout</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page container grid two">
+    <section class="panel">
+      <h2>Users</h2>
+      <table class="table" id="usersTable">
+        <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>LawyerId</th><th>Actions</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <section class="panel">
+      <h2>Cases</h2>
+      <table class="table" id="casesTable">
+        <thead><tr><th>Title</th><th>Client</th><th>Lawyer</th><th>Status</th><th>Assign</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </section>
+  </main>
+
+  <footer class="footer rich"><div class="container copy">© <span id="year"></span> CaseXpert</div></footer>
+  <script src="/auth.js"></script>
+  <script>CaseXAuth.requireRole('admin');</script>
+  <script src="/admin.js" type="module"></script>
+</body>
+</html>

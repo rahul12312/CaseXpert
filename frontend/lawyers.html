@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lawyers • CaseXpert</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="container bar">
+      <div class="brand"><div class="logo">⚖️</div><span class="name">Case<span class="accent">X</span>pert</span></div>
+      <nav class="nav">
+        <a class="btn ghost" href="/index.html">Home</a>
+        <a class="btn" href="/cases.html">Cases</a>
+        <a class="btn primary" href="/login.html">Login</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page container grid two">
+    <section class="panel">
+      <h2>Add Lawyer</h2>
+      <form id="lawyerForm">
+        <div class="field">
+          <label>Name</label>
+          <input id="name" placeholder="Full name" required />
+        </div>
+        <div class="field">
+          <label>Expertise (comma separated)</label>
+          <input id="expertise" placeholder="e.g., Civil, Family" />
+        </div>
+        <div class="field">
+          <label>City</label>
+          <input id="city" placeholder="City" />
+        </div>
+        <div class="field">
+          <label>Rating</label>
+          <input id="rating" type="number" step="0.1" min="0" max="5" value="4.5" />
+        </div>
+        <div class="row">
+          <button class="btn primary" type="submit">Add</button>
+        </div>
+      </form>
+      <div id="out" class="output"></div>
+    </section>
+
+    <section class="panel">
+      <h2>Lawyer Directory</h2>
+      <div id="cards" class="grid three"></div>
+    </section>
+  </main>
+
+  <footer class="footer rich">
+    <div class="container copy">© <span id="year"></span> CaseXpert</div>
+  </footer>
+
+  <script src="/auth.js"></script>
+  <script>CaseXAuth.requireAuth();</script>
+  <script src="/lawyers.js" type="module"></script>
+</body>
+</html>

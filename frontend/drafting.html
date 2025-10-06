@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Document Drafting • CaseXpert</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="container bar">
+      <div class="brand"><div class="logo">⚖️</div><span class="name">Case<span class="accent">X</span>pert</span></div>
+      <nav class="nav fancy-nav">
+        <a class="btn ghost" href="/index.html">Home</a>
+        <a class="btn" href="/cases.html">Cases</a>
+        <button class="btn" id="logoutNav" onclick="CaseXAuth.logout()">Logout</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page container grid two">
+    <section class="panel">
+      <h2>Templates</h2>
+      <div class="field">
+        <label>Choose Template</label>
+        <select id="template">
+          <option value="nda">Mutual NDA</option>
+          <option value="engagement">Client Engagement Letter</option>
+          <option value="notice">Legal Notice</option>
+        </select>
+      </div>
+      <div class="row">
+        <button class="btn" id="load">Load</button>
+        <button class="btn" id="clear">Clear</button>
+      </div>
+      <div class="field" style="margin-top:12px">
+        <label>Variables</label>
+        <textarea id="vars" rows="4" placeholder='{"partyA":"Acme Corp","partyB":"John Doe","date":"2025-10-06"}'></textarea>
+      </div>
+      <div class="row">
+        <button class="btn" id="apply">Apply Variables</button>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Editor</h2>
+      <div class="field">
+        <textarea id="editor" rows="18" placeholder="Template content..."></textarea>
+      </div>
+      <div class="row">
+        <button class="btn" id="aiImprove">AI Improve</button>
+        <button class="btn" id="download">Download</button>
+        <button class="btn" id="copy">Copy</button>
+        <button class="btn" id="hash">SHA-256 Hash</button>
+      </div>
+      <div id="out" class="output"></div>
+    </section>
+  </main>
+
+  <footer class="footer rich"><div class="container copy">© <span id="year"></span> CaseXpert</div></footer>
+  <script src="/auth.js"></script>
+  <script>CaseXAuth.requireAuth();</script>
+  <script src="/drafting.js" type="module"></script>
+</body>
+</html>

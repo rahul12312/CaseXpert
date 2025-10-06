@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cases • CaseXpert</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="container bar">
+      <a class="brand" href="/index.html"><div class="logo">⚖️</div><span class="name">Case<span class="accent">X</span>pert</span></a>
+      <nav class="nav fancy-nav">
+        <a class="btn" data-auth="protected" href="/lawyers.html">Lawyers</a>
+        <a class="btn ghost" id="loginNav" href="/login.html">Login</a>
+        <button class="btn" id="logoutNav" style="display:none" onclick="CaseXAuth.logout()">Logout</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page container grid two">
+    <section class="panel">
+      <h2>New Case</h2>
+      <form id="caseForm">
+        <div class="field">
+          <label>Title</label>
+          <input id="title" placeholder="e.g., Acme vs. Doe" required />
+        </div>
+        <div class="field">
+          <label>Status</label>
+          <select id="status">
+            <option value="open">Open</option>
+            <option value="drafting">Drafting</option>
+            <option value="hearing">Hearing</option>
+            <option value="closed">Closed</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Assign Lawyer</label>
+          <select id="lawyer"></select>
+        </div>
+        <div class="field">
+          <label>Description</label>
+          <textarea id="description" rows="4" placeholder="Brief summary..."></textarea>
+        </div>
+        <div class="field">
+          <label>Attachments</label>
+          <input id="files" type="file" multiple />
+          <small class="muted">Choose files to upload and attach to the case</small>
+        </div>
+        <div class="row">
+          <button class="btn primary" type="submit">Create</button>
+          <button class="btn" type="button" id="ask">Ask AI to summarize</button>
+        </div>
+      </form>
+      <div id="outForm" class="output" aria-live="polite"></div>
+    </section>
+
+    <section class="panel">
+      <div class="row" style="justify-content:space-between">
+        <h2>Cases</h2>
+        <div class="row">
+          <input id="q" placeholder="Search description..." />
+          <button class="btn" id="search">Search</button>
+        </div>
+      </div>
+      <table class="table" id="casesTable">
+        <thead>
+          <tr><th>Title</th><th>Lawyer</th><th>Status</th><th>Created</th><th>Actions</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+  </main>
+
+  <footer class="footer rich">
+    <div class="container copy">© <span id="year"></span> CaseXpert</div>
+  </footer>
+
+  <script src="/auth.js"></script>
+  <script>CaseXAuth.requireAuth();</script>
+  <script src="/cases.js" type="module"></script>
+</body>
+</html>

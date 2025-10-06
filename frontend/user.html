@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Cases • CaseXpert</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="container bar">
+      <a class="brand" href="/index.html"><div class="logo">⚖️</div><span class="name">Case<span class="accent">X</span>pert</span></a>
+      <nav class="nav fancy-nav">
+        <a class="btn" href="/cases.html">All Cases</a>
+        <button class="btn" id="logoutNav" onclick="CaseXAuth.logout()">Logout</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page container grid two">
+    <section class="panel">
+      <h2>Open a New Case</h2>
+      <form id="caseForm">
+        <div class="field"><label>Title</label><input id="title" required /></div>
+        <div class="field"><label>Description</label><textarea id="description" rows="4"></textarea></div>
+        <button class="btn primary" type="submit">Submit</button>
+      </form>
+      <div id="out" class="output"></div>
+    </section>
+
+    <section class="panel">
+      <h2>My Cases</h2>
+      <table class="table" id="casesTable"><thead><tr><th>Title</th><th>Status</th><th>Created</th></tr></thead><tbody></tbody></table>
+    </section>
+  </main>
+
+  <footer class="footer rich"><div class="container copy">© <span id="year"></span> CaseXpert</div></footer>
+  <script src="/auth.js"></script>
+  <script>CaseXAuth.requireRole('user');</script>
+  <script src="/user.js" type="module"></script>
+</body>
+</html>

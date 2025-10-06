@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Logged Out • CaseXpert</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="container bar">
+      <a class="brand" href="/index.html"><div class="logo">⚖️</div><span class="name">Case<span class="accent">X</span>pert</span></a>
+      <nav class="nav fancy-nav">
+        <a class="btn primary" href="/login.html">Login again</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="hero center">
+    <div class="container hero-inner center">
+      <h1>You have been logged out</h1>
+      <p class="subtitle">Your session ended successfully. You can safely close this tab or log in again.</p>
+      <div class="cta">
+        <a class="btn primary" href="/login.html">Sign In</a>
+        <a class="btn" href="/index.html">Back to Home</a>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer rich"><div class="container copy">© <span id="year"></span> CaseXpert</div></footer>
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>

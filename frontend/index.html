@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CaseXpert</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="container bar">
+      <div class="brand">
+        <div class="logo">⚖️</div>
+        <span class="name">Case<span class="accent">X</span>pert</span>
+      </div>
+      <nav class="nav fancy-nav">
+        <div class="dropdown">
+          <button id="menuBtn" aria-haspopup="true" aria-expanded="false">
+            ☰ Menu ▾
+          </button>
+          <ul id="menuList" class="dropdown-list" role="menu">
+            <li role="menuitem"><a href="#assistant">AI Assistant</a></li>
+            <li role="menuitem"><a data-auth="protected" href="/cases.html">Case Tracker</a></li>
+            <li role="menuitem"><a data-auth="protected" href="/lawyers.html">Lawyers</a></li>
+            <li role="menuitem"><a data-auth="protected" href="/drafting.html">Document Drafting</a></li>
+            <li role="menuitem"><a href="#video">Video Consult</a></li>
+            <li role="menuitem"><a href="#knowledge">Knowledge Hub</a></li>
+            <li role="menuitem"><a href="#reports">Reports</a></li>
+            <li role="menuitem" data-role="admin"><a data-auth="protected" href="/admin.html">Admin Panel</a></li>
+            <li role="menuitem" data-role="lawyer"><a data-auth="protected" href="/lawyer.html">Lawyer Panel</a></li>
+            <li role="menuitem" data-role="user"><a data-auth="protected" href="/user.html">My Cases</a></li>
+          </ul>
+        </div>
+        <a class="btn ghost" id="loginNav" href="/login.html">Login</a>
+        <button class="btn" id="logoutNav" style="display:none" onclick="CaseXAuth.logout()">Logout</button>
+        <a class="btn primary" href="/get-started.html">Get Started</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero center">
+      <div class="container hero-inner center">
+        <h1>Legal Solutions Powered <br><span class="grad">Artificial Intelligence</span></h1>
+        <p class="subtitle">Transform your legal practice with CaseXpert — AI + legal expertise for faster, smarter case management.</p>
+        <div class="cta">
+          <button class="btn secondary" id="tryAssistant">Try AI Assistant</button>
+          <a class="btn primary" href="/get-started.html">Get Started</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="features container" id="suite">
+      <h2>Complete Legal Management Suite</h2>
+      <p class="subtitle">Everything you need to manage cases, connect with lawyers, and access legal resources in one powerful platform.</p>
+
+      <div class="cards">
+        <article class="card" id="assistant">
+          <div class="icon">🧠</div>
+          <h3>AI Legal Assistant</h3>
+          <p>24/7 Intelligent support for legal queries with voice and text capabilities.</p>
+          <button class="link" data-demo="assistant">Ask a sample question</button>
+        </article>
+
+        <article class="card" id="cases" data-auth="protected">
+          <div class="icon">📁</div>
+          <h3>Case Tracker</h3>
+          <p>Real-time tracking of case status with timeline visualization.</p>
+          <a class="link" href="/cases.html">Open case dashboard →</a>
+        </article>
+
+        <article class="card" id="lawyers" data-auth="protected">
+          <div class="icon">👩‍⚖️</div>
+          <h3>Lawyer Marketplace</h3>
+          <p>Connect with verified legal professionals matching your needs.</p>
+          <a class="link" href="/lawyers.html">Browse lawyers →</a>
+        </article>
+
+        <article class="card" id="video">
+          <div class="icon">🎥</div>
+          <h3>Video Consultation</h3>
+          <p>Secure video calls with lawyers from anywhere.</p>
+        </article>
+
+        <article class="card" id="drafting" data-auth="protected">
+          <div class="icon">📄</div>
+          <h3>Document Drafting</h3>
+          <p>AI-powered legal document templates and automation.</p>
+          <a class="link" href="/drafting.html">Open drafting tool →</a>
+        </article>
+
+        <article class="card" id="reports">
+          <div class="icon">📊</div>
+          <h3>Advanced Reports</h3>
+          <p>Comprehensive analytics and insights for case management.</p>
+        </article>
+      </div>
+
+      <div id="output" class="output" aria-live="polite"></div>
+    </section>
+  </main>
+
+  <section class="cta-band">
+    <div class="container cta-row">
+      <h3>Ready to transform your legal workflows?</h3>
+      <div class="cta">
+        <a class="btn primary" href="/login.html">Get Started Free</a>
+        <a class="btn ghost" href="#contact">Contact Sales</a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer rich">
+    <div class="container footer-grid">
+      <div>
+        <div class="brand"><div class="logo">⚖️</div><span class="name">Case<span class="accent">X</span>pert</span></div>
+        <p class="muted">Empowering legal professionals with AI-driven solutions for case management, document automation, and intelligent insights.</p>
+        <p class="muted small">📧 contact@casexpert.com<br/>☎️ +1 (555) 123-4567<br/>📍 123 Legal Street, Law City, LC 12345</p>
+      </div>
+      <div>
+        <h4>Product</h4>
+        <ul class="linklist">
+          <li><a href="/index.html#assistant">AI Assistant</a></li>
+          <li><a href="/cases.html">Case Tracker</a></li>
+          <li><a href="/lawyers.html">Lawyer Marketplace</a></li>
+          <li><a href="#video">Video Consult</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Company</h4>
+        <ul class="linklist">
+          <li><a href="#about">About Us</a></li>
+          <li><a href="#contact">Contact</a></li>
+          <li><a href="#careers">Careers</a></li>
+          <li><a href="#blog">Blog</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Legal</h4>
+        <ul class="linklist">
+          <li><a href="#terms">Terms & Conditions</a></li>
+          <li><a href="#privacy">Privacy Policy</a></li>
+          <li><a href="#cookie">Cookie Policy</a></li>
+          <li><a href="#disclaimer">Disclaimer</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="container copy">© <span id="year"></span> CaseXpert. All rights reserved.</div>
+  </footer>
+
+  <script src="/auth.js"></script>
+  <script src="/app.js" type="module"></script>
+  <!-- Chatbot Widget -->
+  <button id="chatFab" class="chat-fab" aria-label="Open legal assistant">💬</button>
+  <div id="chatPanel" class="chat-panel" aria-live="polite" aria-hidden="true">
+    <div class="chat-head">
+      <strong>CaseXpert Assistant</strong>
+      <button id="chatClose" class="btn">✕</button>
+    </div>
+    <div class="chat-body" id="chatBody"></div>
+    <div class="chat-actions">
+      <input id="chatInput" placeholder="Ask a legal question or search keywords..." />
+      <div class="row">
+        <button id="chatAsk" class="btn primary">Ask AI</button>
+        <button id="chatSearch" class="btn">Search Cases</button>
+      </div>
+    </div>
+  </div>
+  <script src="/chatbot.js" type="module"></script>
+</body>
+</html>
