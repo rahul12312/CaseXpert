@@ -7,6 +7,7 @@ CaseXpert is a lightweight legal management prototype built with Node.js + Expre
 Prerequisites: Node.js 18+
 
 ```bash
+# cd backend npm install then cd .. then run npm run dev
 # 1) Install backend dependencies
 npm install --prefix backend
 
