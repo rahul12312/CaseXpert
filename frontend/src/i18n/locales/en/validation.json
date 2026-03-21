@@ -1,0 +1,120 @@
+{
+    "required": "This field is required",
+    "invalid": "Invalid value",
+    "email": {
+        "required": "Email is required",
+        "invalid": "Please enter a valid email address",
+        "taken": "This email is already registered",
+        "format": "Email format: example@email.com"
+    },
+    "password": {
+        "required": "Password is required",
+        "minLength": "Password must be at least {{min}} characters",
+        "maxLength": "Password must not exceed {{max}} characters",
+        "weak": "Password is too weak",
+        "medium": "Password strength: Medium",
+        "strong": "Password strength: Strong",
+        "mismatch": "Passwords do not match",
+        "requirements": "Password must contain: uppercase, lowercase, number, and special character",
+        "current": "Current password is incorrect"
+    },
+    "name": {
+        "required": "Name is required",
+        "minLength": "Name must be at least {{min}} characters",
+        "maxLength": "Name must not exceed {{max}} characters",
+        "invalid": "Name can only contain letters and spaces",
+        "format": "Please enter first and last name"
+    },
+    "phone": {
+        "required": "Phone number is required",
+        "invalid": "Please enter a valid phone number",
+        "format": "Phone number should be 10 digits",
+        "taken": "This phone number is already registered"
+    },
+    "date": {
+        "required": "Date is required",
+        "invalid": "Please select a valid date",
+        "past": "Date cannot be in the past",
+        "future": "Date cannot be in the future",
+        "range": "Please select a date between {{start}} and {{end}}",
+        "format": "Date format: DD/MM/YYYY"
+    },
+    "time": {
+        "required": "Time is required",
+        "invalid": "Please select a valid time",
+        "past": "Time cannot be in the past",
+        "format": "Time format: HH:MM"
+    },
+    "file": {
+        "required": "Please select a file",
+        "size": "File size must not exceed {{max}}MB",
+        "type": "File type must be {{types}}",
+        "tooMany": "You can upload maximum {{max}} files",
+        "uploadFailed": "File upload failed",
+        "invalidFormat": "Invalid file format"
+    },
+    "number": {
+        "required": "This field is required",
+        "invalid": "Please enter a valid number",
+        "min": "Value must be at least {{min}}",
+        "max": "Value must not exceed {{max}}",
+        "positive": "Value must be positive",
+        "integer": "Value must be a whole number",
+        "decimal": "Value must be a decimal number"
+    },
+    "text": {
+        "required": "This field is required",
+        "minLength": "Must be at least {{min}} characters",
+        "maxLength": "Must not exceed {{max}} characters",
+        "pattern": "Invalid format",
+        "alphanumeric": "Only letters and numbers allowed",
+        "alphabetic": "Only letters allowed",
+        "noSpecialChars": "Special characters are not allowed"
+    },
+    "select": {
+        "required": "Please select an option",
+        "invalid": "Invalid selection"
+    },
+    "checkbox": {
+        "required": "This field is required",
+        "minSelect": "Please select at least {{min}} options",
+        "maxSelect": "You can select maximum {{max}} options"
+    },
+    "url": {
+        "required": "URL is required",
+        "invalid": "Please enter a valid URL",
+        "format": "URL format: https://example.com"
+    },
+    "address": {
+        "required": "Address is required",
+        "minLength": "Address must be at least {{min}} characters",
+        "maxLength": "Address must not exceed {{max}} characters"
+    },
+    "pincode": {
+        "required": "Pincode is required",
+        "invalid": "Please enter a valid pincode",
+        "format": "Pincode should be 6 digits"
+    },
+    "age": {
+        "required": "Age is required",
+        "min": "Minimum age is {{min}} years",
+        "max": "Maximum age is {{max}} years",
+        "invalid": "Please enter a valid age"
+    },
+    "terms": {
+        "required": "You must agree to the terms and conditions"
+    },
+    "common": {
+        "cannotBeEmpty": "Cannot be empty",
+        "invalidFormat": "Invalid format",
+        "pleaseCheck": "Please check this field",
+        "required_field": "Required field"
+    },
+    "message": {
+        "success": "Validation successful",
+        "error": "Please fix the errors before submitting",
+        "checking": "Validating...",
+        "valid": "Valid",
+        "invalid": "Invalid"
+    }
+}

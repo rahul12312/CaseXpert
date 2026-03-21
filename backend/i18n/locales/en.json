@@ -1,0 +1,91 @@
+{
+    "auth": {
+        "login_success": "Login successful",
+        "logout_success": "Logged out successfully",
+        "registration_success": "Account created successfully",
+        "password_reset_sent": "Password reset link sent to your email",
+        "password_changed": "Password changed successfully",
+        "invalid_credentials": "Invalid email or password",
+        "account_deactivated": "Your account has been deactivated",
+        "session_expired": "Your session has expired. Please login again",
+        "token_invalid": "Invalid authentication token",
+        "unauthorized": "You are not authorized to perform this action",
+        "access_denied": "Access denied. You don't have permission"
+    },
+    "validation": {
+        "required_field": "{{field}} is required",
+        "invalid_email": "Please enter a valid email address",
+        "invalid_phone": "Please enter a valid phone number",
+        "password_too_short": "Password must be at least 8 characters",
+        "password_mismatch": "Passwords do not match",
+        "user_exists": "User with this email already exists"
+    },
+    "success": {
+        "created": "{{resource}} created successfully",
+        "updated": "{{resource}} updated successfully",
+        "deleted": "{{resource}} deleted successfully",
+        "saved": "Changes saved successfully",
+        "case_created": "Case created successfully",
+        "booking_confirmed": "Booking confirmed successfully",
+        "review_submitted": "Review submitted successfully",
+        "document_uploaded": "Document uploaded successfully",
+        "message_sent": "Message sent successfully"
+    },
+    "errors": {
+        "generic": "An error occurred. Please try again",
+        "not_found": "{{resource}} not found",
+        "server_error": "Internal server error. Please try again later",
+        "database_error": "Database error occurred",
+        "network_error": "Network error. Please check your connection",
+        "unauthorized_access": "Unauthorized access",
+        "forbidden": "You don't have permission to access this resource",
+        "invalid_request": "Invalid request",
+        "resource_exists": "{{resource}} already exists",
+        "operation_failed": "Operation failed. Please try again"
+    },
+    "booking": {
+        "slot_unavailable": "This time slot is no longer available",
+        "booking_created": "Booking created successfully",
+        "booking_cancelled": "Booking cancelled successfully",
+        "booking_updated": "Booking updated successfully",
+        "booking_confirmed": "Your booking has been confirmed",
+        "booking_rejected": "Your booking has been rejected"
+    },
+    "case": {
+        "created": "Case created successfully",
+        "updated": "Case updated successfully",
+        "deleted": "Case deleted successfully",
+        "status_updated": "Case status updated",
+        "not_found": "Case not found",
+        "access_denied": "You don't have access to this case"
+    },
+    "lawyer": {
+        "not_found": "Lawyer not found",
+        "unavailable": "Lawyer is currently unavailable",
+        "profile_verified": "Lawyer profile is verified",
+        "pending_verification": "Your lawyer profile is pending verification"
+    },
+    "notification": {
+        "new_message": "You have a new message",
+        "new_booking": "New booking received",
+        "booking_confirmed": "Your booking has been confirmed",
+        "case_updated": "Case has been updated",
+        "hearing_reminder": "Hearing reminder: {{case_title}} on {{date}}",
+        "document_uploaded": "New document uploaded to {{case_title}}",
+        "payment_received": "Payment received for {{booking_id}}"
+    },
+    "common": {
+        "welcome": "Welcome",
+        "thank_you": "Thank you",
+        "please_wait": "Please wait",
+        "loading": "Loading",
+        "processing": "Processing",
+        "success": "Success",
+        "failed": "Failed",
+        "cancelled": "Cancelled",
+        "completed": "Completed",
+        "pending": "Pending",
+        "approved": "Approved",
+        "rejected": "Rejected"
+    }
+}
