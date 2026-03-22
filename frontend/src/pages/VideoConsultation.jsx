@@ -6,7 +6,7 @@ import api from '../lib/api';
 import { Video, ShieldAlert, Loader2, Home } from 'lucide-react';
 
 const VideoConsultation = () => {
-    const { caseId } = useParams();
+    const { roomId } = useParams();
     const { user } = useAuth();
     const navigate = useNavigate();
     
@@ -15,7 +15,7 @@ const VideoConsultation = () => {
     const [error, setError] = useState(null);
     const [joined, setJoined] = useState(false);
 
-    const roomName = `consultation_${caseId}`;
+    const roomName = `consultation_${roomId}`;
 
     useEffect(() => {
         if (!user) {
@@ -23,7 +23,7 @@ const VideoConsultation = () => {
             return;
         }
 
-        if (!caseId) {
+        if (!roomId) {
             setError('Missing consultation ID');
             setLoading(false);
             return;
@@ -48,7 +48,7 @@ const VideoConsultation = () => {
         };
 
         fetchToken();
-    }, [caseId, user, navigate, roomName]);
+    }, [roomId, user, navigate, roomName]);
 
     const handleJoin = () => {
         setJoined(true);
@@ -101,6 +101,7 @@ const VideoConsultation = () => {
                 token={token} 
                 roomName={roomName} 
                 username={user.name || user.email} 
+                userRole={user.role || user.user_type}
                 onLeave={handleLeave} 
             />
         );
@@ -117,7 +118,7 @@ const VideoConsultation = () => {
                         
                         <h1 className="text-4xl font-black text-white mb-4 tracking-tight">Ready to Join?</h1>
                         <p className="text-lg text-slate-400 mb-10 max-w-sm mx-auto">
-                            You are about to enter a secure video consultation for <span className="text-indigo-400 font-semibold">ID #{caseId}</span>.
+                            You are about to enter a secure video consultation for <span className="text-indigo-400 font-semibold">REF #{roomId}</span>.
                         </p>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10">

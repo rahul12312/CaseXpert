@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import api from '../lib/api';
 import { useAuth } from '../context/AuthContext';
+import { Video } from 'lucide-react';
 
 const LawyerAcceptedCases = () => {
     const { user } = useAuth();
+    const navigate = useNavigate();
     const [cases, setCases] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -135,64 +137,67 @@ const LawyerAcceptedCases = () => {
                         {/* Cases Grid */}
                         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                             {cases.map((caseItem) => (
-                                <Link
+                                <div
                                     key={caseItem.id}
-                                    to={`/case/details/${caseItem.id}`}
-                                    className="group rounded-lg bg-white dark:bg-slate-800 p-6 shadow-md hover:shadow-xl transition-all border border-slate-200 dark:border-slate-700"
+                                    className="group rounded-xl bg-white dark:bg-slate-800 p-6 shadow-md hover:shadow-xl transition-all border border-slate-200 dark:border-slate-700 flex flex-col"
                                 >
                                     {/* Header */}
                                     <div className="mb-4 flex items-start justify-between">
                                         <div className="flex-1">
-                                            <h3 className="font-semibold text-slate-900 dark:text-white group-hover:text-primary-600 transition-colors line-clamp-2">
+                                            <h3 className="font-bold text-lg text-slate-900 dark:text-white line-clamp-2">
                                                 {caseItem.title}
                                             </h3>
-                                            <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
+                                            <p className="mt-1 text-sm font-mono text-slate-500">
                                                 #{caseItem.case_number}
                                             </p>
                                         </div>
                                     </div>
 
                                     {/* Status & Priority Badges */}
-                                    <div className="mb-4 flex flex-wrap gap-2">
-                                        <span className={`rounded-full px-3 py-1 text-xs font-medium border ${getStatusColor(caseItem.status)}`}>
-                                            {caseItem.status?.toUpperCase()}
+                                    <div className="mb-6 flex flex-wrap gap-2">
+                                        <span className={`rounded-full px-3 py-1 text-[10px] font-bold border uppercase transition-colors ${getStatusColor(caseItem.status)}`}>
+                                            {caseItem.status}
                                         </span>
-                                        <span className={`rounded-full px-3 py-1 text-xs font-medium border ${getPriorityColor(caseItem.priority)}`}>
-                                            {caseItem.priority?.toUpperCase()}
+                                        <span className={`rounded-full px-3 py-1 text-[10px] font-bold border uppercase transition-colors ${getPriorityColor(caseItem.priority)}`}>
+                                            {caseItem.priority}
                                         </span>
                                     </div>
 
                                     {/* Client Info */}
-                                    <div className="mb-4 space-y-2 text-sm">
-                                        <div className="flex items-center gap-2 text-slate-700 dark:text-slate-300">
-                                            <span>👤</span>
-                                            <span className="font-medium">Client:</span>
-                                            <span className="text-slate-600 dark:text-slate-400">{caseItem.user_name}</span>
-                                        </div>
-                                        <div className="flex items-center gap-2 text-slate-700 dark:text-slate-300">
-                                            <span>⚖️</span>
-                                            <span className="font-medium">Type:</span>
-                                            <span className="text-slate-600 dark:text-slate-400">{caseItem.case_type}</span>
-                                        </div>
-                                        {caseItem.court_name && (
-                                            <div className="flex items-center gap-2 text-slate-700 dark:text-slate-300">
-                                                <span>🏛️</span>
-                                                <span className="font-medium">Court:</span>
-                                                <span className="text-slate-600 dark:text-slate-400 line-clamp-1">{caseItem.court_name}</span>
+                                    <div className="mb-6 space-y-3 text-sm flex-grow">
+                                        <div className="flex items-center gap-3 text-slate-700 dark:text-slate-300">
+                                            <span className="text-lg">👤</span>
+                                            <div>
+                                                <p className="text-[10px] uppercase font-bold text-slate-400 leading-none mb-1">Client</p>
+                                                <p className="font-semibold">{caseItem.user_name}</p>
                                             </div>
-                                        )}
+                                        </div>
+                                        <div className="flex items-center gap-3 text-slate-700 dark:text-slate-300">
+                                            <span className="text-lg">⚖️</span>
+                                            <div>
+                                                <p className="text-[10px] uppercase font-bold text-slate-400 leading-none mb-1">Type</p>
+                                                <p className="font-semibold">{caseItem.case_type}</p>
+                                            </div>
+                                        </div>
                                     </div>
 
-                                    {/* Stats */}
-                                    <div className="flex items-center gap-4 text-xs text-slate-600 dark:text-slate-400 border-t border-slate-200 dark:border-slate-700 pt-4">
-                                        <span className="flex items-center gap-1">
-                                            📄 {caseItem.document_count || 0} docs
-                                        </span>
-                                        <span className="flex items-center gap-1">
-                                            📝 {caseItem.update_count || 0} updates
-                                        </span>
+                                    {/* Actions */}
+                                    <div className="grid grid-cols-2 gap-3 pt-4 border-t border-slate-100 dark:border-slate-700">
+                                        <Link
+                                            to={`/cases/${caseItem.id}`}
+                                            className="flex items-center justify-center px-4 py-2 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg text-sm font-bold hover:bg-slate-200 dark:hover:bg-slate-600 transition-all"
+                                        >
+                                            Details
+                                        </Link>
+                                        <Link
+                                            to={`/consultation/C${caseItem.id}`}
+                                            className="flex items-center justify-center px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-bold hover:bg-indigo-700 transition-all gap-2 shadow-md shadow-indigo-200 dark:shadow-none"
+                                        >
+                                            <Video size={16} />
+                                            Video Call
+                                        </Link>
                                     </div>
-                                </Link>
+                                </div>
                             ))}
                         </div>
                     </>

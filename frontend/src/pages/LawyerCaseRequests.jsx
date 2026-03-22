@@ -10,6 +10,7 @@ const LawyerCaseRequests = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [accepting, setAccepting] = useState(null);
+    const [declining, setDeclining] = useState(null);
 
     useEffect(() => {
         if (!isLawyer()) {
@@ -46,6 +47,22 @@ const LawyerCaseRequests = () => {
             alert(err.response?.data?.message || 'Failed to accept case. Please try again.');
         } finally {
             setAccepting(null);
+        }
+    };
+
+    const handleDeclineCase = async (caseId) => {
+        if (!window.confirm('Are you sure you want to decline this case request?')) return;
+        
+        setDeclining(caseId);
+        try {
+            await api.post(`/lawyer-dashboard/case-requests/${caseId}/decline`);
+            setRequests(prev => prev.filter(r => r.id !== caseId));
+            alert('Case declined successfully.');
+        } catch (err) {
+            console.error('Error declining case:', err);
+            alert(err.response?.data?.message || 'Failed to decline case.');
+        } finally {
+            setDeclining(null);
         }
     };
 
@@ -146,14 +163,21 @@ const LawyerCaseRequests = () => {
                                     <div className="ml-4 flex flex-col gap-2">
                                         <button
                                             onClick={() => handleAcceptCase(request.id)}
-                                            disabled={accepting === request.id}
-                                            className="rounded-md bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                                            disabled={accepting === request.id || declining === request.id}
+                                            className="rounded-md bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
                                         >
                                             {accepting === request.id ? 'Accepting...' : 'Accept Case'}
                                         </button>
                                         <button
+                                            onClick={() => handleDeclineCase(request.id)}
+                                            disabled={accepting === request.id || declining === request.id}
+                                            className="rounded-md bg-red-50 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-100 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed border border-red-200 transition-colors"
+                                        >
+                                            {declining === request.id ? 'Declining...' : 'Decline Case'}
+                                        </button>
+                                        <button
                                             onClick={() => navigate(`/cases/${request.id}`)}
-                                            className="rounded-md bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200"
+                                            className="rounded-md bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200 transition-colors"
                                         >
                                             View Details
                                         </button>

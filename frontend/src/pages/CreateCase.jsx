@@ -1,10 +1,15 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import api from '../lib/api';
 import Toast from '../components/Toast';
 
 const CreateCase = () => {
     const navigate = useNavigate();
+    const location = useLocation();
+    const queryParams = new URLSearchParams(location.search);
+    const assignedLawyerId = queryParams.get('lawyer_id');
+    const assignedLawyerName = queryParams.get('lawyer_name');
+
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState({});
     const [generalError, setGeneralError] = useState('');
@@ -22,6 +27,7 @@ const CreateCase = () => {
         opponent_name: '',
         opponent_lawyer: ''
     });
+    const [files, setFiles] = useState([]);
     const [showMoreOptions, setShowMoreOptions] = useState(false);
 
     // Ensure error states are clear on mount
@@ -64,7 +70,8 @@ const CreateCase = () => {
                 court_name: formData.court_name.trim() || undefined,
                 filing_date: formData.filing_date || undefined,
                 opponent_name: formData.opponent_name.trim() || undefined,
-                opponent_lawyer: formData.opponent_lawyer.trim() || undefined
+                opponent_lawyer: formData.opponent_lawyer.trim() || undefined,
+                lawyer_id: assignedLawyerId ? parseInt(assignedLawyerId, 10) : undefined
             };
 
             console.log('Submitting case data to /api/cases:', submitData);
@@ -73,6 +80,23 @@ const CreateCase = () => {
             const response = await api.post('/cases', submitData);
 
             if (response.data.success) {
+                const caseId = response.data.data.case_id;
+
+                if (files.length > 0) {
+                    for (const file of files) {
+                        const fileData = new FormData();
+                        fileData.append('case_id', caseId);
+                        fileData.append('file', file);
+                        try {
+                            await api.post('/cases/upload-document', fileData, {
+                                headers: { 'Content-Type': 'multipart/form-data' }
+                            });
+                        } catch (err) {
+                            console.error('Failed to upload file:', file.name, err);
+                        }
+                    }
+                }
+
                 // Show toast notification
                 setToastMessage(`Case #${response.data.data.case_number} created successfully!`);
                 setShowToast(true);
@@ -124,6 +148,20 @@ const CreateCase = () => {
                 <h1 className="text-3xl font-bold text-slate-900 dark:text-white">Create New Case</h1>
                 <p className="mt-2 text-slate-600 dark:text-slate-400">Enter the details of the new legal case.</p>
             </div>
+
+            {assignedLawyerId && (
+                <div className="mb-6 rounded-xl border border-indigo-200 bg-indigo-50 p-4 dark:border-indigo-900/50 dark:bg-indigo-900/20 flex items-start gap-3">
+                    <svg className="h-5 w-5 text-indigo-600 dark:text-indigo-400 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <div>
+                        <h3 className="text-sm font-medium text-indigo-900 dark:text-indigo-300">Lawyer Assignment</h3>
+                        <p className="mt-1 text-sm text-indigo-700 dark:text-indigo-400">
+                            This case will be automatically assigned to <strong>{assignedLawyerName || 'Selected Lawyer'}</strong> upon creation.
+                        </p>
+                    </div>
+                </div>
+            )}
 
             {/* General Error Message */}
             {generalError && (
@@ -298,6 +336,36 @@ const CreateCase = () => {
                         </div>
                     </div>
                 )}
+
+                {/* File Upload Section */}
+                <div className="space-y-2 pt-4 border-t border-slate-100 dark:border-slate-800">
+                    <label className="text-sm font-medium text-slate-900 dark:text-slate-200">
+                        Attachments (Optional)
+                    </label>
+                    <input
+                        type="file"
+                        multiple
+                        onChange={(e) => setFiles(Array.from(e.target.files))}
+                        className="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-2 text-slate-900 dark:text-white focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                        accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png"
+                    />
+                    <p className="text-xs text-slate-500 mt-1">You can upload PDF, Word documents, text files, or photos.</p>
+                    {files.length > 0 && (
+                        <ul className="mt-3 space-y-2">
+                            {files.map((file, index) => (
+                                <li key={index} className="text-sm text-slate-700 dark:text-slate-300 flex items-center gap-2 bg-slate-50 dark:bg-slate-800/50 p-2 rounded-lg border border-slate-100 dark:border-slate-700">
+                                    <svg className="w-4 h-4 text-primary-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                                    </svg>
+                                    <span className="truncate">{file.name}</span>
+                                    <span className="text-xs text-slate-400 ml-auto flex-shrink-0">
+                                        {(file.size / 1024 / 1024).toFixed(2)} MB
+                                    </span>
+                                </li>
+                            ))}
+                        </ul>
+                    )}
+                </div>
 
                 <div className="flex justify-end gap-4 pt-4">
                     <button

@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Video from 'twilio-video';
 import VideoControls from './VideoControls';
-import { User, ShieldCheck, Clock, MessageSquare, Send, X, Video as VideoIcon, MicOff } from 'lucide-react';
+import { User, ShieldCheck, Clock, MessageSquare, Send, X, Video as VideoIcon, MicOff, ShieldAlert, Loader2 } from 'lucide-react';
 
-const VideoRoom = ({ token, roomName, username, onLeave }) => {
+const VideoRoom = ({ token, roomName, username, userRole, onLeave }) => {
     const [room, setRoom] = useState(null);
     const [participants, setParticipants] = useState([]);
     const [isMuted, setIsMuted] = useState(false);
@@ -15,6 +15,7 @@ const VideoRoom = ({ token, roomName, username, onLeave }) => {
     const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState('');
     const [isRecording, setIsRecording] = useState(false);
+    const [error, setError] = useState(null);
 
     const localVideoRef = useRef();
     const remoteMediaRef = useRef();
@@ -40,21 +41,50 @@ const VideoRoom = ({ token, roomName, username, onLeave }) => {
     };
 
     useEffect(() => {
+        let isMounted = true;
+        let activeRoom = null;
+
+        const attachTrack = (track) => {
+            if (!remoteMediaRef.current || track.kind === 'data') return;
+            const el = track.attach();
+            if (track.kind === 'video') {
+                el.style.width = '100%';
+                el.style.height = '100%';
+                el.style.objectFit = 'cover';
+            }
+            remoteMediaRef.current.appendChild(el);
+            console.log(`✅ Attached remote ${track.kind} track`);
+        };
+
         const participantConnected = (participant) => {
-            setParticipants((prevParticipants) => [...prevParticipants, participant]);
-            
+            console.log('👤 Participant joined:', participant.identity, participant.sid);
+            setParticipants((prevParticipants) => {
+                if (!prevParticipants.find(p => p.sid === participant.sid)) {
+                    console.log('🆕 Adding new participant to state');
+                    return [...prevParticipants, participant];
+                }
+                return prevParticipants;
+            });
+
+            // Attach tracks that are ALREADY subscribed (e.g. second person joining)
             participant.tracks.forEach((publication) => {
-                if (publication.isSubscribed) {
-                    const track = publication.track;
-                    remoteMediaRef.current.appendChild(track.attach());
+                console.log(`📼 Track: ${publication.kind}, subscribed=${publication.isSubscribed}, track=${!!publication.track}`);
+                if (publication.isSubscribed && publication.track) {
+                    attachTrack(publication.track);
                 }
             });
 
+            // Listen for future track subscriptions
             participant.on('trackSubscribed', (track) => {
-                remoteMediaRef.current.appendChild(track.attach());
+                console.log('🔔 Track subscribed:', track.kind);
+                attachTrack(track);
             });
 
-            // Handle data tracks for chat if needed (simplified for this demo)
+            participant.on('trackUnsubscribed', (track) => {
+                console.log('🔕 Track unsubscribed:', track.kind);
+                track.detach().forEach(element => element.remove());
+            });
+
             setMessages(prev => [...prev, { system: true, text: `${participant.identity} joined the consultation` }]);
         };
 
@@ -62,6 +92,12 @@ const VideoRoom = ({ token, roomName, username, onLeave }) => {
             setParticipants((prevParticipants) =>
                 prevParticipants.filter((p) => p !== participant)
             );
+            // Optionally detach tracks left behind
+            participant.tracks.forEach((publication) => {
+                if (publication.track) {
+                    publication.track.detach().forEach(element => element.remove());
+                }
+            });
             setMessages(prev => [...prev, { system: true, text: `${participant.identity} left the consultation` }]);
         };
 
@@ -70,35 +106,62 @@ const VideoRoom = ({ token, roomName, username, onLeave }) => {
             video: true,
             audio: true
         }).then((room) => {
+            if (!isMounted) {
+                // If unmounted before connect resolved
+                room.disconnect();
+                return;
+            }
+            activeRoom = room;
             setRoom(room);
+            console.log('✅ Connected to Twilio room:', room.name);
+            console.log('👥 Current participants:', room.participants.size);
+            room.participants.forEach(p => console.log('👤 Present:', p.identity));
             
-            // Attach local tracks
+            // Attach local tracks securely
             const localParticipant = room.localParticipant;
+            if (localVideoRef.current) {
+                localVideoRef.current.innerHTML = ''; // Wipe existing tracks to prevent dupes
+            }
             localParticipant.videoTracks.forEach(publication => {
-                localVideoRef.current.appendChild(publication.track.attach());
+                if (localVideoRef.current) {
+                    localVideoRef.current.appendChild(publication.track.attach());
+                }
             });
 
             room.on('participantConnected', participantConnected);
             room.on('participantDisconnected', participantDisconnected);
             room.participants.forEach(participantConnected);
+
+            room.on('disconnected', () => {
+                if (isMounted) {
+                    setRoom(null);
+                    setParticipants([]);
+                }
+            });
         }).catch(err => {
             console.error('Twilio Video Connect Error:', err);
+            if (isMounted) {
+                if (err.name === 'NotAllowedError' || err.message.includes('Permission denied')) {
+                    setError('Camera and Microphone access was denied. Please enable them in your browser settings and refresh to join the consultation.');
+                } else {
+                    setError(`Connection Error: ${err.message}`);
+                }
+            }
         });
 
         return () => {
-            setRoom((currentRoom) => {
-                if (currentRoom && currentRoom.localParticipant.state === 'connected') {
-                    currentRoom.localParticipant.tracks.forEach((publication) => {
-                        publication.track.stop();
-                        const attachedElements = publication.track.detach();
-                        attachedElements.forEach((element) => element.remove());
+            isMounted = false;
+            if (activeRoom) {
+                if (activeRoom.localParticipant.state === 'connected') {
+                    activeRoom.localParticipant.tracks.forEach((publication) => {
+                        if (publication.track) {
+                            publication.track.stop();
+                            publication.track.detach().forEach(el => el.remove());
+                        }
                     });
-                    currentRoom.disconnect();
-                    return null;
-                } else {
-                    return currentRoom;
                 }
-            });
+                activeRoom.disconnect();
+            }
         };
     }, [token, roomName]);
 
@@ -223,7 +286,21 @@ const VideoRoom = ({ token, roomName, username, onLeave }) => {
                     <div className="relative flex-grow bg-slate-900 rounded-3xl overflow-hidden border border-white/5 shadow-2xl transition-all duration-500 ring-1 ring-white/10">
                         <div ref={remoteMediaRef} className="h-full w-full object-cover [&>video]:h-full [&>video]:w-full [&>video]:object-cover" />
                         
-                        {participants.length === 0 && (
+                        {error ? (
+                            <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-900 z-50 p-6 text-center">
+                                <div className="bg-red-500/10 p-8 rounded-3xl border border-red-500/20 max-w-md">
+                                    <ShieldAlert className="w-16 h-16 text-red-500 mx-auto mb-4" />
+                                    <h3 className="text-2xl font-bold text-white mb-2">Connection Blocked</h3>
+                                    <p className="text-slate-400 mb-8">{error}</p>
+                                    <button 
+                                        onClick={() => window.location.reload()}
+                                        className="w-full py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl font-semibold transition-all"
+                                    >
+                                        Try Again
+                                    </button>
+                                </div>
+                            </div>
+                        ) : participants.length === 0 && (
                             <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-900 z-10">
                                 <div className="relative">
                                     <div className="absolute inset-0 bg-indigo-500 blur-3xl opacity-20 scale-150 animate-pulse"></div>
@@ -231,9 +308,11 @@ const VideoRoom = ({ token, roomName, username, onLeave }) => {
                                         <User size={64} className="text-slate-500" />
                                     </div>
                                 </div>
-                                <h3 className="mt-8 text-2xl font-semibold text-slate-300">Waiting for Lawyer...</h3>
+                                <h3 className="mt-8 text-2xl font-semibold text-slate-300">
+                                    {userRole === 'lawyer' ? 'Waiting for Client...' : 'Waiting for Lawyer...'}
+                                </h3>
                                 <p className="mt-2 text-slate-500 max-w-xs text-center px-4">
-                                    Your secure consultation will begin as soon as the lawyer joins the room.
+                                    Your secure consultation will begin as soon as the {userRole === 'lawyer' ? 'client' : 'lawyer'} joins the room.
                                 </p>
                                 <div className="mt-8 flex space-x-2">
                                     <div className="w-2 h-2 rounded-full bg-indigo-500 animate-bounce [animation-delay:-0.3s]"></div>

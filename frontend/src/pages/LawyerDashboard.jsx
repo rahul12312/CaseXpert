@@ -57,7 +57,7 @@ const LawyerDashboard = () => {
             const { data } = await api.put(`/bookings/${id}/accept`);
             if (data.success) {
                 // Navigate to meeting room directly
-                navigate(`/consultation/${id}`);
+                navigate(`/consultation/B${id}`);
             }
         } catch (error) {
             alert('Failed to accept meeting');

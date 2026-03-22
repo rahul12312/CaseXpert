@@ -166,7 +166,7 @@ const UserBookings = () => {
                                 )}
                                 {booking.status === 'confirmed' && (
                                     <Link
-                                        to={`/consultation/${booking.id}`}
+                                        to={`/consultation/B${booking.id}`}
                                         className="w-full text-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium transition shadow-sm"
                                     >
                                         Join Meeting

@@ -212,7 +212,7 @@ const LawyerConsultations = () => {
 
                                 <div className="flex gap-2">
                                     <Link
-                                        to={`/consultation/${booking.id}`}
+                                        to={`/consultation/B${booking.id}`}
                                         className="flex-1 bg-blue-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-blue-700 text-center"
                                     >
                                         Start Meeting
