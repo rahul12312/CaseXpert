@@ -57,8 +57,8 @@ const App = () => {
     <div className={`flex min-h-screen flex-col ${isDashboard ? 'bg-slate-950' : 'bg-slate-50 dark:bg-slate-950'} overflow-x-hidden`}>
       <Toaster position="top-center" reverseOrder={false} />
       <VideoNotificationListener />
-      {!isDashboard && <Navbar />}
-      <main className={`${isDashboard ? 'w-full' : 'mx-auto w-full max-w-7xl'} flex flex-1 flex-col ${isDashboard ? 'px-0 pt-0' : 'px-4 pt-24'} pb-8 sm:px-6 lg:px-8 overflow-x-hidden`}>
+      <Navbar />
+      <main className={`flex flex-1 flex-col pt-24 pb-8 sm:px-6 lg:px-8 overflow-x-hidden ${isDashboard ? 'w-full px-0' : 'mx-auto w-full max-w-7xl px-4'}`}>
         {!isDashboard && <BackButton />}
         <Routes>
           {/* ── PUBLIC ROUTES (no login required) ── */}
@@ -93,7 +93,7 @@ const App = () => {
           {/* Case Tracking Routes - Client Only */}
           <Route path="/cases" element={<ProtectedRoute allowedRoles={['client', 'user']}><CaseTracker /></ProtectedRoute>} />
           <Route path="/cases/create" element={<ProtectedRoute allowedRoles={['client', 'user']}><CreateCase /></ProtectedRoute>} />
-          <Route path="/cases/:id" element={<ProtectedRoute allowedRoles={['client', 'user']}><CaseDetails /></ProtectedRoute>} />
+          <Route path="/cases/:id" element={<ProtectedRoute allowedRoles={['client', 'user', 'lawyer']}><CaseDetails /></ProtectedRoute>} />
 
           {/* Reports */}
           <Route path="/reports" element={<ProtectedRoute><ReportsDashboard /></ProtectedRoute>} />
@@ -106,7 +106,7 @@ const App = () => {
 
           {/* Consultation */}
           <Route path="/video-hub" element={<ProtectedRoute><VideoHub /></ProtectedRoute>} />
-          <Route path="/consultation/:caseId" element={<ProtectedRoute><VideoConsultation /></ProtectedRoute>} />
+          <Route path="/consultation/:roomId" element={<ProtectedRoute><VideoConsultation /></ProtectedRoute>} />
           <Route path="/consultation" element={<ProtectedRoute><VideoConsultation /></ProtectedRoute>} />
 
           {/* Insights */}

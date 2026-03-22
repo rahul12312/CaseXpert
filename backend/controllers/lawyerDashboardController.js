@@ -187,10 +187,11 @@ exports.getCaseRequests = async (req, res) => {
         u.id as client_id, u.name as client_name, u.email as client_email
        FROM cases c
        JOIN users u ON c.user_id = u.id
-       WHERE c.lawyer_id IS NULL AND c.status = 'pending'
+       WHERE (c.lawyer_id IS NULL AND c.status = 'pending') 
+          OR (c.lawyer_id = ? AND (c.assignment_status = 'REQUESTED' OR c.status = 'Under Review'))
        ORDER BY c.priority DESC, c.created_at DESC
        LIMIT 50`,
-            []
+            [lawyer.id]
         );
 
         return res.json({
@@ -247,22 +248,22 @@ exports.acceptCaseRequest = async (req, res) => {
             });
         }
 
-        // Check if case exists and is unassigned
+        // Check if case exists and is either unassigned or specifically assigned to this lawyer
         const [cases] = await database.query(
-            "SELECT * FROM cases WHERE id = ? AND lawyer_id IS NULL",
-            [caseId]
+            "SELECT * FROM cases WHERE id = ? AND (lawyer_id IS NULL OR (lawyer_id = ? AND assignment_status = 'REQUESTED'))",
+            [caseId, lawyerId]
         );
 
         if (!cases || cases.length === 0) {
             return res.status(404).json({
                 success: false,
-                message: "Case not found or already assigned"
+                message: "Case not found, already assigned, or you are not authorized to accept it."
             });
         }
 
-        // Assign case to lawyer
+        // Assign case to lawyer and update assignment status
         await database.query(
-            "UPDATE cases SET lawyer_id = ?, status = 'assigned' WHERE id = ?",
+            "UPDATE cases SET lawyer_id = ?, status = 'assigned', assignment_status = 'ACCEPTED' WHERE id = ?",
             [lawyerId, caseId]
         );
 
@@ -276,6 +277,71 @@ exports.acceptCaseRequest = async (req, res) => {
         return res.status(500).json({
             success: false,
             message: "Error accepting case",
+            error: error.message
+        });
+    }
+};
+
+// ============================================================================
+// DECLINE CASE REQUEST
+// ============================================================================
+exports.declineCaseRequest = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const { caseId } = req.params;
+        const database = getDb();
+
+        if (!database) {
+            return res.status(500).json({
+                success: false,
+                message: "Database connection not available"
+            });
+        }
+
+        // Get lawyer record
+        const [lawyers] = await database.query(
+            "SELECT id FROM lawyers WHERE user_id = ?",
+            [userId]
+        );
+
+        if (!lawyers || lawyers.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: "Lawyer profile not found"
+            });
+        }
+
+        const lawyerId = lawyers[0].id;
+
+        // Check if case exists and is requested to this lawyer
+        const [cases] = await database.query(
+            "SELECT * FROM cases WHERE id = ? AND lawyer_id = ? AND assignment_status = 'REQUESTED'",
+            [caseId, lawyerId]
+        );
+
+        if (!cases || cases.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: "Request not found or already processed."
+            });
+        }
+
+        // Reset case to unassigned so client can assign someone else
+        await database.query(
+            "UPDATE cases SET lawyer_id = NULL, status = 'pending', assignment_status = 'UNASSIGNED' WHERE id = ?",
+            [caseId]
+        );
+
+        return res.json({
+            success: true,
+            message: "Case declined successfully. It is now unassigned."
+        });
+
+    } catch (error) {
+        console.error("Decline case error:", error.message);
+        return res.status(500).json({
+            success: false,
+            message: "Error declining case",
             error: error.message
         });
     }

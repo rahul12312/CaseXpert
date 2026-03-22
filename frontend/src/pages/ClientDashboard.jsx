@@ -277,7 +277,7 @@ const ClientDashboard = () => {
                                                         {new Date(b.booking_time).toLocaleDateString()} at {new Date(b.booking_time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
                                                     </div>
                                                     {b.status === 'confirmed' && (
-                                                        <Link to={`/consultation/${b.id}`} className="inline-block mt-2 text-[10px] font-black text-emerald-400 uppercase tracking-widest hover:text-emerald-300">
+                                                        <Link to={`/consultation/B${b.id}`} className="inline-block mt-2 text-[10px] font-black text-emerald-400 uppercase tracking-widest hover:text-emerald-300">
                                                             Connect Securely →
                                                         </Link>
                                                     )}

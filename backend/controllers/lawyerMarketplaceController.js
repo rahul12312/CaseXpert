@@ -380,9 +380,15 @@ exports.getFilterOptions = async (req, res) => {
         const uniqueLanguages = new Set();
         languageRows.forEach(row => {
             if (row.languages) {
-                row.languages.split(',').forEach(lang => {
-                    uniqueLanguages.add(lang.trim());
-                });
+                if (typeof row.languages === 'string') {
+                    row.languages.split(',').forEach(lang => {
+                        uniqueLanguages.add(lang.trim());
+                    });
+                } else if (Array.isArray(row.languages)) {
+                    row.languages.forEach(lang => {
+                        uniqueLanguages.add(lang.trim ? lang.trim() : lang);
+                    });
+                }
             }
         });
         const sortedLanguages = Array.from(uniqueLanguages).sort();

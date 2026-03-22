@@ -45,6 +45,13 @@ router.get('/details/:id', caseController.getCaseDetails);
 router.put('/update/:id', caseController.updateCase);
 
 /**
+ * PUT /api/case/:id/assign
+ * Assign an existing case to a lawyer
+ * Body: { lawyer_id }
+ */
+router.put('/:id/assign', caseController.assignCase);
+
+/**
  * PUT /api/case/status/:id
  * Update case status
  * Body: { status }

@@ -106,7 +106,7 @@ exports.getUserBookings = async (req, res) => {
                 u.name as lawyer_name,
                 u.profile_image as lawyer_image,
                 l.specialization,
-                l.fee_per_hour as consultation_fee
+                l.consultation_fee
             FROM bookings b
             LEFT JOIN lawyers l ON b.lawyer_id = l.id
             LEFT JOIN users u ON l.user_id = u.id

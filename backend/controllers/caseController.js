@@ -96,7 +96,7 @@ exports.createCase = async (req, res) => {
           // CRITICAL CHECK: Has the user completed a consultation with this lawyer?
           const [bookings] = await getDatabase().execute(`
              SELECT id FROM bookings 
-             WHERE user_id = ? AND lawyer_id = ? AND status = 'completed'
+             WHERE user_id = ? AND lawyer_id = ? AND status IN ('completed', 'confirmed')
              LIMIT 1
           `, [req.user.id, lawyer.id]);
 
@@ -1097,6 +1097,85 @@ exports.deleteCasePermanently = async (req, res) => {
   } catch (error) {
     console.error('   ❌ Error deleting case permanently:', error);
     res.status(500).json({ success: false, message: 'Failed to delete case' });
+  }
+};
+
+/**
+ * Assign an existing case to a lawyer
+ */
+exports.assignCase = async (req, res) => {
+  try {
+    const caseId = req.params.id;
+    const { lawyer_id } = req.body;
+    const userId = req.user.id;
+
+    console.log('\n📋 ASSIGN CASE REQUEST');
+    console.log(`   Case ID: ${caseId}, Lawyer ID: ${lawyer_id}, User ID: ${userId}`);
+
+    if (!lawyer_id) {
+      return res.status(400).json({ success: false, message: 'Lawyer ID is required' });
+    }
+
+    const { getDatabase } = require('../config/database');
+
+    // 1. Verify the user owns the case and it is unassigned
+    const [cases] = await getDatabase().execute(
+      'SELECT id, assignment_status FROM cases WHERE id = ? AND user_id = ?',
+      [caseId, userId]
+    );
+
+    if (cases.length === 0) {
+      return res.status(403).json({ success: false, message: 'You do not have access to this case.' });
+    }
+
+    if (cases[0].assignment_status !== 'UNASSIGNED') {
+      return res.status(400).json({ success: false, message: 'This case is already assigned or requested.' });
+    }
+
+    // 2. Verify the lawyer exists and the user has a completed consultation
+    const [lawyers] = await getDatabase().execute(`
+      SELECT l.id, u.name 
+      FROM lawyers l
+      JOIN users u ON l.user_id = u.id
+      WHERE l.id = ? AND u.user_type = 'lawyer'
+    `, [lawyer_id]);
+
+    if (lawyers.length === 0) {
+      return res.status(404).json({ success: false, message: 'Lawyer not found.' });
+    }
+
+    const [bookings] = await getDatabase().execute(`
+       SELECT id FROM bookings 
+       WHERE user_id = ? AND lawyer_id = ? AND status IN ('completed', 'confirmed')
+       LIMIT 1
+    `, [userId, lawyer_id]);
+
+    if (bookings.length === 0) {
+      return res.status(403).json({
+        success: false,
+        message: 'You cannot assign a case to this lawyer without a completed consultation first.'
+      });
+    }
+
+    // 3. Update the case
+    await getDatabase().execute(
+      `UPDATE cases SET lawyer_id = ?, assignment_status = 'REQUESTED' WHERE id = ?`,
+      [lawyer_id, caseId]
+    );
+
+    // 4. Activity Log
+    await getDatabase().execute(
+      `INSERT INTO case_activities (case_id, activity, actor_name, actor_role, activity_type)
+       VALUES (?, ?, ?, 'user', 'update')`,
+      [caseId, `Assigned case to ${lawyers[0].name}`, req.user.name || 'User']
+    );
+
+    console.log('   ✅ Case successfully assigned.');
+
+    res.json({ success: true, message: 'Case assigned successfully!' });
+  } catch (error) {
+    console.error('   ❌ Error assigning case:', error);
+    res.status(500).json({ success: false, message: 'Failed to assign case' });
   }
 };
 

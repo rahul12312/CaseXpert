@@ -34,7 +34,7 @@ async function verifyCaseSchema() {
           case_number VARCHAR(100) NOT NULL UNIQUE,
           case_type ENUM('civil', 'criminal', 'corporate', 'family', 'property', 'labor', 'consumer', 'other') NOT NULL,
           priority ENUM('low', 'medium', 'high', 'urgent') DEFAULT 'medium',
-          status ENUM('open', 'in-progress', 'closed', 'archived') DEFAULT 'open',
+          status ENUM('open', 'pending', 'in-progress', 'hearing-scheduled', 'resolved', 'closed', 'archived') DEFAULT 'open',
           court_name VARCHAR(200),
           filing_date DATE,
           opponent_name VARCHAR(200),
@@ -176,7 +176,7 @@ async function verifyCaseSchema() {
             await db.query(`
         CREATE TABLE IF NOT EXISTS case_hearings (
           id INT AUTO_INCREMENT PRIMARY KEY,
-          case_id INT NOT NULL,
+          case_id BIGINT UNSIGNED NOT NULL,
           hearing_date DATETIME NOT NULL,
           purpose VARCHAR(200),
           courtroom VARCHAR(100),
@@ -193,6 +193,29 @@ async function verifyCaseSchema() {
             console.log('   ✅ case_hearings table created');
         } else {
             console.log('   ✅ case_hearings table exists');
+        }
+
+        // 7.5 Check case_intelligence table
+        console.log('\n7.5️⃣  Checking CASE_INTELLIGENCE table...');
+        const [intelligenceTables] = await db.query("SHOW TABLES LIKE 'case_intelligence'");
+
+        if (intelligenceTables.length === 0) {
+            console.log('   Creating case_intelligence table...');
+            await db.query(`
+        CREATE TABLE IF NOT EXISTS case_intelligence (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            case_id BIGINT UNSIGNED NOT NULL,
+            report_data LONGTEXT,
+            risk_score INT,
+            summary TEXT,
+            analysis_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (case_id) REFERENCES cases(id) ON DELETE CASCADE,
+            INDEX idx_case_id (case_id)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+      `);
+            console.log('   ✅ case_intelligence table created');
+        } else {
+            console.log('   ✅ case_intelligence table exists');
         }
 
         // 8. Verify users table exists (required for foreign key)

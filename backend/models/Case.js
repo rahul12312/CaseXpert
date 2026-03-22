@@ -767,14 +767,22 @@ class Case {
    */
   static async hasAccess(caseId, userId, role = 'user') {
     if (role === 'lawyer') {
-      // Lawyers can only access cases assigned to them that are NOT 'UNASSIGNED'
-      // They must be 'ACCEPTED' or 'REQUESTED'
+      // 1. Get lawyer_id for this user
+      const [lawyers] = await getDatabase().query(
+        'SELECT id FROM lawyers WHERE user_id = ?',
+        [userId]
+      );
+      
+      if (lawyers.length === 0) return false;
+      const lawyerId = lawyers[0].id;
+
+      // 2. Check if case is assigned to this lawyer
       const [cases] = await getDatabase().query(
         `SELECT id FROM cases 
          WHERE id = ? 
          AND lawyer_id = ? 
          AND assignment_status IN ('ACCEPTED', 'REQUESTED')`,
-        [caseId, userId]
+        [caseId, lawyerId]
       );
       return cases.length > 0;
     } else {

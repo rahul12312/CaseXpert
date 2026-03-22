@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import api from '../lib/api';
 import CaseDocuments from '../components/CaseDocuments';
 import { useAuth } from '../context/AuthContext';
 import { sendCaseUpdateEmail } from '../services/emailService';
 import toast from 'react-hot-toast';
+import { Video } from 'lucide-react';
 
 const CaseDetails = () => {
     const { id } = useParams();
@@ -30,6 +31,12 @@ const CaseDetails = () => {
     const [aiLoading, setAiLoading] = useState(false);
     const [aiAnalysis, setAiAnalysis] = useState('');
 
+    // Assign Lawyer State
+    const [showAssignModal, setShowAssignModal] = useState(false);
+    const [consultedLawyers, setConsultedLawyers] = useState([]);
+    const [assigningLoading, setAssigningLoading] = useState(false);
+    const [selectedLawyerId, setSelectedLawyerId] = useState('');
+
     const fetchCase = async () => {
         setLoading(true);
         try {
@@ -44,8 +51,36 @@ const CaseDetails = () => {
         }
     };
 
+    const fetchConsultedLawyers = async () => {
+        try {
+            const { data } = await api.get('/bookings/user');
+            if (data.success) {
+                // Filter for completed bookings and extract unique lawyers
+                const uniqueLawyers = [];
+                const seenLawyerIds = new Set();
+
+                data.bookings.forEach(b => {
+                    if ((b.status === 'completed' || b.status === 'confirmed') && !seenLawyerIds.has(b.lawyer_id)) {
+                        uniqueLawyers.push({
+                            id: b.lawyer_id,
+                            name: b.lawyer_name,
+                            specialization: b.specialization
+                        });
+                        seenLawyerIds.add(b.lawyer_id);
+                    }
+                });
+                setConsultedLawyers(uniqueLawyers);
+            }
+        } catch (error) {
+            console.error("Failed to fetch consulted lawyers", error);
+        }
+    };
+
     useEffect(() => {
         fetchCase();
+        if (!isLawyer() && !isAdmin()) {
+            fetchConsultedLawyers();
+        }
     }, [id]);
 
     const handleAddHearing = async (e) => {
@@ -127,11 +162,69 @@ const CaseDetails = () => {
         }
     };
 
+    const handleAcceptCase = async () => {
+        setUpdatingStatus(true);
+        try {
+            await api.post(`/lawyer-dashboard/case-requests/${id}/accept`);
+            toast.success('Case accepted successfully!');
+            fetchCase(); // Refresh to show the full case view
+        } catch (error) {
+            console.error('Error accepting case:', error);
+            toast.error(error.response?.data?.message || 'Failed to accept case.');
+        } finally {
+            setUpdatingStatus(false);
+        }
+    };
+
+    const handleDeclineCase = async () => {
+        if (!window.confirm('Are you sure you want to decline this case?')) return;
+        setUpdatingStatus(true);
+        try {
+            await api.post(`/lawyer-dashboard/case-requests/${id}/decline`);
+            toast.success('Case request declined.');
+            navigate('/lawyer/dashboard'); // Redirect since they no longer have access
+        } catch (error) {
+            console.error('Error declining case:', error);
+            toast.error(error.response?.data?.message || 'Failed to decline case.');
+        } finally {
+            setUpdatingStatus(false);
+        }
+    };
+
+
     if (loading) return <div className="p-8 text-center">Loading...</div>;
     if (!caseData) return null;
 
     return (
         <div className="flex flex-col gap-6">
+            {/* Lawyer Request Banner */}
+            {isLawyer() && caseData.assignment_status === 'REQUESTED' && (
+                <div className="rounded-xl bg-blue-600 p-6 shadow-md text-white flex flex-col md:flex-row justify-between items-center gap-4">
+                    <div>
+                        <h2 className="text-xl font-bold">New Case Request</h2>
+                        <p className="text-blue-100 text-sm mt-1">
+                            A client has specifically requested you to handle this case. Review the details below.
+                        </p>
+                    </div>
+                    <div className="flex gap-3 w-full md:w-auto">
+                        <button
+                            onClick={handleAcceptCase}
+                            disabled={updatingStatus}
+                            className="flex-1 md:flex-none px-6 py-2 bg-white text-blue-600 font-bold rounded-lg hover:bg-blue-50 transition-colors disabled:opacity-50"
+                        >
+                            {updatingStatus ? 'Processing...' : 'Accept Case'}
+                        </button>
+                        <button
+                            onClick={handleDeclineCase}
+                            disabled={updatingStatus}
+                            className="flex-1 md:flex-none px-6 py-2 bg-blue-700 text-white font-bold rounded-lg hover:bg-blue-800 transition-colors disabled:opacity-50 border border-blue-500"
+                        >
+                            Decline
+                        </button>
+                    </div>
+                </div>
+            )}
+
             {/* Header */}
             <div className="rounded-xl bg-white p-6 shadow-sm border border-slate-200">
                 <div className="flex flex-col md:flex-row justify-between items-start gap-4">
@@ -146,12 +239,32 @@ const CaseDetails = () => {
                         <p className="text-slate-500 mt-1">{caseData.case_number} • {caseData.court_name}</p>
                     </div>
                     <div className="w-full md:w-auto flex flex-col items-start md:items-end gap-3 transition-all">
+                        {/* Assign Lawyer Button (Visible only to client if case is unassigned) */}
+                        {!isLawyer() && !isAdmin() && !caseData.lawyer_id && (
+                            <button
+                                onClick={() => setShowAssignModal(true)}
+                                className="w-full md:w-auto px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 shadow-sm flex justify-center items-center gap-2"
+                            >
+                                🤝 Assign to Lawyer
+                            </button>
+                        )}
+
                         <button
                             onClick={() => navigate(`/reports/intelligence/${id}`)}
                             className="w-full md:w-auto px-4 py-2 bg-purple-100 text-purple-700 rounded-lg text-sm font-medium hover:bg-purple-200 border border-purple-200 flex justify-center md:justify-start items-center gap-2"
                         >
                             <span>📊</span> View Intelligence Report
                         </button>
+
+                        {(caseData.lawyer_id || isLawyer()) && (
+                            <Link
+                                to={`/consultation/C${id}`}
+                                className="w-full md:w-auto px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-bold hover:bg-indigo-700 shadow-md flex justify-center items-center gap-2 transition-all hover:scale-[1.02]"
+                            >
+                                <Video size={16} />
+                                Join Video Consultation
+                            </Link>
+                        )}
                         <div className="flex items-center gap-2 md:block text-left md:text-right">
                             <p className="text-sm text-slate-500">Status</p>
                             {(isLawyer() || isAdmin()) ? (
@@ -207,9 +320,16 @@ const CaseDetails = () => {
                                     <dd className="font-medium text-slate-900 capitalize">{caseData.case_type}</dd>
                                 </div>
                                 <div className="flex justify-between border-b border-slate-100 pb-2">
+                                    <dt className="text-slate-500">Assigned Lawyer</dt>
+                                    <dd className="font-semibold text-blue-600">
+                                        {caseData.lawyer_name || (caseData.lawyer_id ? 'Loading...' : 'Not Assigned')}
+                                        {caseData.assignment_status === 'REQUESTED' && <span className="ml-2 text-[10px] bg-yellow-100 text-yellow-700 px-1.5 py-0.5 rounded font-bold uppercase">Pending Response</span>}
+                                    </dd>
+                                </div>
+                                <div className="flex justify-between border-b border-slate-100 pb-2">
                                     <dt className="text-slate-500">Filing Date</dt>
                                     <dd className="font-medium text-slate-900">
-                                        {new Date(caseData.filing_date).toLocaleDateString()}
+                                        {caseData.filing_date ? new Date(caseData.filing_date).toLocaleDateString() : 'N/A'}
                                     </dd>
                                 </div>
                                 <div className="flex justify-between border-b border-slate-100 pb-2">
@@ -475,8 +595,81 @@ const CaseDetails = () => {
                     </div>
                 </div>
             )}
+            {/* Assign Lawyer Modal */}
+            {showAssignModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
+                    <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-2xl animate-in fade-in zoom-in duration-200">
+                        <div className="flex justify-between items-center mb-6">
+                            <h3 className="text-xl font-bold text-slate-900">Assign to Lawyer</h3>
+                            <button onClick={() => setShowAssignModal(false)} className="text-slate-400 hover:text-slate-600 transition-colors">
+                                <span className="text-2xl">×</span>
+                            </button>
+                        </div>
+
+                        <p className="text-slate-600 text-sm mb-6">
+                            Select a lawyer you have consulted with to manage this case. They will receive a request to accept the assignment.
+                        </p>
+
+                        {consultedLawyers.length === 0 ? (
+                            <div className="text-center py-8 bg-slate-50 rounded-xl border border-dashed border-slate-300">
+                                <p className="text-slate-500 text-sm mb-4 font-medium">No completed consultations found.</p>
+                                <button
+                                    onClick={() => navigate('/lawyers')}
+                                    className="text-primary-600 text-sm font-bold hover:underline"
+                                >
+                                    Browse Lawyers & Book Consultation
+                                </button>
+                            </div>
+                        ) : (
+                            <div className="space-y-4">
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Choose Lawyer</label>
+                                    <select
+                                        value={selectedLawyerId}
+                                        onChange={(e) => setSelectedLawyerId(e.target.value)}
+                                        className="w-full rounded-xl border-slate-200 bg-slate-50 py-3 px-4 text-slate-900 font-medium focus:ring-2 focus:ring-primary-500 transition-all outline-none"
+                                    >
+                                        <option value="">Select a lawyer...</option>
+                                        {consultedLawyers.map(l => (
+                                            <option key={l.id} value={l.id}>{l.name} ({l.specialization})</option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                <button
+                                    disabled={assigningLoading || !selectedLawyerId}
+                                    onClick={async () => {
+                                        setAssigningLoading(true);
+                                        try {
+                                            await api.put(`/case/${id}/assign`, { lawyer_id: selectedLawyerId });
+                                            toast.success('Assignment request sent successfully!');
+                                            setShowAssignModal(false);
+                                            fetchCase();
+                                        } catch (error) {
+                                            toast.error(error.response?.data?.message || 'Failed to assign lawyer');
+                                        } finally {
+                                            setAssigningLoading(false);
+                                        }
+                                    }}
+                                    className="w-full py-4 bg-primary-600 text-white rounded-xl font-bold hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
+                                >
+                                    {assigningLoading ? 'Assigning...' : '🤝 Confirm Assignment'}
+                                </button>
+                            </div>
+                        )}
+
+                        <button
+                            onClick={() => setShowAssignModal(false)}
+                            className="w-full mt-4 text-slate-400 text-sm font-medium hover:text-slate-600 transition-colors"
+                        >
+                            Nevermind, keep it private
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
 
 export default CaseDetails;
+

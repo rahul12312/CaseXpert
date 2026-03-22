@@ -5,6 +5,7 @@ const {
     getClientQueries,
     getCaseRequests,
     acceptCaseRequest,
+    declineCaseRequest,
     getLawyerProfile
 } = require("../controllers/lawyerDashboardController");
 const { verifyToken, requireRole } = require("../middleware/auth");
@@ -18,6 +19,7 @@ router.get("/dashboard/stats", getDashboardStats);
 router.get("/client-queries", getClientQueries);
 router.get("/case-requests", getCaseRequests);
 router.post("/case-requests/:caseId/accept", acceptCaseRequest);
+router.post("/case-requests/:caseId/decline", declineCaseRequest);
 router.get("/profile", getLawyerProfile);
 
 module.exports = router;
