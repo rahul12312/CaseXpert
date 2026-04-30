@@ -1,0 +1,178 @@
+{
+    "profile": {
+        "title": "Lawyer Profile",
+        "viewProfile": "View Profile",
+        "editProfile": "Edit Profile",
+        "verification": "Verification",
+        "rating": "Rating",
+        "reviews": "Reviews",
+        "consultationFee": "Consultation Fee",
+        "location": "Location",
+        "availability": "Availability",
+        "specialization": "Specialization",
+        "experience": "Experience",
+        "languages": "Languages",
+        "education": "Education",
+        "barId": "Bar Council ID",
+        "achievements": "Achievements",
+        "cases": "Cases Handled"
+    },
+    "marketplace": {
+        "title": "Find Lawyers",
+        "searchPlaceholder": "Search by name, specialization, or location",
+        "filters": "Filters",
+        "sortBy": "Sort By",
+        "showing": "Showing {{count}} lawyers",
+        "noResults": "No lawyers found matching your criteria",
+        "viewOnMap": "View on Map",
+        "listView": "List View",
+        "gridView": "Grid View"
+    },
+    "filter": {
+        "specialization": "Area of Law",
+        "experience": "Experience",
+        "rating": "Minimum Rating",
+        "fee": "Consultation Fee",
+        "location": "Location",
+        "language": "Languages",
+        "availability": "Availability",
+        "verified": "Verified Only"
+    },
+    "sort": {
+        "relevance": "Relevance",
+        "rating": "Highest Rated",
+        "experience": "Most Experienced",
+        "fee_low": "Fee: Low to High",
+        "fee_high": "Fee: High to Low",
+        "nearest": "Nearest First"
+    },
+    "booking": {
+        "title": "Book Consultation",
+        "selectDate": "Select Date",
+        "selectTime": "Select Time Slot",
+        "consultationType": "Consultation Type",
+        "description": "Describe Your Issue",
+        "fee": "Consultation Fee",
+        "paymentMethod": "Payment Method",
+        "confirmBooking": "Confirm Booking",
+        "bookingConfirmed": "Booking Confirmed!",
+        "types": {
+            "inPerson": "In-Person Meeting",
+            "video": "Video Call",
+            "phone": "Phone Call",
+            "chat": "Chat Consultation"
+        },
+        "status": {
+            "pending": "Pending",
+            "confirmed": "Confirmed",
+            "completed": "Completed",
+            "cancelled": "Cancelled",
+            "rescheduled": "Rescheduled"
+        }
+    },
+    "reviews": {
+        "title": "Reviews & Ratings",
+        "writeReview": "Write a Review",
+        "overallRating": "Overall Rating",
+        "basedOn": "Based on {{count}} reviews",
+        "helpful": "Helpful",
+        "verified": "Verified Client",
+        "noReviews": "No reviews yet",
+        "sortBy": {
+            "recent": "Most Recent",
+            "helpful": "Most Helpful",
+            "rating": "Highest Rating"
+        },
+        "rating": {
+            "excellent": "Excellent",
+            "good": "Good",
+            "average": "Average",
+            "poor": "Poor",
+            "terrible": "Terrible"
+        },
+        "form": {
+            "title": "Write Your Review",
+            "rating": "Your Rating",
+            "comment": "Your Review",
+            "placeholder": "Share your experience...",
+            "submit": "Submit Review",
+            "success": "Review submitted successfully"
+        }
+    },
+    "dashboard": {
+        "title": "Lawyer Dashboard",
+        "stats": {
+            "totalClients": "Total Clients",
+            "activeQases": "Active Cases",
+            "upcomingConsultations": "Upcoming Consultations",
+            "revenue": "This Month Revenue",
+            "rating": "Average Rating"
+        },
+        "appointments": {
+            "title": "Today's Appointments",
+            "noAppointments": "No appointments today",
+            "viewAll": "View All Appointments"
+        },
+        "requests": {
+            "title": "Consultation Requests",
+            "accept": "Accept",
+            "reject": "Reject",
+            "noRequests": "No pending requests"
+        },
+        "clients": {
+            "title": "Recent Clients",
+            "viewAll": "View All Clients"
+        }
+    },
+    "availability": {
+        "title": "Set Availability",
+        "workingHours": "Working Hours",
+        "workingDays": "Working Days",
+        "timeSlots": "Time Slots",
+        "addSlot": "Add Time Slot",
+        "removeSlot": "Remove Slot",
+        "save": "Save Availability",
+        "days": {
+            "monday": "Monday",
+            "tuesday": "Tuesday",
+            "wednesday": "Wednesday",
+            "thursday": "Thursday",
+            "friday": "Friday",
+            "saturday": "Saturday",
+            "sunday": "Sunday"
+        }
+    },
+    "verification": {
+        "status": {
+            "verified": "Verified",
+            "pending": "Pending Verification",
+            "rejected": "Verification Rejected",
+            "notSubmitted": "Not Submitted"
+        },
+        "title": "Account Verification",
+        "uploadDocuments": "Upload Documents",
+        "required": {
+            "barId": "Bar Council ID Card",
+            "degree": "Law Degree Certificate",
+            "idProof": "Government ID Proof",
+            "address": "Address Proof"
+        },
+        "submit": "Submit for Verification",
+        "submitted": "Verification documents submitted",
+        "underReview": "Your profile is under review"
+    },
+    "specializations": {
+        "criminal": "Criminal Law",
+        "civil": "Civil Law",
+        "corporate": "Corporate Law",
+        "family": "Family Law",
+        "property": "Property Law",
+        "tax": "Tax Law",
+        "labor": "Labor Law",
+        "intellectual": "Intellectual Property",
+        "immigration": "Immigration Law",
+        "cyber": "Cyber Law",
+        "consumer": "Consumer Law",
+        "environmental": "Environmental Law"
+    }
+}

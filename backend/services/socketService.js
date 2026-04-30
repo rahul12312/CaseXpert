@@ -1,0 +1,97 @@
+const { Server } = require("socket.io");
+
+let io;
+
+const initSocket = (server) => {
+    io = new Server(server, {
+        cors: {
+            origin: "*",
+            methods: ["GET", "POST"]
+        }
+    });
+
+    console.log("✅ Socket.IO Initialized");
+
+    io.on("connection", (socket) => {
+        console.log(`🔌 New Connection: ${socket.id}`);
+
+        socket.on("join-room", async ({ roomId, userId, role }) => {
+            console.log(`👤 User ${userId} (${role}) joining room: ${roomId}`);
+            socket.join(roomId);
+
+            // Notify host if participant joins
+            if (role !== 'lawyer') {
+                socket.to(roomId).emit("join-request", { userId, socketId: socket.id });
+            } else {
+                // Notify participant if host joins/is present
+                // This tells waiting participants to re-send their join-request
+                socket.to(roomId).emit("host-ready", { userId });
+            }
+
+            socket.on("recheck-lobby", () => {
+                console.log(`🔍 Room ${roomId}: Lawyer requesting lobby update`);
+                // Ask all clients in the room to re-identify themselves
+                socket.to(roomId).emit("request-rejoin-status");
+            });
+
+            socket.to(roomId).emit("user-joined", { userId, role });
+        });
+
+        // Gated Approval Signaling
+        socket.on("approve-request", ({ roomId, participantSocketId }) => {
+            console.log(`✅ Host approved request in ${roomId} for ${participantSocketId}`);
+            socket.to(participantSocketId).emit("request-approved", { roomId });
+            // Also notify room to start WebRTC
+            io.to(roomId).emit("meeting-active", { roomId });
+        });
+
+        socket.on("reject-request", ({ roomId, participantSocketId, reason }) => {
+            console.log(`❌ Host rejected request in ${roomId} for ${participantSocketId}`);
+            socket.to(participantSocketId).emit("request-rejected", { reason: reason || "Host declined your join request." });
+        });
+
+        // WebRTC Signaling - Only after approval logic is handled in frontend
+        socket.on("webrtc-offer", (payload) => {
+            console.log(`📤 Offer from ${socket.id} to room ${payload.roomId}`);
+            socket.to(payload.roomId).emit("webrtc-offer", payload);
+        });
+
+        socket.on("webrtc-answer", (payload) => {
+            console.log(`📥 Answer from ${socket.id} to room ${payload.roomId}`);
+            socket.to(payload.roomId).emit("webrtc-answer", payload);
+        });
+
+        socket.on("webrtc-ice-candidate", (payload) => {
+            console.log(`❄️ ICE Candidate from ${socket.id}`);
+            socket.to(payload.roomId).emit("webrtc-ice-candidate", payload);
+        });
+
+        socket.on("leave-room", ({ roomId, userId }) => {
+            console.log(`👋 User ${userId} leaving room ${roomId}`);
+            socket.leave(roomId);
+            socket.to(roomId).emit("user-left", { userId });
+        });
+
+        socket.on("end-call", async ({ roomId, duration }) => {
+            console.log(`📞 Call ended in room ${roomId}. Duration: ${duration}s`);
+
+            // Optionally update DB here or let the frontend trigger a REST call
+            socket.to(roomId).emit("call-ended");
+        });
+
+        socket.on("disconnect", () => {
+            console.log(`🔌 Disconnected: ${socket.id}`);
+        });
+    });
+
+    return io;
+};
+
+const getIO = () => {
+    if (!io) {
+        throw new Error("Socket.io not initialized!");
+    }
+    return io;
+};
+
+module.exports = { initSocket, getIO };

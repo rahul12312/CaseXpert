@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test AI Assistant Connection</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            background: #4F46E5;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        button:hover {
+            background: #4338CA;
+        }
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .success {
+            background: #D1FAE5;
+            border: 1px solid #10B981;
+            color: #065F46;
+        }
+        .error {
+            background: #FEE2E2;
+            border: 1px solid #EF4444;
+            color: #991B1B;
+        }
+        .info {
+            background: #DBEAFE;
+            border: 1px solid #3B82F6;
+            color: #1E40AF;
+        }
+        .loading {
+            color: #6B7280;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 AI Legal Assistant Connection Test</h1>
+        
+        <div class="test-section">
+            <h2>Test 1: Backend Health Check</h2>
+            <button onclick="testHealth()">Test Health Endpoint</button>
+            <div id="health-result"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>Test 2: Service Info</h2>
+            <button onclick="testInfo()">Test Info Endpoint</button>
+            <div id="info-result"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>Test 3: Chat Endpoint (Requires API Key)</h2>
+            <button onclick="testChat()">Test Chat Endpoint</button>
+            <div id="chat-result"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>Test 4: CORS Preflight</h2>
+            <button onclick="testCORS()">Test CORS</button>
+            <div id="cors-result"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>All Tests</h2>
+            <button onclick="runAllTests()">Run All Tests</button>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5001/api';
+
+        function showResult(elementId, message, type) {
+            const element = document.getElementById(elementId);
+            element.className = `result ${type}`;
+            element.textContent = message;
+        }
+
+        function showLoading(elementId) {
+            const element = document.getElementById(elementId);
+            element.className = 'result loading';
+            element.textContent = 'Testing...';
+        }
+
+        async function testHealth() {
+            showLoading('health-result');
+            try {
+                const response = await fetch(`${API_BASE}/ai-legal-assistant/health`);
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    showResult('health-result', 
+                        `✅ SUCCESS!\n\nStatus: ${response.status}\nService: ${data.service}\nStatus: ${data.status}\nMessage: ${data.message}`,
+                        'success'
+                    );
+                } else {
+                    showResult('health-result', 
+                        `⚠️ Response received but not successful\n\n${JSON.stringify(data, null, 2)}`,
+                        'error'
+                    );
+                }
+            } catch (error) {
+                showResult('health-result', 
+                    `❌ ERROR!\n\n${error.message}\n\nPossible causes:\n- Backend not running\n- CORS issue\n- Network problem`,
+                    'error'
+                );
+            }
+        }
+
+        async function testInfo() {
+            showLoading('info-result');
+            try {
+                const response = await fetch(`${API_BASE}/ai-legal-assistant/info`);
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    showResult('info-result', 
+                        `✅ SUCCESS!\n\nName: ${data.name}\nModel: ${data.model}\n\nCapabilities:\n${data.capabilities.map(c => '- ' + c).join('\n')}`,
+                        'success'
+                    );
+                } else {
+                    showResult('info-result', 
+                        `⚠️ Response received but not successful\n\n${JSON.stringify(data, null, 2)}`,
+                        'error'
+                    );
+                }
+            } catch (error) {
+                showResult('info-result', 
+                    `❌ ERROR!\n\n${error.message}`,
+                    'error'
+                );
+            }
+        }
+
+        async function testChat() {
+            showLoading('chat-result');
+            try {
+                const response = await fetch(`${API_BASE}/ai-legal-assistant/chat`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        history: [],
+                        question: 'Hello, this is a test message'
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    showResult('chat-result', 
+                        `✅ SUCCESS!\n\nAI Response:\n${data.answer.substring(0, 200)}...\n\nDisclaimer: ${data.disclaimer}`,
+                        'success'
+                    );
+                } else {
+                    const errorMsg = data.error || data.message || 'Unknown error';
+                    if (errorMsg.includes('429') || errorMsg.includes('quota')) {
+                        showResult('chat-result', 
+                            `⚠️ API KEY QUOTA EXCEEDED\n\nThe OpenAI API key has exceeded its quota.\n\nError: ${errorMsg}\n\nSolution:\n1. Get new API key from OpenAI\n2. Update backend/.env file\n3. Restart backend`,
+                            'info'
+                        );
+                    } else {
+                        showResult('chat-result', 
+                            `❌ ERROR!\n\n${errorMsg}\n\nFull response:\n${JSON.stringify(data, null, 2)}`,
+                            'error'
+                        );
+                    }
+                }
+            } catch (error) {
+                showResult('chat-result', 
+                    `❌ NETWORK ERROR!\n\n${error.message}\n\nThis means the frontend cannot reach the backend.\n\nCheck:\n- Backend is running on port 5001\n- CORS is configured\n- No firewall blocking`,
+                    'error'
+                );
+            }
+        }
+
+        async function testCORS() {
+            showLoading('cors-result');
+            try {
+                const response = await fetch(`${API_BASE}/ai-legal-assistant/chat`, {
+                    method: 'OPTIONS'
+                });
+                
+                if (response.ok) {
+                    showResult('cors-result', 
+                        `✅ CORS PREFLIGHT SUCCESS!\n\nStatus: ${response.status}\nCORS is properly configured.`,
+                        'success'
+                    );
+                } else {
+                    showResult('cors-result', 
+                        `⚠️ CORS preflight returned status ${response.status}`,
+                        'error'
+                    );
+                }
+            } catch (error) {
+                showResult('cors-result', 
+                    `❌ CORS ERROR!\n\n${error.message}`,
+                    'error'
+                );
+            }
+        }
+
+        async function runAllTests() {
+            await testHealth();
+            await new Promise(resolve => setTimeout(resolve, 500));
+            await testInfo();
+            await new Promise(resolve => setTimeout(resolve, 500));
+            await testCORS();
+            await new Promise(resolve => setTimeout(resolve, 500));
+            await testChat();
+        }
+
+        // Auto-run health check on page load
+        window.addEventListener('load', () => {
+            setTimeout(testHealth, 500);
+        });
+    </script>
+</body>
+</html>
