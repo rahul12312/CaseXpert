@@ -48,6 +48,9 @@ import AdminDashboard from './pages/AdminDashboard.jsx';
 import LawyerDashboard from './pages/LawyerDashboard.jsx';
 import LawyerConsultations from './pages/LawyerConsultations.jsx';
 
+// AI Assistant
+import AILegalAssistantChat from './pages/AILegalAssistantChat.jsx';
+
 const App = () => {
   const location = useLocation();
 
@@ -142,6 +145,9 @@ const App = () => {
             path="/lawyer/consultations" 
             element={<ProtectedRoute allowedRoles={['lawyer']}><LawyerConsultations /></ProtectedRoute>} 
           />
+
+          {/* AI Assistant - Accessible to all logged in users */}
+          <Route path="/assistant" element={<ProtectedRoute><AILegalAssistantChat /></ProtectedRoute>} />
         </Routes>
       </main>
       {!hideFooter && <FooterModern />}

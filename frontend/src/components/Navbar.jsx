@@ -37,6 +37,7 @@ const Navbar = () => {
 
     const lawyerNavLinks = [
         { name: 'Dashboard', path: '/lawyer/dashboard', icon: '📊' },
+        { name: 'AI Assistant', path: '/assistant', icon: '🤖' },
         { name: 'Accepted Cases', path: '/lawyer/accepted-cases', icon: '📁' },
         { name: 'Consultations', path: '/lawyer/consultations', icon: '📅' },
         { name: 'Case Requests', path: '/lawyer/case-requests', icon: '📋' },
