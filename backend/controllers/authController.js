@@ -74,6 +74,7 @@ exports.registerUser = async (req, res) => {
         phone: user.phone,
         role: user.user_type,
         user_type: user.user_type,
+        profile_image: user.profile_image,
       },
       token,
     });
@@ -122,6 +123,7 @@ exports.loginUser = async (req, res) => {
         role: user.user_type,
         user_type: user.user_type,
         is_verified: user.is_verified,
+        profile_image: user.profile_image,
       },
       token,
     });
@@ -154,8 +156,7 @@ exports.updateUserProfile = async (req, res) => {
     const update = { name, phone };
 
     if (req.file) {
-      const baseUrl = process.env.BASE_URL || "http://localhost:5001";
-      update.profile_image = `${baseUrl}/uploads/profiles/${req.file.filename}`;
+      update.profile_image = req.file.path; // Cloudinary URL
     }
 
     await User.findByIdAndUpdate(req.user.id, update);
