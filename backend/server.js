@@ -2,13 +2,11 @@ const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const path = require("path");
-const cron = require("node-cron");
-const axios = require("axios");
-const connectMongoDB = require("./config/mongodb");
-const { initSocket } = require("./services/socketService");
 
-// Load environment variables
-dotenv.config();
+// Load environment variables from the same directory as server.js
+dotenv.config({ path: path.join(__dirname, ".env") });
+
+const connectMongoDB = require("./config/mongodb");
 
 // Initialize Express app
 const app = express();
@@ -87,8 +85,6 @@ const reportsRoutes = require("./routes/reportsRoutes");
 const insightRoutes = require("./routes/insightRoutes");
 const govDocRoutes = require("./routes/governmentDocumentSampleRoutes");
 const videoRoutes = require("./routes/videoRoutes");
-const conversationRoutes = require("./routes/conversationRoutes");
-const aiDocumentRoutes = require("./routes/aiDocumentRoutes");
 
 app.use("/api/auth", authRoutes);
 app.use("/api/lawyer", lawyerRoutes);
@@ -108,17 +104,10 @@ app.use("/api/reports", reportsRoutes);
 app.use("/api/insights", insightRoutes);
 app.use("/api/gov-docs", govDocRoutes);
 app.use("/api/video", videoRoutes);
-app.use("/api/conversations", conversationRoutes);
-app.use("/api/ai-document", aiDocumentRoutes);
 
 // Health Check
 app.get("/", (req, res) => {
   res.json({ success: true, message: "CaseXpert MongoDB API", version: "3.0.0", status: "running" });
-});
-
-// Dedicated health endpoint (for uptime monitors)
-app.get("/health", (req, res) => {
-  res.json({ success: true, status: "healthy", timestamp: new Date().toISOString() });
 });
 
 // 404 handler
@@ -142,26 +131,6 @@ const server = app.listen(PORT, () => {
   console.log(`📡 Port: ${PORT} | Env: ${process.env.NODE_ENV || "development"}`);
   console.log("=".repeat(60) + "\n");
 });
-
-// Initialize Socket.IO
-initSocket(server);
-
-// ============================================================================
-// KEEP-ALIVE SELF-PING (prevents Render free tier cold starts)
-// Pings this server every 14 minutes so it never sleeps
-// ============================================================================
-const SELF_URL = process.env.RENDER_EXTERNAL_URL || process.env.BASE_URL || `http://localhost:${PORT}`;
-
-cron.schedule("*/14 * * * *", async () => {
-  try {
-    const response = await axios.get(`${SELF_URL}/health`, { timeout: 10000 });
-    console.log(`[Keep-Alive] ✅ Self-ping OK at ${new Date().toISOString()} — status: ${response.data?.status}`);
-  } catch (err) {
-    console.warn(`[Keep-Alive] ⚠️ Self-ping failed: ${err.message}`);
-  }
-});
-
-console.log(`[Keep-Alive] 🕐 Self-ping scheduled every 14 minutes → ${SELF_URL}/health`);
 
 // Handle uncaught errors
 process.on("uncaughtException", (err) => {

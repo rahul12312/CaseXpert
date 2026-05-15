@@ -1,7 +1,10 @@
 const multer = require('multer');
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const cloudinary = require('cloudinary').v2;
-require('dotenv').config();
+const path = require('path');
+
+// Ensure environment variables are loaded from backend/.env
+require('dotenv').config({ path: path.join(__dirname, '../.env') });
 
 // Configure Cloudinary
 console.log("☁️ CLOUDINARY CONFIG CHECK:", {
