@@ -133,7 +133,21 @@ const Navbar = () => {
                                     onClick={() => setUserMenuOpen(!userMenuOpen)}
                                     className="flex items-center gap-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 shadow-sm hover:bg-slate-50 dark:bg-slate-950 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
                                 >
-                                    <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-blue-600 text-xs font-bold text-white">
+                                    {user?.profile_image ? (
+                                        <img 
+                                            src={user.profile_image} 
+                                            alt={user?.name} 
+                                            className="h-7 w-7 rounded-full object-cover" 
+                                            onError={(e) => {
+                                                e.target.style.display = 'none';
+                                                e.target.nextSibling.style.display = 'flex';
+                                            }}
+                                        />
+                                    ) : null}
+                                    <div 
+                                        className="h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-blue-600 text-xs font-bold text-white"
+                                        style={{ display: user?.profile_image ? 'none' : 'flex' }}
+                                    >
                                         {user?.name?.charAt(0)?.toUpperCase() || 'U'}
                                     </div>
                                     <span className="hidden sm:inline">{user?.name || 'User'}</span>
