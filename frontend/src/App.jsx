@@ -26,8 +26,8 @@ import DocumentAnalyzer from './pages/DocumentAnalyzer.jsx';
 
 // Private Pages - Client
 import CaseTracker from './pages/CaseTracker.jsx';
-import DocumentVault from './pages/DocumentVault.jsx';
-import Reports from './pages/Reports.jsx';
+import DocumentDrafting from './pages/DocumentDrafting.jsx';
+import ReportsDashboard from './pages/ReportsDashboard.jsx';
 import UserBookings from './pages/UserBookings.jsx';
 import AIInsights from './pages/AIInsights.jsx';
 import VideoHub from './pages/VideoHub.jsx';
@@ -108,10 +108,10 @@ const App = () => {
           <Route path="/cases" element={<ProtectedRoute allowedRoles={['client', 'user']}><CaseTracker /></ProtectedRoute>} />
           
           {/* Document Management - Client Only */}
-          <Route path="/documents" element={<ProtectedRoute allowedRoles={['client', 'user']}><DocumentVault /></ProtectedRoute>} />
+          <Route path="/documents" element={<ProtectedRoute allowedRoles={['client', 'user']}><DocumentDrafting /></ProtectedRoute>} />
           
           {/* Reports & Analytics - Client Only */}
-          <Route path="/reports" element={<ProtectedRoute allowedRoles={['client', 'user']}><Reports /></ProtectedRoute>} />
+          <Route path="/reports" element={<ProtectedRoute allowedRoles={['client', 'user']}><ReportsDashboard /></ProtectedRoute>} />
           
           {/* Bookings - Client Only */}
           <Route path="/my-bookings" element={<ProtectedRoute allowedRoles={['client', 'user']}><UserBookings /></ProtectedRoute>} />
