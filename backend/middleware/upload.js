@@ -4,10 +4,16 @@ const cloudinary = require('cloudinary').v2;
 require('dotenv').config();
 
 // Configure Cloudinary
+console.log("☁️ CLOUDINARY CONFIG CHECK:", {
+  name: process.env.CLOUDINARY_CLOUD_NAME ? "PRESENT" : "MISSING",
+  key: process.env.CLOUDINARY_API_KEY ? "PRESENT" : "MISSING",
+  secret: process.env.CLOUDINARY_API_SECRET ? "PRESENT" : "MISSING"
+});
+
 cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME || 'demo',
-  api_key: process.env.CLOUDINARY_API_KEY || '896522513251433', // Demo fallback
-  api_secret: process.env.CLOUDINARY_API_SECRET || 'your_api_secret_here'
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
 // Configure storage
