@@ -18,6 +18,7 @@ import ResetPassword from './pages/ResetPassword.jsx';
 import LawyerMarketplace from './pages/LawyerMarketplace.jsx';
 import LawyerProfile from './pages/LawyerProfile.jsx';
 import NewsHub from './pages/NewsHub.jsx';
+import Blog from './pages/Blog.jsx';
 
 // Private Pages - Common
 import Profile from './pages/Profile.jsx';
@@ -35,9 +36,8 @@ import ClientDashboard from './pages/ClientDashboard.jsx';
 
 // Footer Pages
 import AboutUs from './pages/AboutUs.jsx';
-import TermsOfService from './pages/TermsOfService.jsx';
-import PrivacyPolicy from './pages/PrivacyPolicy.jsx';
-import ContactUs from './pages/ContactUs.jsx';
+import LegalPage from './pages/LegalPage.jsx';
+import Contact from './pages/Contact.jsx';
 import Careers from './pages/Careers.jsx';
 
 // Admin Pages
@@ -92,10 +92,10 @@ const App = () => {
 
           {/* Static Content */}
           <Route path="/about" element={<AboutUs />} />
-          <Route path="/terms" element={<TermsOfService />} />
-          <Route path="/privacy" element={<PrivacyPolicy />} />
-          <Route path="/contact" element={<ContactUs />} />
+          <Route path="/legal/:type" element={<LegalPage />} />
+          <Route path="/contact" element={<Contact />} />
           <Route path="/careers" element={<Careers />} />
+          <Route path="/blog" element={<Blog />} />
 
           {/* ── PROTECTED ROUTES (Login Required) ── */}
           
