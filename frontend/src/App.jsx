@@ -17,7 +17,7 @@ import ForgotPassword from './pages/ForgotPassword.jsx';
 import ResetPassword from './pages/ResetPassword.jsx';
 import LawyerMarketplace from './pages/LawyerMarketplace.jsx';
 import LawyerProfile from './pages/LawyerProfile.jsx';
-import LegalUpdates from './pages/LegalUpdates.jsx';
+import NewsHub from './pages/NewsHub.jsx';
 
 // Private Pages - Common
 import Profile from './pages/Profile.jsx';
@@ -88,7 +88,7 @@ const App = () => {
           <Route path="/reset-password/:token" element={<ResetPassword />} />
           <Route path="/lawyers" element={<LawyerMarketplace />} />
           <Route path="/lawyers/:id" element={<LawyerProfile />} />
-          <Route path="/news" element={<LegalUpdates />} />
+          <Route path="/news" element={<NewsHub />} />
 
           {/* Static Content */}
           <Route path="/about" element={<AboutUs />} />
