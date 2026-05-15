@@ -212,6 +212,7 @@ exports.verifyOTPAndRegister = async (req, res) => {
         role: user.user_type,
         user_type: user.user_type,
         is_verified: true,
+        profile_image: user.profile_image,
       },
       token,
     });
@@ -320,7 +321,19 @@ exports.registerUser = async (req, res) => {
     }
 
     const token = signToken(user);
-    return res.status(201).json({ user: { id: user._id, name: user.name, email: user.email, phone: user.phone, role: user.user_type, user_type: user.user_type }, token });
+
+    return res.status(201).json({
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        role: user.user_type,
+        user_type: user.user_type,
+        profile_image: user.profile_image,
+      },
+      token,
+    });
   } catch (error) {
     console.error("❌ REGISTRATION ERROR:", error.message);
     return res.status(500).json({ success: false, message: "Registration failed", error: error.message });
@@ -375,6 +388,7 @@ exports.loginUser = async (req, res) => {
         role: user.user_type,
         user_type: user.user_type,
         is_verified: user.is_verified,
+        profile_image: user.profile_image,
       },
       token,
     });
@@ -406,8 +420,7 @@ exports.updateUserProfile = async (req, res) => {
     const update = { name, phone };
 
     if (req.file) {
-      const baseUrl = process.env.BASE_URL || `http://localhost:${process.env.PORT || 5000}`;
-      update.profile_image = `${baseUrl}/uploads/profiles/${req.file.filename}`;
+      update.profile_image = req.file.path; // Cloudinary URL
     }
 
     await User.findByIdAndUpdate(req.user.id, update);
