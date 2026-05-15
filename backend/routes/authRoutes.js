@@ -23,6 +23,10 @@ router.post("/send-otp", sendOTP);               // Step 1: send OTP
 router.post("/verify-otp", verifyOTPAndRegister); // Step 2: verify OTP → activate
 router.post("/resend-otp", resendOTP);            // Resend OTP
 
+// Password Reset (Public)
+router.post("/forgot-password", require("../controllers/authController").forgotPassword);
+router.post("/reset-password/:token", require("../controllers/authController").resetPassword);
+
 // ── Protected routes ──────────────────────────────────────
 router.get("/profile", verifyToken, getUserProfile);
 router.put("/profile", verifyToken, upload.single("profileImage"), updateUserProfile);

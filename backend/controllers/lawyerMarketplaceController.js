@@ -84,6 +84,8 @@ exports.getAllLawyers = async (req, res) => {
       average_rating: l.rating,
       total_cases: l.total_cases,
       availability_status: l.availability_status,
+      latitude: l.location?.coordinates?.[1] || 0,
+      longitude: l.location?.coordinates?.[0] || 0,
     }));
 
     return res.json({

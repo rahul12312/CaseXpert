@@ -1,6 +1,21 @@
 import React, { useState, useEffect, useRef } from 'react';
 import api from '../lib/api.js';
 import { useAuth } from '../context/AuthContext.jsx';
+import { 
+    Scale, 
+    User, 
+    Mic, 
+    MicOff, 
+    Send, 
+    Plus, 
+    Trash2, 
+    History, 
+    Globe, 
+    Menu,
+    ChevronLeft,
+    ChevronRight,
+    MessageSquare
+} from 'lucide-react';
 
 const AILegalAssistantChat = () => {
     const { user, isAuthenticated } = useAuth();
@@ -46,6 +61,7 @@ const AILegalAssistantChat = () => {
     const messagesEndRef = useRef(null);
     const messagesContainerRef = useRef(null);
     const recognitionRef = useRef(null);
+    const inputRef = useRef(null);
 
     // Auto-scroll to bottom on new messages (scrolls the page)
     const scrollToBottom = () => {
@@ -311,14 +327,18 @@ const AILegalAssistantChat = () => {
                     {/* New Chat Button */}
                     <button
                         onClick={startNewChat}
-                        className="mb-4 flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 px-4 py-3 text-white font-medium shadow-lg hover:shadow-xl transition-all hover:scale-105"
+                        className="mb-6 flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 px-4 py-3 text-white font-medium shadow-md hover:shadow-lg transition-all active:scale-95"
                     >
-                        <span className="text-xl">+</span>
+                        <Plus size={20} />
                         <span>New Chat</span>
                     </button>
 
                     {/* Chat Sessions List */}
-                    <div className="flex-1 overflow-y-auto">
+                    <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
+                        <div className="flex items-center gap-2 mb-4 text-slate-400">
+                            <History size={14} />
+                            <span className="text-[10px] font-bold uppercase tracking-wider">History</span>
+                        </div>
                         {Object.keys(groupedSessions).length === 0 ? (
                             <div className="py-8 text-center">
                                 <div className="text-4xl mb-2">💬</div>
@@ -375,44 +395,44 @@ const AILegalAssistantChat = () => {
             {/* ============================================ */}
             <div className="flex flex-1 flex-col">
                 {/* Header */}
-                <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-700 dark:border-slate-800 bg-white dark:bg-slate-900 dark:bg-slate-900 px-6 py-4">
+                <div className="flex items-center justify-between border-b border-slate-200 dark:border-white/10 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md px-6 py-4 sticky top-0 z-30">
                     <div className="flex items-center gap-4">
                         <button
                             onClick={() => setSidebarOpen(!sidebarOpen)}
-                            className="rounded-lg p-2 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-800 transition-colors"
+                            className="rounded-lg p-2 hover:bg-slate-100 dark:hover:bg-white/10 text-slate-500 transition-colors"
                         >
-                            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                            </svg>
+                            {sidebarOpen ? <ChevronLeft size={20} /> : <Menu size={20} />}
                         </button>
-
+                        
                         <div className="flex items-center gap-3">
-                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-r from-blue-500 to-purple-500">
-                                <span className="text-xl">⚖️</span>
+                            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-white shadow-blue-500/20 shadow-lg">
+                                <Scale size={20} />
                             </div>
                             <div>
-                                <h1 className="text-lg font-bold text-slate-900 dark:text-white dark:text-white">
+                                <h1 className="text-sm font-bold text-slate-900 dark:text-white">
                                     AI Legal Assistant
                                 </h1>
-                                <p className="text-xs text-slate-500 dark:text-slate-400 dark:text-slate-400">
-                                    Powered by Groq • Indian Law Expert
-                                </p>
+                                <div className="flex items-center gap-1.5">
+                                    <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                                    <p className="text-[10px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                                        Online • Indian Law Expert
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </div>
 
                     {/* Language Selector */}
-                    <div className="flex items-center gap-2">
-                        <span className="text-xs text-slate-500 dark:text-slate-400 dark:text-slate-400 hidden sm:inline">🌐 Language:</span>
+                    <div className="flex items-center gap-3 bg-slate-100 dark:bg-white/5 rounded-full px-3 py-1.5 border border-transparent hover:border-slate-200 dark:hover:border-white/10 transition-all">
+                        <Globe size={14} className="text-slate-400" />
                         <select
                             value={language}
                             onChange={(e) => setLanguage(e.target.value)}
-                            className="rounded-lg border border-slate-200 dark:border-slate-700 dark:border-slate-700 bg-white dark:bg-slate-900 dark:bg-slate-800 px-3 py-1.5 text-sm text-slate-900 dark:text-white dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/30 cursor-pointer shadow-sm"
-                            title="Select AI response language"
+                            className="bg-transparent text-xs font-semibold text-slate-700 dark:text-slate-300 focus:outline-none cursor-pointer"
                         >
                             {LANGUAGES.map(lang => (
-                                <option key={lang.code} value={lang.code}>
-                                    {lang.flag} {lang.label}
+                                <option key={lang.code} value={lang.code} className="dark:bg-slate-900 text-slate-900 dark:text-white">
+                                    {lang.label}
                                 </option>
                             ))}
                         </select>
@@ -433,23 +453,24 @@ const AILegalAssistantChat = () => {
                                     Ask me anything about Indian law, legal procedures, case strategies, or document drafting.
                                 </p>
 
-                                {/* Suggestion Cards */}
-                                <div className="grid w-full max-w-2xl gap-3 sm:grid-cols-2">
+                                <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2">
                                     {[
-                                        { emoji: '⚖️', text: 'Explain my legal rights', query: 'What are my basic legal rights as a citizen in India?' },
-                                        { emoji: '📄', text: 'Draft a legal document', query: 'Help me draft a basic rental agreement.' },
-                                        { emoji: '🏛️', text: 'Court procedures', query: 'How do I file a case in civil court in India?' },
-                                        { emoji: '📹', text: 'Video Consultation', query: 'I would like to book a video consultation with a lawyer.' },
-                                    ].map((suggestion, idx) => (
+                                        { title: 'Explain Rights', desc: 'What are my basic legal rights?', query: 'Explain my basic legal rights in India.' },
+                                        { title: 'Draft Document', desc: 'Help me draft a rental agreement.', query: 'How do I draft a rental agreement in India?' },
+                                        { title: 'Court Info', desc: 'How to file a civil case?', query: 'What is the procedure to file a civil case in India?' },
+                                        { title: 'Lawyer Find', desc: 'Find specialized lawyers.', query: 'How can I find a good criminal lawyer near me?' }
+                                    ].map((card, i) => (
                                         <button
-                                            key={idx}
-                                            onClick={() => setInput(suggestion.query)}
-                                            className="rounded-xl border border-slate-200 dark:border-slate-700 dark:border-slate-700 bg-white dark:bg-slate-900 dark:bg-slate-800 p-4 text-left shadow-sm hover:shadow-md hover:border-blue-500 dark:hover:border-blue-500 transition-all"
+                                            key={i}
+                                            onClick={() => setInput(card.query)}
+                                            className="group flex flex-col items-start rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 p-5 text-left transition-all hover:border-blue-500 hover:shadow-xl hover:shadow-blue-500/5 active:scale-95"
                                         >
-                                            <div className="text-2xl mb-2">{suggestion.emoji}</div>
-                                            <div className="text-sm font-medium text-slate-900 dark:text-white dark:text-white">
-                                                {suggestion.text}
-                                            </div>
+                                            <span className="mb-2 text-sm font-bold text-slate-900 dark:text-white group-hover:text-blue-600 transition-colors">
+                                                {card.title}
+                                            </span>
+                                            <span className="text-xs text-slate-500 dark:text-slate-400">
+                                                {card.desc}
+                                            </span>
                                         </button>
                                     ))}
                                 </div>
@@ -517,39 +538,37 @@ const AILegalAssistantChat = () => {
                 <div className="border-t border-slate-200 dark:border-slate-700 dark:border-slate-800 bg-white dark:bg-slate-900 dark:bg-slate-900 px-4 py-4">
                     <div className="mx-auto max-w-3xl">
                         <form onSubmit={handleSubmit} className="flex gap-3">
-                            <input
-                                type="text"
+                            <textarea
+                                ref={inputRef}
                                 value={input}
                                 onChange={(e) => setInput(e.target.value)}
-                                placeholder={isListening ? '🎙️ Listening... speak now' : 'Ask a legal question...'}
-                                className={`flex-1 rounded-xl border px-5 py-3 text-sm text-slate-900 dark:text-white dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 transition-all ${
-                                    isListening
-                                        ? 'border-red-400 dark:border-red-500 bg-red-50 dark:bg-red-900/10 focus:ring-red-400/30'
-                                        : 'border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 dark:bg-slate-800 focus:border-blue-500 focus:ring-blue-500/20'
-                                }`}
-                                disabled={loading}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' && !e.shiftKey) {
+                                        e.preventDefault();
+                                        handleSubmit();
+                                    }
+                                }}
+                                placeholder="Ask about Indian law, rights, or procedures..."
+                                rows={1}
+                                className="flex-1 max-h-48 py-3 bg-transparent border-none focus:ring-0 text-sm text-slate-900 dark:text-white resize-none scroll-smooth"
+                                style={{ height: 'auto' }}
+                                onInput={(e) => {
+                                    e.target.style.height = 'auto';
+                                    e.target.style.height = `${Math.min(e.target.scrollHeight, 192)}px`;
+                                }}
                             />
                             {/* Mic Button */}
                             <button
                                 type="button"
                                 onClick={startVoiceInput}
-                                disabled={loading}
-                                title={isListening ? 'Stop listening' : `Speak in ${LANGUAGES.find(l => l.code === language)?.label || 'selected language'}`}
-                                className={`rounded-xl px-4 py-3 font-medium text-white shadow-lg transition-all ${
-                                    isListening
-                                        ? 'bg-red-500 hover:bg-red-600 animate-pulse'
-                                        : 'bg-slate-600 hover:bg-slate-700 hover:scale-105'
-                                } disabled:opacity-50 disabled:cursor-not-allowed`}
+                                className={`p-3 rounded-full transition-all ${
+                                    isListening 
+                                    ? 'text-red-500 bg-red-50 dark:bg-red-500/10 animate-pulse' 
+                                    : 'text-slate-400 hover:text-blue-500'
+                                }`}
+                                title={isListening ? 'Stop listening' : 'Voice input'}
                             >
-                                {isListening ? (
-                                    <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
-                                        <rect x="6" y="6" width="12" height="12" rx="2" />
-                                    </svg>
-                                ) : (
-                                    <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
-                                    </svg>
-                                )}
+                                {isListening ? <MicOff size={22} /> : <Mic size={22} />}
                             </button>
 
 
@@ -557,24 +576,17 @@ const AILegalAssistantChat = () => {
                             {/* Send Button */}
                             <button
                                 type="submit"
-                                disabled={loading || !input.trim()}
-                                className="rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 px-6 py-3 font-medium text-white shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all hover:scale-105"
+                                disabled={!input.trim() || loading}
+                                className={`p-2.5 rounded-full shadow-lg transition-all ${
+                                    input.trim() && !loading
+                                    ? 'bg-blue-600 text-white hover:scale-105 hover:bg-blue-700'
+                                    : 'bg-slate-200 dark:bg-white/5 text-slate-400 cursor-not-allowed'
+                                }`}
                             >
                                 {loading ? (
-                                    <span className="flex items-center gap-2">
-                                        <svg className="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">
-                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                        </svg>
-                                        Sending...
-                                    </span>
+                                    <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
                                 ) : (
-                                    <span className="flex items-center gap-2">
-                                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                                        </svg>
-                                        Send
-                                    </span>
+                                    <Send size={18} />
                                 )}
                             </button>
                         </form>
@@ -608,35 +620,42 @@ const SessionItem = ({ session, isActive, onClick, onDelete }) => {
     return (
         <div
             onClick={onClick}
-            className={`group relative mb-2 cursor-pointer rounded-lg p-3 transition-all ${isActive
-                ? 'bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 border border-blue-200 dark:border-blue-800'
-                : 'hover:bg-slate-50 dark:bg-slate-950 dark:hover:bg-slate-800 border border-transparent'
-                }`}
+            className={`group relative mb-2 cursor-pointer rounded-xl p-3 transition-all border ${
+                isActive
+                ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800'
+                : 'hover:bg-slate-50 dark:hover:bg-white/5 border-transparent'
+            }`}
         >
-            <div className="flex items-start justify-between gap-2">
+            <div className="flex items-start justify-between gap-3">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-100 dark:bg-white/5 text-slate-500 group-hover:text-blue-500 transition-colors flex-shrink-0">
+                    <MessageSquare size={16} />
+                </div>
+                
                 <div className="flex-1 min-w-0">
-                    <div className={`truncate text-sm font-medium ${isActive ? 'text-blue-900 dark:text-blue-100' : 'text-slate-900 dark:text-white dark:text-white'
-                        }`}>
-                        {session.title}
+                    <div className={`truncate text-sm font-semibold ${
+                        isActive ? 'text-blue-900 dark:text-blue-100' : 'text-slate-700 dark:text-slate-300'
+                    }`}>
+                        {session.title || 'Untitled Chat'}
                     </div>
                     <div className="mt-1 flex items-center justify-between">
-                        <span className="text-xs text-slate-500 dark:text-slate-400 dark:text-slate-400">
-                            {session.message_count} message{session.message_count !== 1 ? 's' : ''}
+                        <span className="text-[10px] font-medium text-slate-400">
+                            {session.message_count} messages
                         </span>
-                        <span className="text-[10px] text-slate-400 dark:text-slate-500">
+                        <span className="text-[10px] text-slate-400">
                             {displayDate()}
                         </span>
                     </div>
                 </div>
 
                 <button
-                    onClick={onDelete}
-                    className="opacity-0 group-hover:opacity-100 rounded p-1 text-red-500 hover:bg-red-100 dark:hover:bg-red-900/20 transition-opacity"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onDelete();
+                    }}
+                    className="opacity-0 group-hover:opacity-100 rounded-lg p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-all"
                     title="Delete chat"
                 >
-                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
+                    <Trash2 size={14} />
                 </button>
             </div>
         </div>

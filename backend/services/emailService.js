@@ -219,3 +219,60 @@ exports.sendCaseUpdateEmail = async ({
         return { success: false, error: error.message };
     }
 };
+
+// ============================================================
+// SEND PASSWORD RESET EMAIL
+// ============================================================
+exports.sendPasswordResetEmail = async ({ userEmail, userName, resetUrl }) => {
+    try {
+        const fromName = process.env.FROM_NAME || 'CaseXpert Support';
+        const fromEmail = process.env.FROM_EMAIL || process.env.SMTP_EMAIL;
+
+        const htmlContent = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <style>
+                    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #333; line-height: 1.6; background-color: #f8fafc; }
+                    .container { max-width: 600px; margin: 40px auto; padding: 40px; background: #ffffff; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+                    .header { text-align: center; margin-bottom: 30px; }
+                    .header h1 { color: #1e3a8a; margin: 0; }
+                    .content { margin-bottom: 30px; }
+                    .cta-button { display: inline-block; padding: 14px 28px; background-color: #3b82f6; color: white !important; text-decoration: none; border-radius: 8px; font-weight: bold; }
+                    .footer { font-size: 0.8em; color: #64748b; text-align: center; margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 20px; }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <div class="header"><h1>CaseXpert</h1></div>
+                    <div class="content">
+                        <p>Hello <strong>${userName}</strong>,</p>
+                        <p>You requested to reset your password. Please click the button below to set a new one. This link will expire in 30 minutes.</p>
+                        <div style="text-align:center; margin: 30px 0;">
+                            <a href="${resetUrl}" class="cta-button">Reset My Password</a>
+                        </div>
+                        <p>If you didn't request this, you can safely ignore this email.</p>
+                    </div>
+                    <div class="footer">
+                        <p>&copy; ${new Date().getFullYear()} CaseXpert Platform. All rights reserved.</p>
+                    </div>
+                </div>
+            </body>
+            </html>
+        `;
+
+        const mailOptions = {
+            from: `"${fromName}" <${fromEmail}>`,
+            to: userEmail,
+            subject: 'Password Reset Request - CaseXpert',
+            html: htmlContent
+        };
+
+        const info = await transporter.sendMail(mailOptions);
+        console.log(`✅ Password reset email sent to ${userEmail}:`, info.messageId);
+        return { success: true, messageId: info.messageId };
+    } catch (error) {
+        console.error('❌ Password reset email failed:', error);
+        return { success: false, error: error.message };
+    }
+};

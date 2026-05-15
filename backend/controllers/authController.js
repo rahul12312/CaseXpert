@@ -3,7 +3,7 @@ const crypto = require("crypto");
 const bcrypt = require("bcryptjs");
 const User = require("../models/User");
 const Lawyer = require("../models/Lawyer");
-const { sendOTPEmail } = require("../services/emailService");
+const { sendOTPEmail, sendPasswordResetEmail } = require("../services/emailService");
 
 // ============================================================
 // HELPERS
@@ -500,5 +500,76 @@ exports.changePassword = async (req, res) => {
   } catch (error) {
     console.error("❌ CHANGE PASSWORD ERROR:", error.message);
     return res.status(500).json({ success: false, message: "Error changing password", error: error.message });
+  }
+};
+
+// ============================================================
+// FORGOT PASSWORD
+// ============================================================
+exports.forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found with this email" });
+    }
+
+    // Generate reset token
+    const resetToken = crypto.randomBytes(32).toString("hex");
+    user.reset_password_token = crypto.createHash("sha256").update(resetToken).digest("hex");
+    user.reset_password_expires = Date.now() + 30 * 60 * 1000; // 30 minutes
+
+    await user.save();
+
+    // Send email
+    const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}/reset-password/${resetToken}`;
+    
+    await sendPasswordResetEmail({
+      userEmail: user.email,
+      userName: user.name,
+      resetUrl
+    });
+
+    console.log(`🔑 Reset email sent to: ${user.email}`);
+
+    return res.json({ 
+      success: true, 
+      message: "Password reset link sent to your email",
+      // Dev only: return token if email service not fully configured
+      resetToken: process.env.NODE_ENV === 'development' ? resetToken : undefined 
+    });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: "Error in forgot password", error: error.message });
+  }
+};
+
+// ============================================================
+// RESET PASSWORD
+// ============================================================
+exports.resetPassword = async (req, res) => {
+  try {
+    const { token } = req.params;
+    const { password } = req.body;
+
+    const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+
+    const user = await User.findOne({
+      reset_password_token: hashedToken,
+      reset_password_expires: { $gt: Date.now() }
+    });
+
+    if (!user) {
+      return res.status(400).json({ success: false, message: "Invalid or expired reset token" });
+    }
+
+    user.password = password;
+    user.reset_password_token = null;
+    user.reset_password_expires = null;
+    await user.save();
+
+    return res.json({ success: true, message: "Password reset successful" });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: "Error in reset password", error: error.message });
   }
 };

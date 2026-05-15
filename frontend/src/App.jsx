@@ -16,6 +16,7 @@ import Register from './pages/Register.jsx';
 import ForgotPassword from './pages/ForgotPassword.jsx';
 import ResetPassword from './pages/ResetPassword.jsx';
 import LawyerMarketplace from './pages/LawyerMarketplace.jsx';
+import LawyerMarketplaceWithMap from './pages/LawyerMarketplaceWithMap.jsx';
 import LawyerProfile from './pages/LawyerProfile.jsx';
 import NewsHub from './pages/NewsHub.jsx';
 import Blog from './pages/Blog.jsx';
@@ -87,6 +88,7 @@ const App = () => {
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password/:token" element={<ResetPassword />} />
           <Route path="/lawyers" element={<LawyerMarketplace />} />
+          <Route path="/lawyers-map" element={<LawyerMarketplaceWithMap />} />
           <Route path="/lawyers/:id" element={<LawyerProfile />} />
           <Route path="/news" element={<NewsHub />} />
 
