@@ -34,6 +34,8 @@ import UserBookings from './pages/UserBookings.jsx';
 import AIInsights from './pages/AIInsights.jsx';
 import VideoHub from './pages/VideoHub.jsx';
 import ClientDashboard from './pages/ClientDashboard.jsx';
+import Messages from './pages/Messages.jsx';
+import DocumentAnalyzer from './pages/DocumentAnalyzer.jsx';
 
 // Footer Pages
 import AboutUs from './pages/AboutUs.jsx';
@@ -51,34 +53,17 @@ import LawyerConsultations from './pages/LawyerConsultations.jsx';
 
 const App = () => {
   const location = useLocation();
-  const isFeaturePage = 
-    location.pathname.startsWith('/assistant') ||
-    location.pathname.startsWith('/lawyers') ||
-    location.pathname.startsWith('/cases') ||
-    location.pathname.startsWith('/documents') ||
-    location.pathname.startsWith('/reports') ||
-    location.pathname.startsWith('/bookings') ||
-    location.pathname.startsWith('/my-bookings') ||
-    location.pathname.startsWith('/profile') ||
-    location.pathname.startsWith('/news') ||
-    location.pathname.startsWith('/video-hub') ||
-    location.pathname.startsWith('/consultation') ||
-    location.pathname.startsWith('/insights') ||
-    location.pathname.startsWith('/lawyer/dashboard') ||
-    location.pathname.startsWith('/admin/dashboard') ||
-    location.pathname === '/dashboard';
-
-  const hideFooter = isFeaturePage;
-  const hideNavbar = location.pathname.startsWith('/assistant') || location.pathname.startsWith('/consultation');
-  const fullScreen = hideNavbar;
+  const isClientDashboard = location.pathname === '/dashboard';
+  const isConsultation = location.pathname.includes('consultation');
+  const hideGlobalUI = isClientDashboard || isConsultation;
 
   return (
     <div className={`flex min-h-screen flex-col bg-slate-50 dark:bg-slate-950 overflow-x-hidden`}>
       <Toaster position="top-center" reverseOrder={false} />
       <VideoNotificationListener />
-      {!hideNavbar && <Navbar />}
-      <main className={`flex flex-1 flex-col ${!fullScreen ? 'pt-24 pb-8 sm:px-6 lg:px-8 mx-auto w-full max-w-7xl px-4' : 'pt-0 w-full px-0 overflow-hidden'}`}>
-        {!fullScreen && <BackButton />}
+      {!hideGlobalUI && <Navbar />}
+      <main className={`flex flex-1 flex-col ${!hideGlobalUI ? 'pt-24 pb-8 sm:px-6 lg:px-8 mx-auto w-full max-w-7xl px-4' : 'pt-0 w-full px-0 overflow-hidden'}`}>
+        {!hideGlobalUI && <BackButton />}
         <Routes>
           {/* ── PUBLIC ROUTES (no login required) ── */}
           <Route path="/login" element={<Login />} />
@@ -108,6 +93,8 @@ const App = () => {
 
           {/* Profile */}
           <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+          <Route path="/messages" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
+          <Route path="/document-analyzer" element={<ProtectedRoute><DocumentAnalyzer /></ProtectedRoute>} />
 
           {/* Case Tracking Routes - Client Only */}
           <Route path="/cases" element={<ProtectedRoute allowedRoles={['client', 'user']}><CaseTracker /></ProtectedRoute>} />
@@ -155,7 +142,7 @@ const App = () => {
           />
         </Routes>
       </main>
-      {!hideFooter && <FooterModern />}
+      {!hideGlobalUI && <FooterModern />}
     </div>
   );
 };

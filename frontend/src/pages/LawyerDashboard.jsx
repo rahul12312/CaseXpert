@@ -72,7 +72,8 @@ const LawyerDashboard = () => {
         try {
             const { data } = await api.put(`/bookings/${id}/accept`);
             if (data.success) {
-                navigate(`/consultation/B${id}`);
+                // Navigate to the consultations tab/page as requested
+                navigate('/lawyer/consultations');
             }
         } catch (error) {
             alert('Failed to accept meeting');
@@ -181,7 +182,7 @@ const LawyerDashboard = () => {
                                         onClick={() => handleAcceptMeeting(meeting.id)}
                                         className="w-full py-4 bg-blue-600 text-white rounded-2xl font-black text-sm hover:bg-blue-700 transition-all flex items-center justify-center gap-2 shadow-lg shadow-blue-500/20 active:scale-95 group-hover:translate-y-[-2px]"
                                     >
-                                        <CheckCircle className="w-5 h-5" /> Accept & Start
+                                        <CheckCircle className="w-5 h-5" /> Accept
                                     </button>
                                 </div>
                             ))}
@@ -197,6 +198,7 @@ const LawyerDashboard = () => {
                         icon={Briefcase}
                         color="blue"
                         trend="+2 New"
+                        onClick={() => navigate('/lawyer/accepted-cases')}
                     />
                     <StatCard
                         title="Success Rate"
@@ -204,6 +206,7 @@ const LawyerDashboard = () => {
                         icon={TrendingUp}
                         color="green"
                         trend="Top 5%"
+                        onClick={() => navigate('/profile')}
                     />
                     <StatCard
                         title="Consultations"
@@ -211,6 +214,7 @@ const LawyerDashboard = () => {
                         icon={Users}
                         color="indigo"
                         trend="Lifetime"
+                        onClick={() => navigate('/lawyer/consultations')}
                     />
                     <StatCard
                         title="Rating"
@@ -218,6 +222,7 @@ const LawyerDashboard = () => {
                         icon={Star}
                         color="amber"
                         trend={`${stats?.totalReviews || 0} reviews`}
+                        onClick={() => navigate('/profile')}
                     />
                 </div>
 
@@ -348,7 +353,7 @@ const LawyerDashboard = () => {
 };
 
 // Modern Stat Card Component
-const StatCard = ({ title, value, icon: Icon, color, trend }) => {
+const StatCard = ({ title, value, icon: Icon, color, trend, onClick }) => {
     const colorStyles = {
         blue: 'bg-blue-500 shadow-blue-500/20',
         green: 'bg-green-500 shadow-green-500/20',
@@ -358,7 +363,10 @@ const StatCard = ({ title, value, icon: Icon, color, trend }) => {
     };
 
     return (
-        <div className="group bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 p-8 rounded-[2.5rem] shadow-xl shadow-slate-200/50 dark:shadow-none transition-all duration-300 hover:shadow-2xl hover:translate-y-[-4px]">
+        <div 
+            onClick={onClick}
+            className={`group bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 p-8 rounded-[2.5rem] shadow-xl shadow-slate-200/50 dark:shadow-none transition-all duration-300 hover:shadow-2xl hover:translate-y-[-4px] ${onClick ? 'cursor-pointer active:scale-[0.98]' : ''}`}
+        >
             <div className={`w-14 h-14 rounded-2xl ${colorStyles[color]} flex items-center justify-center text-white mb-6 transform transition-transform group-hover:scale-110 group-hover:rotate-3 shadow-lg`}>
                 <Icon className="w-7 h-7" />
             </div>

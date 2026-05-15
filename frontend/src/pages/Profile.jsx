@@ -178,10 +178,18 @@ const Profile = () => {
                                         src={previewImage || formData.profile_image}
                                         alt="Profile"
                                         className="h-full w-full object-cover"
+                                        onError={(e) => {
+                                            e.target.style.display = 'none';
+                                            e.target.nextSibling.style.display = 'flex';
+                                        }}
                                     />
-                                ) : (
-                                    <User size={48} />
-                                )}
+                                ) : null}
+                                <div
+                                    className="h-full w-full items-center justify-center text-2xl font-bold text-slate-500"
+                                    style={{ display: (previewImage || formData.profile_image) ? 'none' : 'flex' }}
+                                >
+                                    {formData.name ? formData.name.charAt(0).toUpperCase() : <User size={48} />}
+                                </div>
 
                                 {/* Overlay for editing */}
                                 {isEditing && (

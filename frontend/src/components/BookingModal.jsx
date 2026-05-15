@@ -14,7 +14,10 @@ const BookingModal = ({ isOpen, onClose, lawyerId, lawyerName, consultationFee, 
     const [formData, setFormData] = useState({
         consultationType: initialType || 'video_call',
         date: new Date().toISOString().split('T')[0],
-        timeSlot: initialTime || new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }),
+        timeSlot: initialTime || (() => {
+            const now = new Date();
+            return `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+        })(),
         description: initialDescription || ''
     });
 
@@ -65,9 +68,20 @@ const BookingModal = ({ isOpen, onClose, lawyerId, lawyerName, consultationFee, 
         setError(null);
 
         try {
+            // Construct a proper Date object in the user's local timezone
+            const [year, month, day] = formData.date.split('-').map(Number);
+            const [hours, minutes] = formData.timeSlot.split(':').map(Number);
+            
+            if (isNaN(year) || isNaN(month) || isNaN(day) || isNaN(hours) || isNaN(minutes)) {
+                throw new Error('Invalid date or time selected');
+            }
+
+            const localDateTime = new Date(year, month - 1, day, hours, minutes);
+
             const response = await api.post('/bookings/book', {
                 lawyerId,
-                ...formData
+                ...formData,
+                bookingTimestamp: localDateTime.getTime() // Send exact timestamp
             });
 
             if (response.data.success) {

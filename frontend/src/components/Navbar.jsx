@@ -35,7 +35,6 @@ const Navbar = () => {
     const isAdminUser = isAdmin();
     const isLawyerUser = isLawyer();
 
-    // LAWYER Navigation
     const lawyerNavLinks = [
         { name: 'Dashboard', path: '/lawyer/dashboard', icon: '📊' },
         { name: 'Accepted Cases', path: '/lawyer/accepted-cases', icon: '📁' },
@@ -43,12 +42,12 @@ const Navbar = () => {
         { name: 'Case Requests', path: '/lawyer/case-requests', icon: '📋' },
     ];
 
-    // USER/CLIENT Navigation
     const userNavLinks = [
         { name: 'AI Assistant', path: '/assistant', icon: '🤖' },
         { name: 'Video Consult', path: '/video-hub', icon: '📹' },
         { name: 'Case Tracker', path: '/cases', icon: '📋' },
         { name: 'Documents', path: '/documents', icon: '📄' },
+        { name: 'AI Doc Analyzer', path: '/document-analyzer', icon: '📄✨' },
         { name: 'Find Lawyers', path: '/lawyers', icon: '⚖️' },
         { name: 'News', path: '/news', icon: '📰' },
     ];
@@ -97,6 +96,20 @@ const Navbar = () => {
 
                     {/* Right Side Actions */}
                     <div className="flex items-center gap-3">
+                        {/* Messages Icon (Right Side) */}
+                        {isAuthenticated && !isAdminUser && (
+                            <Link 
+                                to="/messages" 
+                                className="relative rounded-lg p-2 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:bg-slate-800 transition-colors"
+                                aria-label="Messages"
+                            >
+                                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                                </svg>
+                                {/* Add a red dot badge here later if there are unread messages */}
+                            </Link>
+                        )}
+
                         {/* Theme Toggle Button */}
                         <button
                             onClick={toggleTheme}
@@ -120,21 +133,7 @@ const Navbar = () => {
                                     onClick={() => setUserMenuOpen(!userMenuOpen)}
                                     className="flex items-center gap-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 shadow-sm hover:bg-slate-50 dark:bg-slate-950 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
                                 >
-                                    {user?.profile_image ? (
-                                        <img 
-                                            src={user.profile_image} 
-                                            alt={user?.name} 
-                                            className="h-7 w-7 rounded-full object-cover" 
-                                            onError={(e) => {
-                                                e.target.style.display = 'none';
-                                                e.target.nextSibling.style.display = 'flex';
-                                            }}
-                                        />
-                                    ) : null}
-                                    <div 
-                                        className="h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-blue-600 text-xs font-bold text-white"
-                                        style={{ display: user?.profile_image ? 'none' : 'flex' }}
-                                    >
+                                    <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-blue-600 text-xs font-bold text-white">
                                         {user?.name?.charAt(0)?.toUpperCase() || 'U'}
                                     </div>
                                     <span className="hidden sm:inline">{user?.name || 'User'}</span>
@@ -195,19 +194,6 @@ const Navbar = () => {
                                                     </Link>
                                                 )}
 
-                                                {/* Dashboard - Only for Clients */}
-                                                {!isAdminUser && !isLawyerUser && (
-                                                    <Link
-                                                        to="/dashboard"
-                                                        className="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
-                                                    >
-                                                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
-                                                        </svg>
-                                                        Dashboard
-                                                    </Link>
-                                                )}
-
                                                 {isAdminUser && (
                                                     <Link
                                                         to="/admin/dashboard"
@@ -247,16 +233,6 @@ const Navbar = () => {
                                     className="rounded-lg bg-gradient-to-r from-blue-600 to-blue-700 px-4 py-2 text-sm font-medium text-white shadow-sm hover:from-blue-700 hover:to-blue-800 transition-all"
                                 >
                                     Sign Up
-                                </Link>
-                                <Link
-                                    to="/admin/dashboard"
-                                    className="rounded-lg bg-gradient-to-r from-red-600 to-red-700 px-4 py-2 text-sm font-medium text-white shadow-sm hover:from-red-700 hover:to-red-800 transition-all flex items-center gap-1.5"
-                                    title="Admin Login"
-                                >
-                                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                                    </svg>
-                                    Admin
                                 </Link>
                             </div>
                         )}
@@ -309,15 +285,6 @@ const Navbar = () => {
                                     className="block rounded-lg bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700"
                                 >
                                     Sign Up
-                                </Link>
-                                <Link
-                                    to="/admin/dashboard"
-                                    className="block rounded-lg bg-gradient-to-r from-red-600 to-red-700 px-3 py-2 text-sm font-medium text-white hover:from-red-700 hover:to-red-800 flex items-center justify-center gap-1.5"
-                                >
-                                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                                    </svg>
-                                    Admin Dashboard
                                 </Link>
                             </div>
                         )}

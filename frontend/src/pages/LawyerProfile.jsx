@@ -110,6 +110,26 @@ const LawyerProfile = () => {
         setIsBookingModalOpen(true);
     };
 
+    const handleStartChat = async () => {
+        if (!user) {
+            navigate('/login');
+            return;
+        }
+
+        try {
+            // Add user ID to backend to start conversation
+            // In API we get the participantId from lawyer user
+            const participantId = lawyer.user_id || lawyer.user?._id || lawyer.id;
+            const response = await api.post('/conversations/start', { participantId });
+            if (response.data.success) {
+                navigate('/messages');
+            }
+        } catch (error) {
+            console.error('Error starting chat:', error);
+            alert('Failed to start conversation. Please try again.');
+        }
+    };
+
     if (loading) {
         return (
             <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
@@ -245,6 +265,13 @@ const LawyerProfile = () => {
                                         className="w-full px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
                                         Book Appointment
+                                    </button>
+                                    <button
+                                        onClick={handleStartChat}
+                                        className="w-full px-6 py-3 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors flex items-center justify-center gap-2"
+                                    >
+                                        <MessageCircle className="w-5 h-5" />
+                                        Message Lawyer
                                     </button>
                                 </div>
                             </div>

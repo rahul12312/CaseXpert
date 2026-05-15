@@ -137,8 +137,13 @@ const Home = () => {
   const { isAuthenticated, isLawyer } = useAuth();
   const navigate = useNavigate();
 
-  // Removed automatic redirect to dashboard for authenticated users
-  // to allow them to see the home page after login/signup as requested.
+  useEffect(() => {
+    if (isLawyer && isLawyer()) {
+      navigate('/lawyer/dashboard');
+    } else if (isAuthenticated) {
+      navigate('/dashboard');
+    }
+  }, [isLawyer, isAuthenticated, navigate]);
 
   const features = [
     {

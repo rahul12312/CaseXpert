@@ -159,10 +159,34 @@ export const AuthProvider = ({ children }) => {
     return data.user;
   };
 
+  // Step 1 — send OTP to email (does NOT create session)
+  const sendOTP = async payload => {
+    const { data } = await api.post('/auth/send-otp', payload);
+    return data; // { success, message, email }
+  };
+
+  // Step 2 — verify OTP, activate account, auto-login
+  const verifyOTP = async (email, otp, extraPayload = {}) => {
+    const { data } = await api.post('/auth/verify-otp', { email, otp, ...extraPayload });
+    if (data.token && data.user) {
+      const userRole = data.user.role || data.user.user_type || 'user';
+      const roleKey = userRole === 'client' ? 'user' : userRole;
+      setUser(data.user);
+      setToken(data.token);
+      localStorage.setItem(`casexpert_auth_${roleKey}`, JSON.stringify({ user: data.user, token: data.token }));
+    }
+    return data;
+  };
+
+  // Resend OTP to same email
+  const resendOTP = async (email) => {
+    const { data } = await api.post('/auth/resend-otp', { email });
+    return data;
+  };
+
+  // Legacy register (kept for backward compat)
   const register = async payload => {
-    console.log('Register API:', API_BASE_URL);
     const { data } = await api.post('/auth/register', payload);
-    // Do NOT auto-login after register — let user login manually
     return data.user;
   };
 
@@ -225,6 +249,9 @@ export const AuthProvider = ({ children }) => {
     isAuthenticated: !!user,
     login,
     register,
+    sendOTP,
+    verifyOTP,
+    resendOTP,
     logout,
     updateUser,
     switchRole,

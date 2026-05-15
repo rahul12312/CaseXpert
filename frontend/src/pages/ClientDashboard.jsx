@@ -80,6 +80,7 @@ const ClientDashboard = () => {
         { name: 'Litigation Hub', path: '/cases', icon: Briefcase },
         { name: 'Legal Market', path: '/lawyers', icon: Gavel },
         { name: 'Drafting Room', path: '/documents', icon: FileText },
+        { name: 'AI Doc Analyzer', path: '/document-analyzer', icon: Search, badge: 'New' },
         { name: 'Consultations', path: '/video-hub', icon: Video },
         { name: 'Knowledge Center', path: '/news', icon: BookOpen },
         { name: 'Analytics', path: '/reports', icon: BarChart2 },
@@ -301,6 +302,7 @@ const ClientDashboard = () => {
                             icon={Briefcase}
                             color="indigo"
                             trend="+2 Pending"
+                            onClick={() => navigate('/cases')}
                         />
                         <InsightCard
                             title="Scheduled Calls"
@@ -308,6 +310,7 @@ const ClientDashboard = () => {
                             icon={Calendar}
                             color="purple"
                             trend="Next: Today 5 PM"
+                            onClick={() => navigate('/bookings')}
                         />
                         <InsightCard
                             title="Audit Reports"
@@ -315,6 +318,7 @@ const ClientDashboard = () => {
                             icon={Shield}
                             color="emerald"
                             trend="Systems Secure"
+                            onClick={() => navigate('/reports')}
                         />
                     </div>
 
@@ -423,7 +427,7 @@ const ClientDashboard = () => {
     );
 };
 
-const InsightCard = ({ title, count, icon: Icon, color, trend }) => {
+const InsightCard = ({ title, count, icon: Icon, color, trend, onClick }) => {
     const colors = {
         indigo: 'border-indigo-500/20 shadow-indigo-500/5 hover:border-indigo-500/50',
         purple: 'border-purple-500/20 shadow-purple-500/5 hover:border-purple-500/50',
@@ -437,7 +441,10 @@ const InsightCard = ({ title, count, icon: Icon, color, trend }) => {
     };
 
     return (
-        <div className={`p-4 sm:p-6 rounded-2xl sm:rounded-3xl bg-white dark:bg-[#0f172a]/50 border backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 shadow-xl group ${colors[color]}`}>
+        <div 
+            onClick={onClick}
+            className={`p-4 sm:p-6 rounded-2xl sm:rounded-3xl bg-white dark:bg-[#0f172a]/50 border backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 shadow-xl group ${colors[color]} ${onClick ? 'cursor-pointer active:scale-[0.98]' : ''}`}
+        >
             <div className={`h-10 w-10 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform ${iconColors[color]}`}>
                 <Icon size={18} />
             </div>

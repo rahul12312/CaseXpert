@@ -14,6 +14,10 @@ const userSchema = new mongoose.Schema(
     preferred_language: { type: String, enum: ["en", "hi", "mr"], default: "en" },
     reset_password_token: { type: String, default: null },
     reset_password_expires: { type: Date, default: null },
+    // OTP fields for email verification
+    otp: { type: String, default: null },
+    otp_expires: { type: Date, default: null },
+    otp_last_sent: { type: Date, default: null },
   },
   { timestamps: true }
 );

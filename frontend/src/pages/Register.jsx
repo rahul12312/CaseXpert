@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 
@@ -42,9 +42,57 @@ const INDIAN_LANGUAGES = [
   'Malayalam', 'Punjabi', 'Assamese', 'Maithili', 'Sanskrit'
 ];
 
+const STATE_LANGUAGES_MAP = {
+  'Andhra Pradesh': ['English', 'Hindi', 'Telugu', 'Urdu'],
+  'Arunachal Pradesh': ['English', 'Hindi', 'Assamese'],
+  'Assam': ['English', 'Hindi', 'Assamese', 'Bengali'],
+  'Bihar': ['English', 'Hindi', 'Maithili', 'Bhojpuri'],
+  'Chhattisgarh': ['English', 'Hindi', 'Marathi', 'Odia'],
+  'Goa': ['English', 'Hindi', 'Marathi', 'Kannada'],
+  'Gujarat': ['English', 'Hindi', 'Gujarati'],
+  'Haryana': ['English', 'Hindi', 'Punjabi', 'Urdu'],
+  'Himachal Pradesh': ['English', 'Hindi', 'Punjabi'],
+  'Jharkhand': ['English', 'Hindi', 'Maithili', 'Bengali', 'Odia'],
+  'Karnataka': ['English', 'Hindi', 'Kannada', 'Telugu', 'Marathi', 'Tamil'],
+  'Kerala': ['English', 'Hindi', 'Malayalam', 'Tamil'],
+  'Madhya Pradesh': ['English', 'Hindi', 'Marathi'],
+  'Maharashtra': ['English', 'Hindi', 'Marathi', 'Gujarati'],
+  'Manipur': ['English', 'Hindi', 'Bengali'],
+  'Meghalaya': ['English', 'Hindi', 'Assamese', 'Bengali'],
+  'Mizoram': ['English', 'Hindi', 'Bengali'],
+  'Nagaland': ['English', 'Hindi', 'Assamese'],
+  'Odisha': ['English', 'Hindi', 'Odia', 'Telugu', 'Bengali'],
+  'Punjab': ['English', 'Hindi', 'Punjabi'],
+  'Rajasthan': ['English', 'Hindi', 'Punjabi', 'Gujarati'],
+  'Sikkim': ['English', 'Hindi', 'Bengali'],
+  'Tamil Nadu': ['English', 'Hindi', 'Tamil', 'Telugu', 'Malayalam'],
+  'Telangana': ['English', 'Hindi', 'Telugu', 'Urdu', 'Marathi'],
+  'Tripura': ['English', 'Hindi', 'Bengali'],
+  'Uttar Pradesh': ['English', 'Hindi','Bhojpuri',],
+  'Uttarakhand': ['English', 'Hindi', 'Urdu', 'Sanskrit', ],
+  'West Bengal': ['English', 'Hindi', 'Bengali', 'Odia']
+};
+
 const Register = () => {
-  const { register } = useAuth();
+  const { sendOTP, verifyOTP, resendOTP } = useAuth();
   const navigate = useNavigate();
+
+  // OTP step state
+  const [step, setStep] = useState(1); // 1 = form, 2 = OTP
+  const [pendingEmail, setPendingEmail] = useState('');
+  const [pendingPayload, setPendingPayload] = useState(null);
+  const [otpDigits, setOtpDigits] = useState(['', '', '', '', '', '']);
+  const [otpError, setOtpError] = useState('');
+  const [otpLoading, setOtpLoading] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState(0);
+  const otpRefs = useRef([]);
+
+  useEffect(() => {
+    if (resendCooldown > 0) {
+      const t = setTimeout(() => setResendCooldown(c => c - 1), 1000);
+      return () => clearTimeout(t);
+    }
+  }, [resendCooldown]);
 
   // ========================================
   // FORM STATE
@@ -81,12 +129,13 @@ const Register = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [availableCities, setAvailableCities] = useState([]);
+  const [availableLanguages, setAvailableLanguages] = useState(['Hindi', 'English']);
   const [showLanguageDropdown, setShowLanguageDropdown] = useState(false);
 
   const isLawyer = form.role === 'lawyer';
 
   // ========================================
-  // UPDATE CITIES WHEN STATE CHANGES
+  // UPDATE CITIES AND LANGUAGES WHEN STATE CHANGES
   // ========================================
   useEffect(() => {
     if (form.state && INDIAN_STATES_CITIES[form.state]) {
@@ -95,9 +144,27 @@ const Register = () => {
       if (!INDIAN_STATES_CITIES[form.state].includes(form.city)) {
         setForm(prev => ({ ...prev, city: '' }));
       }
+      
+      // Update available languages based on state
+      const stateLangs = STATE_LANGUAGES_MAP[form.state] || ['English', 'Hindi'];
+      const uniqueLangs = [...new Set(stateLangs)];
+      const filteredLangs = INDIAN_LANGUAGES.filter(lang => uniqueLangs.includes(lang));
+      setAvailableLanguages(filteredLangs);
+      
+      // Remove selected languages that are no longer available in the new state
+      setForm(prev => ({
+        ...prev,
+        selectedLanguages: prev.selectedLanguages.filter(lang => uniqueLangs.includes(lang))
+      }));
+
     } else {
       setAvailableCities([]);
-      setForm(prev => ({ ...prev, city: '' }));
+      setAvailableLanguages(['Hindi', 'English']);
+      setForm(prev => ({ 
+        ...prev, 
+        city: '',
+        selectedLanguages: prev.selectedLanguages.filter(lang => ['Hindi', 'English'].includes(lang))
+      }));
     }
   }, [form.state]);
 
@@ -276,53 +343,150 @@ const Register = () => {
     }
 
     setLoading(true);
-
     try {
       const payload = {
-        name: form.name,
-        email: form.email,
-        phone: form.phone,
-        password: form.password,
-        role: form.role,
-        gender: form.gender,
+        name: form.name, email: form.email, phone: form.phone,
+        password: form.password, role: form.role, gender: form.gender,
         location: `${form.city}, ${form.state}`,
-        languages: form.selectedLanguages,
-        state: form.state,
-        city: form.city
+        languages: form.selectedLanguages, state: form.state, city: form.city,
+        ...(isLawyer && {
+          experienceYears: Number(form.experienceYears) || 0,
+          specialization: form.specialization.split(',').map(s => s.trim()).filter(Boolean),
+          barIdNumber: form.barIdNumber.trim(),
+        }),
       };
-
-      if (isLawyer) {
-        if (form.experienceYears) {
-          payload.experienceYears = Number(form.experienceYears) || 0;
-        }
-        if (form.specialization.trim()) {
-          payload.specialization = form.specialization
-            .split(',')
-            .map(s => s.trim())
-            .filter(Boolean);
-        }
-        if (form.barIdNumber.trim()) {
-          payload.barIdNumber = form.barIdNumber.trim();
-        }
-      }
-
-      await register(payload);
-
-      // Redirect to login page
-      navigate('/login', { state: { message: 'Registration successful! Please login to continue.' } });
-
+      await sendOTP(payload);
+      setPendingEmail(form.email.toLowerCase());
+      setPendingPayload(payload);
+      setResendCooldown(60);
+      setStep(2);
     } catch (err) {
-      const errorMsg = err.response?.data?.message || err.response?.data?.error || err.message || 'Registration failed. Please check your details and try again.';
-      setError(errorMsg);
-      console.error('Registration error:', err.response?.data || err);
+      setError(err.response?.data?.message || err.message || 'Failed to send OTP. Please try again.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleOtpChange = (index, value) => {
+    const digit = value.replace(/\D/g, '').slice(-1);
+    const next = [...otpDigits];
+    next[index] = digit;
+    setOtpDigits(next);
+    setOtpError('');
+    if (digit && index < 5) otpRefs.current[index + 1]?.focus();
+  };
+
+  const handleOtpKeyDown = (index, e) => {
+    if (e.key === 'Backspace' && !otpDigits[index] && index > 0)
+      otpRefs.current[index - 1]?.focus();
+  };
+
+  const handleVerifyOTP = async () => {
+    const otp = otpDigits.join('');
+    if (otp.length !== 6) { setOtpError('Please enter the complete 6-digit code'); return; }
+    setOtpLoading(true); setOtpError('');
+    try {
+      await verifyOTP(pendingEmail, otp, pendingPayload);
+      const role = pendingPayload?.role || 'user';
+      navigate(role === 'lawyer' ? '/lawyer-dashboard' : '/dashboard');
+    } catch (err) {
+      setOtpError(err.response?.data?.message || 'Invalid OTP. Please try again.');
+      setOtpDigits(['', '', '', '', '', '']);
+      otpRefs.current[0]?.focus();
+    } finally { setOtpLoading(false); }
+  };
+
+  const handleResendOTP = async () => {
+    if (resendCooldown > 0) return;
+    try {
+      await resendOTP(pendingEmail);
+      setResendCooldown(60);
+      setOtpError('');
+      setOtpDigits(['', '', '', '', '', '']);
+    } catch (err) {
+      setOtpError(err.response?.data?.message || 'Failed to resend OTP');
     }
   };
 
   // ========================================
   // RENDER COMPONENT
   // ========================================
+  // ── OTP VERIFICATION SCREEN ──
+  if (step === 2) {
+    return (
+      <div className="flex flex-1 items-center justify-center bg-slate-50 dark:bg-slate-950 px-4 py-10">
+        <div className="w-full max-w-md rounded-3xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-8 shadow-lg text-center">
+          <div className="mb-6">
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/30 text-3xl">📧</div>
+            <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Check your email</h1>
+            <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
+              We sent a 6-digit code to<br />
+              <span className="font-semibold text-slate-700 dark:text-slate-300">{pendingEmail}</span>
+            </p>
+          </div>
+
+          {/* OTP Digit Boxes */}
+          <div className="flex justify-center gap-3 mb-6">
+            {otpDigits.map((digit, i) => (
+              <input
+                key={i}
+                ref={el => otpRefs.current[i] = el}
+                type="text"
+                inputMode="numeric"
+                maxLength={1}
+                value={digit}
+                onChange={e => handleOtpChange(i, e.target.value)}
+                onKeyDown={e => handleOtpKeyDown(i, e)}
+                className={`h-14 w-12 rounded-xl border-2 text-center text-2xl font-bold transition-all focus:outline-none ${
+                  otpError
+                    ? 'border-red-400 bg-red-50 dark:bg-red-900/20 text-red-600'
+                    : digit
+                    ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300'
+                    : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white'
+                } focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-800`}
+              />
+            ))}
+          </div>
+
+          {otpError && (
+            <p className="mb-4 text-sm text-red-600 flex items-center justify-center gap-1"><span>⚠️</span> {otpError}</p>
+          )}
+
+          <button
+            onClick={handleVerifyOTP}
+            disabled={otpLoading || otpDigits.join('').length !== 6}
+            className={`w-full rounded-xl py-3 text-sm font-semibold text-white shadow transition-all ${
+              otpLoading || otpDigits.join('').length !== 6
+                ? 'cursor-not-allowed bg-slate-300 dark:bg-slate-700'
+                : 'bg-blue-600 hover:bg-blue-700 hover:shadow-md'
+            }`}
+          >
+            {otpLoading ? (
+              <span className="flex items-center justify-center gap-2">
+                <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
+                Verifying...
+              </span>
+            ) : '✅ Verify & Create Account'}
+          </button>
+
+          <div className="mt-5 flex items-center justify-center gap-1 text-sm">
+            <span className="text-slate-500 dark:text-slate-400">Didn't get the code?</span>
+            {resendCooldown > 0 ? (
+              <span className="text-slate-400">Resend in {resendCooldown}s</span>
+            ) : (
+              <button onClick={handleResendOTP} className="font-semibold text-blue-600 hover:underline">Resend OTP</button>
+            )}
+          </div>
+
+          <button onClick={() => { setStep(1); setOtpDigits(['','','','','','']); setOtpError(''); }}
+            className="mt-4 text-sm text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors">
+            ← Back to registration form
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-1 items-center justify-center bg-slate-50 dark:bg-slate-950 px-4 py-10 dark:bg-slate-950">
       <div className="w-full max-w-3xl rounded-3xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-6 shadow-lg dark:border-slate-800 dark:bg-slate-900 sm:p-8">
@@ -558,7 +722,7 @@ const Register = () => {
                   onClick={() => setShowLanguageDropdown(!showLanguageDropdown)}>
                   {form.selectedLanguages.length > 0 ? (
                     form.selectedLanguages.map(lang => (
-                      <span key={lang} className="inline-flex items-center gap-1 rounded-md bg-primary-100 px-2 py-1 text-xs font-medium text-primary-700">
+                      <span key={lang} className="inline-flex items-center gap-1 rounded-md bg-primary-100 dark:bg-primary-900/50 px-2 py-1 text-xs font-medium text-primary-700 dark:text-primary-200">
                         {lang}
                         <button
                           type="button"
@@ -566,7 +730,7 @@ const Register = () => {
                             e.stopPropagation();
                             toggleLanguage(lang);
                           }}
-                          className="text-primary-900 hover:text-primary-600"
+                          className="text-primary-900 dark:text-primary-300 hover:text-primary-600 dark:hover:text-primary-100"
                         >
                           ×
                         </button>
@@ -580,7 +744,7 @@ const Register = () => {
                 {/* Language Dropdown */}
                 {showLanguageDropdown && (
                   <div className="max-h-48 overflow-y-auto rounded-lg border border-slate-300 bg-white dark:bg-slate-900 shadow-lg">
-                    {INDIAN_LANGUAGES.map(language => (
+                    {availableLanguages.map(language => (
                       <label
                         key={language}
                         className="flex items-center gap-3 px-4 py-2 hover:bg-slate-50 dark:bg-slate-950 cursor-pointer"

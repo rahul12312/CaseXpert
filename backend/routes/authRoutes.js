@@ -6,20 +6,26 @@ const {
   getUserProfile,
   updateUserProfile,
   updateLanguagePreference,
-  changePassword
+  changePassword,
+  sendOTP,
+  verifyOTPAndRegister,
+  resendOTP,
 } = require("../controllers/authController");
 const { verifyToken } = require("../middleware/auth");
 const upload = require("../middleware/upload");
 
-// Public routes
-router.post("/register", registerUser);
+// ── Public routes ─────────────────────────────────────────
+router.post("/register", registerUser);          // legacy
 router.post("/login", loginUser);
 
+// OTP-based registration (new 2-step flow)
+router.post("/send-otp", sendOTP);               // Step 1: send OTP
+router.post("/verify-otp", verifyOTPAndRegister); // Step 2: verify OTP → activate
+router.post("/resend-otp", resendOTP);            // Resend OTP
 
-// Protected routes
-
+// ── Protected routes ──────────────────────────────────────
 router.get("/profile", verifyToken, getUserProfile);
-router.put("/profile", verifyToken, upload.single('profileImage'), updateUserProfile);
+router.put("/profile", verifyToken, upload.single("profileImage"), updateUserProfile);
 router.put("/change-password", verifyToken, changePassword);
 router.put("/update-language", verifyToken, updateLanguagePreference);
 

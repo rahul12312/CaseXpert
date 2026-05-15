@@ -8,14 +8,22 @@ const User = require("../models/User");
 exports.createBooking = async (req, res) => {
   console.log("➡️ POST /api/bookings/book hit");
   try {
-    const { lawyerId, consultationType, date, timeSlot, description } = req.body;
+    const { lawyerId, consultationType, date, timeSlot, description, isoBookingTime, bookingTimestamp } = req.body;
     const userId = req.user.id;
 
     if (!lawyerId || !date || !timeSlot || !description) {
       return res.status(400).json({ success: false, message: "Missing required fields" });
     }
 
-    const bookingTime = new Date(`${date}T${timeSlot}:00`);
+    // Determine booking time, prioritizing exact timestamp from frontend
+    let bookingTime;
+    if (bookingTimestamp) {
+      bookingTime = new Date(Number(bookingTimestamp));
+    } else if (isoBookingTime) {
+      bookingTime = new Date(isoBookingTime);
+    } else {
+      bookingTime = new Date(`${date}T${timeSlot}:00`);
+    }
 
     // Check for double booking
     const existing = await Booking.findOne({
@@ -355,8 +363,8 @@ exports.startMeeting = async (req, res) => {
         zoomPassword = zoomData.password;
       } catch (zoomError) {
         console.error("Zoom API Error:", zoomError);
-        return res.status(500).json({ 
-          success: false, 
+        return res.status(500).json({
+          success: false,
           message: zoomError.message || "Failed to create Zoom Meeting on Zoom Servers.",
           details: zoomError.response?.data
         });

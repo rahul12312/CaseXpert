@@ -1,17 +1,159 @@
 const nodemailer = require('nodemailer');
+const sgMail = require('@sendgrid/mail');
+const dns = require('dns');
 
+// Force IPv4 resolution first to prevent ENETUNREACH errors on systems with misconfigured IPv6
+if (dns.setDefaultResultOrder) {
+    dns.setDefaultResultOrder('ipv4first');
+}
+
+// ============================================================
+// TRANSPORTER — Gmail SMTP
+// Use Gmail App Password in SMTP_PASSWORD (not your Gmail login)
+// ============================================================
 const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST || 'sandbox.smtp.mailtrap.io',
-    port: process.env.SMTP_PORT || 2525,
+    host: 'smtp.gmail.com',
+    port: 587,
+    secure: false, // STARTTLS
     auth: {
-        user: process.env.SMTP_EMAIL || process.env.SMTP_USER,
-        pass: process.env.SMTP_PASSWORD || process.env.SMTP_PASS,
+        user: process.env.SMTP_EMAIL,
+        pass: process.env.SMTP_PASSWORD,
     },
+    family: 4,
+    // Add debug logging
+    debug: true,
+    logger: true,
+    tls: {
+        // Do not fail on invalid certs
+        rejectUnauthorized: false,
+        // Force specific ciphers if needed
+        ciphers: 'SSLv3'
+    },
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
+    socketTimeout: 10000,
 });
 
-/**
- * Send Professional legal notification email
- */
+
+// ============================================================
+// SEND OTP EMAIL — For account verification during registration
+// ============================================================
+exports.sendOTPEmail = async ({ userEmail, userName, otp }) => {
+    try {
+        const fromName = process.env.FROM_NAME || 'CaseXpert Support';
+        const fromEmail = process.env.FROM_EMAIL || process.env.SMTP_EMAIL;
+        
+        const htmlContent = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <style>
+                    body { margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f1f5f9; }
+                    .wrapper { padding: 40px 20px; }
+                    .container { max-width: 560px; margin: 0 auto; background: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.08); }
+                    .header { background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); padding: 36px 40px; text-align: center; }
+                    .header-icon { font-size: 40px; margin-bottom: 12px; }
+                    .header h1 { color: #ffffff; margin: 0; font-size: 24px; font-weight: 700; letter-spacing: -0.5px; }
+                    .header p { color: #94a3b8; margin: 6px 0 0; font-size: 14px; }
+                    .body { padding: 40px; }
+                    .greeting { font-size: 16px; color: #334155; margin-bottom: 20px; }
+                    .greeting strong { color: #0f172a; }
+                    .otp-label { font-size: 13px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+                    .otp-box { background: #f8fafc; border: 2px dashed #3b82f6; border-radius: 12px; padding: 28px; text-align: center; margin: 20px 0; }
+                    .otp-code { font-size: 48px; font-weight: 800; letter-spacing: 12px; color: #1e3a8a; font-family: 'Courier New', monospace; }
+                    .otp-expiry { font-size: 13px; color: #ef4444; margin-top: 12px; font-weight: 500; }
+                    .divider { height: 1px; background: #e2e8f0; margin: 28px 0; }
+                    .info-box { background: #fef3c7; border-left: 4px solid #f59e0b; border-radius: 0 8px 8px 0; padding: 16px 20px; margin: 20px 0; }
+                    .info-box p { margin: 0; font-size: 13px; color: #92400e; }
+                    .footer { background: #f8fafc; padding: 24px 40px; text-align: center; }
+                    .footer p { margin: 0; font-size: 12px; color: #94a3b8; line-height: 1.8; }
+                    .footer strong { color: #64748b; }
+                </style>
+            </head>
+            <body>
+                <div class="wrapper">
+                    <div class="container">
+                        <div class="header">
+                            <div class="header-icon">⚖️</div>
+                            <h1>CaseXpert</h1>
+                            <p>Legal Assistance Platform</p>
+                        </div>
+                        <div class="body">
+                            <p class="greeting">Hello <strong>${userName}</strong>,</p>
+                            <p style="color:#475569; font-size:15px; margin:0 0 20px;">
+                                Thank you for registering with CaseXpert. To complete your account setup, please use the verification code below.
+                            </p>
+
+                            <p class="otp-label">Your verification code</p>
+                            <div class="otp-box">
+                                <div class="otp-code">${otp}</div>
+                                <p class="otp-expiry">⏱ This code expires in <strong>10 minutes</strong></p>
+                            </div>
+
+                            <div class="info-box">
+                                <p>⚠️ <strong>Never share this code</strong> with anyone. CaseXpert will never ask for your OTP via phone or chat.</p>
+                            </div>
+
+                            <div class="divider"></div>
+                            <p style="color:#94a3b8; font-size:13px; margin:0;">
+                                If you did not request this verification, you can safely ignore this email. Your account will not be created without entering this code.
+                            </p>
+                        </div>
+                        <div class="footer">
+                            <p>
+                                &copy; ${new Date().getFullYear()} <strong>CaseXpert Platform</strong>. All rights reserved.<br>
+                                This is an automated message — please do not reply to this email.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </body>
+            </html>
+        `;
+
+        const subjectLine = `Your CaseXpert Verification Code: ${otp}`;
+
+        // Attempt to use SendGrid if configured (More reliable on Render)
+        if (process.env.SENDGRID_API_KEY && process.env.SENDGRID_API_KEY !== 'your_sendgrid_api_key_here') {
+            console.log(`📤 Using SendGrid to send OTP to ${userEmail}...`);
+            sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+            const msg = {
+                to: userEmail,
+                from: {
+                    name: fromName,
+                    email: process.env.SENDGRID_FROM_EMAIL || fromEmail
+                },
+                subject: subjectLine,
+                html: htmlContent,
+            };
+            await sgMail.send(msg);
+            console.log(`✅ OTP email sent via SendGrid to ${userEmail}`);
+            return { success: true, provider: 'sendgrid' };
+        }
+
+        // Fallback to Nodemailer (Gmail SMTP)
+        const mailOptions = {
+            from: `"${fromName}" <${fromEmail}>`,
+            to: userEmail,
+            subject: subjectLine,
+            html: htmlContent
+        };
+
+        console.log(`📤 Attempting to send OTP email via Gmail SMTP to ${userEmail}...`);
+        const info = await transporter.sendMail(mailOptions);
+        console.log(`✅ OTP email sent via Gmail to ${userEmail}:`, info.messageId);
+        return { success: true, messageId: info.messageId, provider: 'gmail' };
+    } catch (error) {
+        console.error('❌ OTP email failed:', error);
+        return { success: false, error: error.message };
+    }
+};
+
+// ============================================================
+// SEND CASE UPDATE EMAIL — Existing functionality
+// ============================================================
 exports.sendCaseUpdateEmail = async ({
     userName,
     userEmail,
@@ -23,7 +165,7 @@ exports.sendCaseUpdateEmail = async ({
 }) => {
     try {
         const fromName = process.env.FROM_NAME || 'CaseXpert Legal Support';
-        const fromEmail = process.env.FROM_EMAIL || 'noreply@casexpert.com';
+        const fromEmail = process.env.FROM_EMAIL || process.env.SMTP_EMAIL;
 
         const mailOptions = {
             from: `"${fromName}" <${fromEmail}>`,
@@ -46,33 +188,22 @@ exports.sendCaseUpdateEmail = async ({
                 </head>
                 <body>
                     <div class="container">
-                        <div class="header">
-                            <h2>CaseXpert Notification</h2>
-                        </div>
+                        <div class="header"><h2>CaseXpert Notification</h2></div>
                         <div class="content">
                             <p>Hello <strong>${userName}</strong>,</p>
-                            <p>This is an automated notification from <strong>CaseXpert Legal Support</strong> regarding your ongoing case.</p>
-                            
-                            <p>Your case <strong>"${caseTitle}"</strong> has been updated with a new status.</p>
-                            
+                            <p>Your case <strong>"${caseTitle}"</strong> has been updated.</p>
                             <div class="details">
                                 <p><strong>Case ID:</strong> #${caseId}</p>
                                 <p><strong>New Status:</strong> <span class="status-badge">${newStatus}</span></p>
-                                <p><strong>Update Message:</strong> ${updateMessage || 'No specific update message provided by the legal team.'}</p>
-                                <p><strong>Date of Update:</strong> ${updateDate}</p>
+                                <p><strong>Update:</strong> ${updateMessage || 'No specific update message.'}</p>
+                                <p><strong>Date:</strong> ${updateDate}</p>
                             </div>
-                            
-                            <p>Our legal team is actively working on the next steps. You can view all documents, hearing schedules, and detailed progress on your dashboard.</p>
-                            
-                            <div style="text-align: center;">
+                            <div style="text-align:center;">
                                 <a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}/cases/${caseId}" class="cta-button">View Case Details</a>
                             </div>
-                            
-                            <p>Thank you for choosing CaseXpert.</p>
                         </div>
                         <div class="footer">
                             <p>&copy; ${new Date().getFullYear()} CaseXpert Platform. All rights reserved.</p>
-                            <p>This is a system-generated email. Please do not reply directly to this message.</p>
                         </div>
                     </div>
                 </body>
@@ -81,10 +212,10 @@ exports.sendCaseUpdateEmail = async ({
         };
 
         const info = await transporter.sendMail(mailOptions);
-        console.log(`✅ Email sent for case #${caseId}:`, info.messageId);
+        console.log(`✅ Case update email sent for #${caseId}:`, info.messageId);
         return { success: true, messageId: info.messageId };
     } catch (error) {
-        console.error('❌ Email notification failed:', error);
+        console.error('❌ Case update email failed:', error);
         return { success: false, error: error.message };
     }
 };
