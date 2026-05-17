@@ -321,7 +321,7 @@ const AILegalAssistantChat = () => {
 
 
     return (
-        <div className="flex min-h-[calc(100vh-7rem)] bg-slate-50 dark:bg-slate-950 sm:rounded-2xl overflow-hidden shadow-2xl border border-slate-200 dark:border-slate-800">
+        <div className="flex h-screen w-full bg-slate-50 dark:bg-slate-950 overflow-hidden">
             {/* ============================================ */}
             {/* LEFT SIDEBAR - Chat History */}
             {/* ============================================ */}
@@ -396,7 +396,7 @@ const AILegalAssistantChat = () => {
             {/* ============================================ */}
             {/* MAIN CHAT AREA */}
             {/* ============================================ */}
-            <div className="flex flex-1 flex-col">
+            <div className="flex flex-1 flex-col h-full overflow-hidden">
                 {/* Header */}
                 <div className="flex items-center justify-between border-b border-slate-200 dark:border-white/10 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md px-6 py-4 sticky top-0 z-30">
                     <div className="flex items-center gap-4">
@@ -455,7 +455,7 @@ const AILegalAssistantChat = () => {
                 </div>
 
                 {/* Messages Area */}
-                <div ref={messagesContainerRef} className="flex-1 bg-gradient-to-b from-slate-50 to-white dark:from-slate-950 dark:to-slate-900">
+                <div ref={messagesContainerRef} className="flex-1 overflow-y-auto bg-gradient-to-b from-slate-50 to-white dark:from-slate-950 dark:to-slate-900 custom-scrollbar">
                     <div className="mx-auto max-w-3xl px-4 py-8">
                         {messages.length === 0 ? (
                             // Empty State
