@@ -21,7 +21,7 @@ async function getZoomAccessToken() {
         }
     );
 
-    console.log("🎟️ Zoom Token Scopes:", response.data.scope);
+    console.log("🎟️ Zoom Token Scopes: Fetched successfully (Count: " + (response.data.scope ? response.data.scope.split(' ').length : 0) + ")");
     return response.data.access_token;
 }
 
