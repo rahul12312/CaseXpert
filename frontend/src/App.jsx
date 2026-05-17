@@ -33,6 +33,7 @@ import ReportsDashboard from './pages/ReportsDashboard.jsx';
 import UserBookings from './pages/UserBookings.jsx';
 import AIInsights from './pages/AIInsights.jsx';
 import VideoHub from './pages/VideoHub.jsx';
+import VideoConsultation from './pages/VideoConsultation.jsx';
 import ClientDashboard from './pages/ClientDashboard.jsx';
 
 // Footer Pages
@@ -126,6 +127,7 @@ const App = () => {
 
           {/* Video Hub / Consultations */}
           <Route path="/video-hub" element={<ProtectedRoute><VideoHub /></ProtectedRoute>} />
+          <Route path="/consultation/:roomId" element={<ProtectedRoute><VideoConsultation /></ProtectedRoute>} />
           
           {/* Client Dashboard */}
           <Route path="/dashboard" element={<ProtectedRoute allowedRoles={['client', 'user']}><ClientDashboard /></ProtectedRoute>} />
