@@ -97,11 +97,11 @@ const FilterSidebar = ({ filters, onFilterChange, onClearFilters, isOpen, onClos
                     <select
                         value={filters.practice_area || ''}
                         onChange={(e) => handleFilterChange('practice_area', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
                     >
-                        <option value="">All Practice Areas</option>
+                        <option value="" className="bg-white dark:bg-slate-800 text-gray-900 dark:text-white">All Practice Areas</option>
                         {filterOptions.practice_areas?.map((area) => (
-                            <option key={area} value={area}>{area}</option>
+                            <option key={area} value={area} className="bg-white dark:bg-slate-800 text-gray-900 dark:text-white">{area}</option>
                         ))}
                     </select>
                 </FilterSection>
@@ -111,11 +111,11 @@ const FilterSidebar = ({ filters, onFilterChange, onClearFilters, isOpen, onClos
                     <select
                         value={filters.city || ''}
                         onChange={(e) => handleFilterChange('city', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
                     >
-                        <option value="">All Cities</option>
+                        <option value="" className="bg-white dark:bg-slate-800 text-gray-900 dark:text-white">All Cities</option>
                         {filterOptions.cities?.map((city) => (
-                            <option key={city} value={city}>{city}</option>
+                            <option key={city} value={city} className="bg-white dark:bg-slate-800 text-gray-900 dark:text-white">{city}</option>
                         ))}
                     </select>
                 </FilterSection>
@@ -181,11 +181,11 @@ const FilterSidebar = ({ filters, onFilterChange, onClearFilters, isOpen, onClos
                     <select
                         value={filters.language || ''}
                         onChange={(e) => handleFilterChange('language', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
                     >
-                        <option value="">All Languages</option>
+                        <option value="" className="bg-white dark:bg-slate-800 text-gray-900 dark:text-white">All Languages</option>
                         {filterOptions.languages?.map((lang) => (
-                            <option key={lang} value={lang}>{lang}</option>
+                            <option key={lang} value={lang} className="bg-white dark:bg-slate-800 text-gray-900 dark:text-white">{lang}</option>
                         ))}
                     </select>
                 </FilterSection>

@@ -104,11 +104,11 @@ const MapViewToggle = () => {
                         <select
                             value={selectedCity}
                             onChange={(e) => setSelectedCity(e.target.value)}
-                            className="px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            className="px-4 py-3 border border-gray-300 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
                         >
-                            <option value="">All Cities</option>
+                            <option value="" className="bg-white dark:bg-slate-800 text-gray-900 dark:text-white">All Cities</option>
                             {uniqueCities.map(city => (
-                                <option key={city} value={city}>{city}</option>
+                                <option key={city} value={city} className="bg-white dark:bg-slate-800 text-gray-900 dark:text-white">{city}</option>
                             ))}
                         </select>
 

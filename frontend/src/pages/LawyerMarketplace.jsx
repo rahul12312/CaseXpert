@@ -437,12 +437,12 @@ const LawyerMarketplace = () => {
                                     <select
                                         value={sortBy}
                                         onChange={(e) => setSortBy(e.target.value)}
-                                        className="bg-transparent text-slate-700 dark:text-slate-300 text-xs sm:text-sm font-bold focus:outline-none w-full"
+                                        className="bg-transparent text-slate-700 dark:text-slate-300 text-xs sm:text-sm font-bold focus:outline-none w-full outline-none"
                                     >
-                                        <option value="">Default Sort</option>
-                                        <option value="rating">Top Rated</option>
-                                        <option value="experience">Experience</option>
-                                        <option value="fee_low">Price: Low-High</option>
+                                        <option value="" className="bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300">Default Sort</option>
+                                        <option value="rating" className="bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300">Top Rated</option>
+                                        <option value="experience" className="bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300">Experience</option>
+                                        <option value="fee_low" className="bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300">Price: Low-High</option>
                                     </select>
                                 </div>
                             </div>
