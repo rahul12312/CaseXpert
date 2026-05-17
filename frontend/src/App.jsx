@@ -94,6 +94,7 @@ const App = () => {
           <Route path="/lawyers" element={<LawyerMarketplace />} />
           <Route path="/lawyers-map" element={<LawyerMarketplaceWithMap />} />
           <Route path="/lawyers/:id" element={<LawyerProfile />} />
+          <Route path="/lawyer/:id" element={<LawyerProfile />} />
           <Route path="/news" element={<NewsHub />} />
 
           {/* Static Content */}
