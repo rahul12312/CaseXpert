@@ -2,25 +2,21 @@ import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import api from '../lib/api';
-import { useNavigate, Link, useLocation } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import {
-    Bot, Briefcase, Gavel, Video, FileText,
-    BarChart2, BookOpen, Clock, Check, Bell,
-    User, Settings, LogOut, LayoutDashboard,
-    Calendar, MessageSquare, Shield, Zap, TrendingUp, Search, Menu, X
+    Bell, Search, Briefcase, Calendar, Shield,
+    FileText, TrendingUp, Bot, Gavel, Zap
 } from 'lucide-react';
 
 const ClientDashboard = () => {
     const { user, isAuthenticated, logout } = useAuth();
     const { theme, toggleTheme } = useTheme();
     const navigate = useNavigate();
-    const location = useLocation();
     const [recentCases, setRecentCases] = useState([]);
     const [recentBookings, setRecentBookings] = useState([]);
     const [notifications, setNotifications] = useState([]);
     const [loading, setLoading] = useState(true);
     const [notificationsOpen, setNotificationsOpen] = useState(false);
-    const [sidebarOpen, setSidebarOpen] = useState(false);
     const notificationRef = React.useRef(null);
     const [stats, setStats] = useState({
         activeCases: 0,
@@ -74,18 +70,7 @@ const ClientDashboard = () => {
         fetchData();
     }, [isAuthenticated, navigate]);
 
-    const sidebarLinks = [
-        { name: 'Overview', path: '/dashboard', icon: LayoutDashboard },
-        { name: 'AI Counsel', path: '/assistant', icon: Bot, badge: 'Smart' },
-        { name: 'Litigation Hub', path: '/cases', icon: Briefcase },
-        { name: 'Legal Market', path: '/lawyers', icon: Gavel },
-        { name: 'Drafting Room', path: '/documents', icon: FileText },
-        { name: 'AI Doc Analyzer', path: '/document-analyzer', icon: Search, badge: 'New' },
-        { name: 'Consultations', path: '/video-hub', icon: Video },
-        { name: 'Knowledge Center', path: '/news', icon: BookOpen },
-        { name: 'Analytics', path: '/reports', icon: BarChart2 },
-        { name: 'Calendar', path: '/bookings', icon: Calendar },
-    ];
+
 
     const handleClearNotifications = () => {
         setNotifications([]);
@@ -105,70 +90,6 @@ const ClientDashboard = () => {
     return (
         <div className="flex h-screen bg-slate-50 dark:bg-[#020617] text-slate-700 dark:text-slate-300 overflow-hidden font-sans">
 
-            {/* Mobile Sidebar Overlay */}
-            {sidebarOpen && (
-                <div
-                    className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm lg:hidden"
-                    onClick={() => setSidebarOpen(false)}
-                />
-            )}
-
-            {/* Sidebar */}
-            <aside className={`fixed inset-y-0 left-0 z-50 w-72 flex flex-col border-r border-slate-200 dark:border-slate-800/50 bg-slate-50 dark:bg-[#020617] backdrop-blur-3xl transform transition-transform duration-300 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:relative lg:translate-x-0 lg:flex lg:w-80`}>
-                <div className="p-6 pb-4 flex items-center justify-between">
-                    <div className="flex items-center gap-3 px-2">
-                        <div className="relative h-10 w-10 flex items-center justify-center rounded-2xl bg-indigo-600 shadow-[0_0_20px_rgba(79,70,229,0.4)]">
-                            <span className="text-xl">⚖️</span>
-                            <div className="absolute -right-1 -top-1 h-2.5 w-2.5 rounded-full bg-emerald-500 border-2 border-white dark:border-[#020617]"></div>
-                        </div>
-                        <div>
-                            <span className="text-xl font-black text-slate-900 dark:text-white tracking-tight">CaseXpert</span>
-                            <div className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest mt-0.5">Legal Ecosystem</div>
-                        </div>
-                    </div>
-                    <button
-                        onClick={() => setSidebarOpen(false)}
-                        className="lg:hidden p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-                    >
-                        <X className="h-5 w-5" />
-                    </button>
-                </div>
-
-                <nav className="flex-1 space-y-1 px-4 overflow-y-auto">
-                    {sidebarLinks.map((link) => (
-                        <Link
-                            key={link.path}
-                            to={link.path}
-                            onClick={() => setSidebarOpen(false)}
-                            className={`flex items-center justify-between rounded-2xl px-4 py-3.5 transition-all duration-300 group ${location.pathname === link.path
-                                ? 'bg-indigo-600 shadow-[0_4px_20px_rgba(79,70,229,0.3)] text-white'
-                                : 'hover:bg-slate-100 dark:hover:bg-slate-800/50 text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
-                            }`}
-                        >
-                            <div className="flex items-center gap-3">
-                                <link.icon className={`h-5 w-5 shrink-0 ${location.pathname === link.path ? 'text-white' : 'text-slate-500 dark:text-slate-400 group-hover:text-indigo-400'}`} />
-                                <span className="font-bold text-sm tracking-wide">{link.name}</span>
-                            </div>
-                            {link.badge && (
-                                <span className={`px-2 py-0.5 rounded-lg text-[10px] font-black uppercase tracking-tighter ${location.pathname === link.path ? 'bg-white/20 text-white' : 'bg-indigo-100/50 dark:bg-indigo-500/10 text-indigo-400'}`}>
-                                    {link.badge}
-                                </span>
-                            )}
-                        </Link>
-                    ))}
-                </nav>
-
-                <div className="p-4 mt-auto">
-                    <button
-                        onClick={() => logout()}
-                        className="flex w-full items-center gap-3 rounded-2xl px-4 py-3.5 text-sm font-bold text-slate-600 dark:text-slate-400 hover:bg-red-500/10 hover:text-red-400 transition-all group"
-                    >
-                        <LogOut className="h-5 w-5 group-hover:text-red-500 group-hover:scale-110 transition-transform" />
-                        Sign Out
-                    </button>
-                </div>
-            </aside>
-
             {/* Main Content Area */}
             <main className="flex-1 h-screen overflow-y-auto overflow-x-hidden bg-[radial-gradient(circle_at_top_right,rgba(241,245,249,1),rgba(248,250,252,1))] dark:bg-[radial-gradient(circle_at_top_right,rgba(30,41,59,0.3),rgba(2,6,23,1))] relative min-w-0">
                 {/* Background Decorations */}
@@ -177,14 +98,6 @@ const ClientDashboard = () => {
 
                 {/* Top Nav */}
                 <header className="sticky top-0 z-40 px-4 sm:px-6 pt-4 sm:pt-6 pb-4 flex items-center gap-3 backdrop-blur-sm">
-                    {/* Mobile Hamburger */}
-                    <button
-                        onClick={() => setSidebarOpen(true)}
-                        className="lg:hidden h-10 w-10 rounded-xl bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 flex items-center justify-center text-slate-500 hover:text-indigo-400 transition-colors shrink-0"
-                        aria-label="Open menu"
-                    >
-                        <Menu className="h-5 w-5" />
-                    </button>
 
                     {/* Search Bar */}
                     <div className="relative group flex-1 min-w-0">

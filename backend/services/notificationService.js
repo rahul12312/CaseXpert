@@ -6,9 +6,13 @@ if (process.env.SENDGRID_API_KEY) {
     sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 }
 
-// Initialize Twilio
-const twilioClient = (process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN) 
-    ? twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN)
+// Initialize Twilio (only if real credentials are provided - SID must start with "AC")
+const twilioAccountSid = process.env.TWILIO_ACCOUNT_SID;
+const twilioAuthToken = process.env.TWILIO_AUTH_TOKEN;
+const isTwilioConfigured = twilioAccountSid && twilioAuthToken &&
+    twilioAccountSid.startsWith('AC') && twilioAuthToken.length > 10;
+const twilioClient = isTwilioConfigured
+    ? twilio(twilioAccountSid, twilioAuthToken)
     : null;
 
 /**

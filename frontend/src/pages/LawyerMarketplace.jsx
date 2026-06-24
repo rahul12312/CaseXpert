@@ -315,7 +315,7 @@ const LawyerMarketplace = () => {
                                     }}
                                     onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
                                     placeholder="Search by name, specialization..."
-                                    className="w-full pl-12 pr-4 py-3 sm:py-4 rounded-xl text-slate-900 dark:text-white font-medium text-base sm:text-lg focus:outline-none placeholder:text-slate-400"
+                                    className="w-full pl-12 pr-4 py-3 sm:py-4 rounded-xl bg-transparent text-slate-900 dark:text-white font-medium text-base sm:text-lg focus:outline-none placeholder:text-slate-400"
                                 />
                                 {searchQuery && (
                                     <button

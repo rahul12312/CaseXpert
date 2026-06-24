@@ -12,6 +12,8 @@ const userSchema = new mongoose.Schema(
     is_active: { type: Boolean, default: true },
     is_verified: { type: Boolean, default: false },
     preferred_language: { type: String, enum: ["en", "hi", "mr"], default: "en" },
+    email_notifications: { type: Boolean, default: true },
+    two_factor_auth: { type: Boolean, default: false },
     reset_password_token: { type: String, default: null },
     reset_password_expires: { type: Date, default: null },
     // OTP fields for email verification

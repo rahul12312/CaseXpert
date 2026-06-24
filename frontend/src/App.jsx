@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route, useLocation } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 
 // Layout Components
@@ -28,6 +28,7 @@ import DocumentAnalyzer from './pages/DocumentAnalyzer.jsx';
 
 // Private Pages - Client
 import CaseTracker from './pages/CaseTracker.jsx';
+import CreateCase from './pages/CreateCase.jsx';
 import DocumentDrafting from './pages/DocumentDrafting.jsx';
 import ReportsDashboard from './pages/ReportsDashboard.jsx';
 import UserBookings from './pages/UserBookings.jsx';
@@ -74,8 +75,8 @@ const App = () => {
     location.pathname === '/dashboard';
 
   const hideFooter = isFeaturePage;
-  const hideNavbar = location.pathname.startsWith('/assistant') || location.pathname.startsWith('/consultation');
-  const fullScreen = hideNavbar;
+  const hideNavbar = location.pathname.startsWith('/consultation');
+  const fullScreen = location.pathname.startsWith('/assistant') || location.pathname.startsWith('/consultation');
 
   return (
     <div className={`flex min-h-screen flex-col bg-slate-50 dark:bg-slate-950 overflow-x-hidden`}>
@@ -113,6 +114,7 @@ const App = () => {
 
           {/* Case Tracking Routes - Client Only */}
           <Route path="/cases" element={<ProtectedRoute allowedRoles={['client', 'user']}><CaseTracker /></ProtectedRoute>} />
+          <Route path="/cases/create" element={<ProtectedRoute allowedRoles={['client', 'user']}><CreateCase /></ProtectedRoute>} />
           
           {/* Document Management - Client Only */}
           <Route path="/documents" element={<ProtectedRoute allowedRoles={['client', 'user']}><DocumentDrafting /></ProtectedRoute>} />
@@ -151,6 +153,9 @@ const App = () => {
 
           {/* AI Assistant - Accessible to all logged in users */}
           <Route path="/assistant" element={<ProtectedRoute><AILegalAssistantChat /></ProtectedRoute>} />
+
+          {/* Catch-all: redirect any unknown URL to Home */}
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
       {!hideFooter && <FooterModern />}

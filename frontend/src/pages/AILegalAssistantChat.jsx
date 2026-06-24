@@ -120,6 +120,9 @@ const AILegalAssistantChat = () => {
             if (data.success) {
                 setMessages(data.messages || []);
                 setCurrentSessionId(sessionId);
+                if (window.innerWidth < 768) {
+                    setSidebarOpen(false);
+                }
             }
         } catch (error) {
             console.error('Failed to load session:', error);
@@ -135,6 +138,9 @@ const AILegalAssistantChat = () => {
         setMessages([]);
         setCurrentSessionId(null);
         setInput('');
+        if (window.innerWidth < 768) {
+            setSidebarOpen(false);
+        }
     };
 
     /**
@@ -221,7 +227,7 @@ const AILegalAssistantChat = () => {
         const newGroups = { ...groupedSessions };
         Object.keys(newGroups).forEach(key => {
             if (Array.isArray(newGroups[key])) {
-                newGroups[key] = newGroups[key].filter(session => session.id !== sessionId);
+                newGroups[key] = newGroups[key].filter(session => (session.id || session._id) !== sessionId);
             }
         });
         setGroupedSessions(newGroups);
@@ -322,20 +328,29 @@ const AILegalAssistantChat = () => {
 
 
     return (
-        <div className="flex h-screen w-full bg-slate-50 dark:bg-slate-950 overflow-hidden">
+        <div className="flex h-[calc(100vh-64px)] mt-16 w-full bg-slate-50 dark:bg-slate-950 overflow-hidden">
             {/* ============================================ */}
             {/* LEFT SIDEBAR - Chat History */}
             {/* ============================================ */}
             <div className={`${sidebarOpen ? 'w-72' : 'w-0'} transition-all duration-300 overflow-hidden border-r border-slate-200 dark:border-slate-700 dark:border-slate-800 bg-white dark:bg-slate-900 dark:bg-slate-900`}>
                 <div className="flex h-full flex-col p-4">
-                    {/* New Chat Button */}
-                    <button
-                        onClick={startNewChat}
-                        className="mb-6 flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 px-4 py-3 text-white font-medium shadow-md hover:shadow-lg transition-all active:scale-95"
-                    >
-                        <Plus size={20} />
-                        <span>New Chat</span>
-                    </button>
+                    {/* Top Row: New Chat & Close Sidebar */}
+                    <div className="mb-6 flex items-center gap-2">
+                        <button
+                            onClick={startNewChat}
+                            className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 px-4 py-3 text-white font-medium shadow-md hover:shadow-lg transition-all active:scale-95"
+                        >
+                            <Plus size={20} />
+                            <span>New Chat</span>
+                        </button>
+                        <button
+                            onClick={() => setSidebarOpen(false)}
+                            className="flex h-[48px] w-[48px] items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                            title="Close Sidebar"
+                        >
+                            <ChevronLeft size={20} />
+                        </button>
+                    </div>
 
                     {/* Chat Sessions List */}
                     <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
@@ -361,11 +376,11 @@ const AILegalAssistantChat = () => {
                                             </h3>
                                             {groupedSessions[groupKey].map(session => (
                                                 <SessionItem
-                                                    key={session.id}
+                                                    key={session.id || session._id}
                                                     session={session}
-                                                    isActive={session.id === currentSessionId}
-                                                    onClick={() => loadSession(session.id)}
-                                                    onDelete={(e) => deleteSession(session.id, e)}
+                                                    isActive={(session.id || session._id) === currentSessionId}
+                                                    onClick={() => loadSession(session.id || session._id)}
+                                                    onDelete={(e) => deleteSession(session.id || session._id, e)}
                                                 />
                                             ))}
                                         </div>
@@ -401,22 +416,15 @@ const AILegalAssistantChat = () => {
                 {/* Header */}
                 <div className="flex items-center justify-between border-b border-slate-200 dark:border-white/10 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md px-6 py-4 sticky top-0 z-30">
                     <div className="flex items-center gap-4">
-                        {/* Back to Dashboard */}
-                        <Link 
-                            to={isAdmin() ? "/admin/dashboard" : isLawyer() ? "/lawyer/dashboard" : "/dashboard"}
-                            className="flex items-center gap-2 rounded-lg p-2 hover:bg-slate-100 dark:hover:bg-white/10 text-slate-500 transition-colors"
-                            title="Back to Dashboard"
-                        >
-                            <ArrowLeft size={20} />
-                            <span className="hidden md:inline font-semibold text-sm text-slate-700 dark:text-slate-300">Dashboard</span>
-                        </Link>
 
-                        <button
-                            onClick={() => setSidebarOpen(!sidebarOpen)}
-                            className="rounded-lg p-2 hover:bg-slate-100 dark:hover:bg-white/10 text-slate-500 transition-colors"
-                        >
-                            {sidebarOpen ? <ChevronLeft size={20} /> : <Menu size={20} />}
-                        </button>
+                        {!sidebarOpen && (
+                            <button
+                                onClick={() => setSidebarOpen(true)}
+                                className="rounded-lg p-2 hover:bg-slate-100 dark:hover:bg-white/10 text-slate-500 transition-colors"
+                            >
+                                <Menu size={20} />
+                            </button>
+                        )}
                         
                         <div className="flex items-center gap-3">
                             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-white shadow-blue-500/20 shadow-lg">
@@ -554,7 +562,7 @@ const AILegalAssistantChat = () => {
                 {/* Input Area */}
                 <div className="border-t border-slate-200 dark:border-slate-700 dark:border-slate-800 bg-white dark:bg-slate-900 dark:bg-slate-900 px-4 py-4">
                     <div className="mx-auto max-w-3xl">
-                        <form onSubmit={handleSubmit} className="flex gap-3">
+                        <form onSubmit={handleSubmit} className="flex items-end gap-2 rounded-3xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 p-1.5 pl-4 shadow-sm focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500 transition-all">
                             <textarea
                                 ref={inputRef}
                                 value={input}
@@ -567,7 +575,7 @@ const AILegalAssistantChat = () => {
                                 }}
                                 placeholder="Ask about Indian law, rights, or procedures..."
                                 rows={1}
-                                className="flex-1 max-h-48 py-3 bg-transparent border-none focus:ring-0 text-sm text-slate-900 dark:text-white resize-none scroll-smooth"
+                                className="flex-1 max-h-48 py-2.5 bg-transparent border-none focus:ring-0 outline-none text-sm text-slate-900 dark:text-white resize-none scroll-smooth"
                                 style={{ height: 'auto' }}
                                 onInput={(e) => {
                                     e.target.style.height = 'auto';
@@ -578,26 +586,24 @@ const AILegalAssistantChat = () => {
                             <button
                                 type="button"
                                 onClick={startVoiceInput}
-                                className={`p-3 rounded-full transition-all ${
+                                className={`p-2.5 rounded-full transition-all ${
                                     isListening 
                                     ? 'text-red-500 bg-red-50 dark:bg-red-500/10 animate-pulse' 
-                                    : 'text-slate-400 hover:text-blue-500'
+                                    : 'text-slate-400 hover:text-blue-500 hover:bg-slate-100 dark:hover:bg-slate-700'
                                 }`}
                                 title={isListening ? 'Stop listening' : 'Voice input'}
                             >
-                                {isListening ? <MicOff size={22} /> : <Mic size={22} />}
+                                {isListening ? <MicOff size={20} /> : <Mic size={20} />}
                             </button>
-
-
 
                             {/* Send Button */}
                             <button
                                 type="submit"
                                 disabled={!input.trim() || loading}
-                                className={`p-2.5 rounded-full shadow-lg transition-all ${
+                                className={`p-2.5 rounded-full shadow-md transition-all ${
                                     input.trim() && !loading
                                     ? 'bg-blue-600 text-white hover:scale-105 hover:bg-blue-700'
-                                    : 'bg-slate-200 dark:bg-white/5 text-slate-400 cursor-not-allowed'
+                                    : 'bg-slate-100 dark:bg-slate-700 text-slate-400 cursor-not-allowed'
                                 }`}
                             >
                                 {loading ? (
@@ -667,7 +673,7 @@ const SessionItem = ({ session, isActive, onClick, onDelete }) => {
                 <button
                     onClick={(e) => {
                         e.stopPropagation();
-                        onDelete();
+                        onDelete(e);
                     }}
                     className="opacity-0 group-hover:opacity-100 rounded-lg p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-all"
                     title="Delete chat"

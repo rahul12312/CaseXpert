@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import FAQSection from '../components/FAQSection';
 import {
@@ -135,15 +135,6 @@ const FeatureSection = ({ feature, index, isAuthenticated }) => {
 
 const Home = () => {
   const { isAuthenticated, isLawyer } = useAuth();
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (isLawyer && isLawyer()) {
-      navigate('/lawyer/dashboard');
-    } else if (isAuthenticated) {
-      navigate('/dashboard');
-    }
-  }, [isLawyer, isAuthenticated, navigate]);
 
   const features = [
     {

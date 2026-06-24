@@ -3,7 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 
 const Login = () => {
-  const { login } = useAuth();
+  const { login, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [email, setEmail] = useState('');
@@ -14,28 +14,25 @@ const Login = () => {
   const [successMessage, setSuccessMessage] = useState('');
 
   useEffect(() => {
+    // If already logged in, go straight to home
+    if (isAuthenticated) {
+      navigate('/', { replace: true });
+      return;
+    }
     if (location.state?.message) {
       setSuccessMessage(location.state.message);
-      // Clear state so refresh doesn't show it again
       window.history.replaceState({}, document.title);
     }
-  }, [location]);
+  }, [isAuthenticated, location]);
 
   const handleSubmit = async e => {
     e.preventDefault();
     setError('');
     setLoading(true);
     try {
-      const user = await login(email, password);
-
-      // Role-based redirect
-      if (user.role === 'admin' || user.user_type === 'admin') {
-        navigate('/admin/dashboard');
-      } else if (user.role === 'lawyer' || user.user_type === 'lawyer') {
-        navigate('/lawyer/dashboard');
-      } else {
-        navigate('/');
-      }
+      await login(email, password);
+      // Always redirect to home page after login
+      navigate('/');
     } catch (err) {
       const errorMsg = err.response?.data?.message || err.response?.data?.error || (err.message === 'Network Error' ? 'Cannot connect to server. Please ensure the backend is running.' : err.message) || 'Login failed. Please check your details and try again.';
       setError(errorMsg);

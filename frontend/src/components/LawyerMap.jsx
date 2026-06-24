@@ -1,33 +1,44 @@
-import React from 'react';
-import { GoogleMap, LoadScript, Marker, InfoWindow } from '@react-google-maps/api';
-import { MapPin, Star, Briefcase, Phone } from 'lucide-react';
+import React, { useEffect } from 'react';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+import { Star, Briefcase, Phone, MapPin } from 'lucide-react';
 
-const containerStyle = {
-    width: '100%',
-    height: '500px',
-    borderRadius: '12px'
+// Fix Leaflet's default icon issue in React/Vite
+import icon from 'leaflet/dist/images/marker-icon.png';
+import iconShadow from 'leaflet/dist/images/marker-shadow.png';
+
+let DefaultIcon = L.icon({
+    iconUrl: icon,
+    shadowUrl: iconShadow,
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    tooltipAnchor: [16, -28],
+});
+L.Marker.prototype.options.icon = DefaultIcon;
+
+// Component to handle dynamic map centering
+const MapUpdater = ({ center, zoom }) => {
+    const map = useMap();
+    useEffect(() => {
+        if (center) {
+            map.setView([center.lat, center.lng], zoom || map.getZoom(), {
+                animate: true,
+                duration: 1
+            });
+        }
+    }, [center, zoom, map]);
+    return null;
 };
 
-const defaultCenter = {
-    lat: 20.5937, // India center
-    lng: 78.9629
-};
-
-/**
- * LawyerMap Component - Shows multiple lawyers on an interactive map
- * @param {Array} lawyers - Array of lawyer objects with lat/lng
- * @param {Function} onMarkerClick - Callback when marker is clicked
- * @param {Object} center - Optional center coordinates
- * @param {Number} zoom - Optional zoom level (default: 12)
- */
 const LawyerMap = ({ lawyers = [], onMarkerClick, center, zoom = 12 }) => {
-    const [selectedLawyer, setSelectedLawyer] = React.useState(null);
+    // Default to India center if no coordinates are available
+    const defaultCenter = { lat: 20.5937, lng: 78.9629 };
     const [mapCenter, setMapCenter] = React.useState(center || defaultCenter);
-    const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '';
 
-    React.useEffect(() => {
+    useEffect(() => {
         if (lawyers.length > 0 && !center) {
-            // Auto-center to first lawyer or calculate bounds
+            // Auto-center to first lawyer
             const firstLawyer = lawyers.find(l => l.latitude && l.longitude);
             if (firstLawyer) {
                 setMapCenter({
@@ -40,125 +51,76 @@ const LawyerMap = ({ lawyers = [], onMarkerClick, center, zoom = 12 }) => {
         }
     }, [lawyers, center]);
 
-    const handleMarkerClick = (lawyer) => {
-        setSelectedLawyer(lawyer);
-        if (onMarkerClick) {
-            onMarkerClick(lawyer);
-        }
-    };
-
-    // Fallback: If no API key, show message
-    if (!apiKey) {
-        return (
-            <div className="w-full h-[500px] bg-gray-100 dark:bg-gray-800 rounded-xl flex items-center justify-center">
-                <div className="text-center p-8">
-                    <MapPin className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                        Map View Unavailable
-                    </h3>
-                    <p className="text-gray-500 dark:text-gray-400 max-w-md">
-                        Google Maps API key not configured. Please add VITE_GOOGLE_MAPS_API_KEY to your .env file.
-                    </p>
-                    <p className="text-sm text-gray-400 mt-2">
-                        Displaying {lawyers.length} lawyers with location data
-                    </p>
-                </div>
-            </div>
-        );
-    }
+    const validLawyers = lawyers.filter(lawyer => lawyer.latitude && lawyer.longitude);
 
     return (
-        <div className="w-full">
-            <LoadScript googleMapsApiKey={apiKey}>
-                <GoogleMap
-                    mapContainerStyle={containerStyle}
-                    center={mapCenter}
-                    zoom={zoom}
-                    options={{
-                        zoomControl: true,
-                        streetViewControl: false,
-                        mapTypeControl: false,
-                        fullscreenControl: true
-                    }}
-                >
-                    {lawyers
-                        .filter(lawyer => lawyer.latitude && lawyer.longitude)
-                        .map((lawyer) => (
-                            <Marker
-                                key={lawyer.id}
-                                position={{
-                                    lat: parseFloat(lawyer.latitude),
-                                    lng: parseFloat(lawyer.longitude)
-                                }}
-                                onClick={() => handleMarkerClick(lawyer)}
-                                title={lawyer.name}
-                            />
-                        ))}
+        <div className="w-full h-[500px] rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 shadow-sm relative z-0">
+            <MapContainer 
+                center={[mapCenter.lat, mapCenter.lng]} 
+                zoom={zoom} 
+                scrollWheelZoom={true}
+                className="w-full h-full z-0"
+            >
+                <TileLayer
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                />
+                
+                <MapUpdater center={mapCenter} zoom={zoom} />
 
-                    {selectedLawyer && (
-                        <InfoWindow
-                            position={{
-                                lat: parseFloat(selectedLawyer.latitude),
-                                lng: parseFloat(selectedLawyer.longitude)
-                            }}
-                            onCloseClick={() => setSelectedLawyer(null)}
-                        >
-                            <div className="p-3 max-w-xs">
-                                <div className="flex items-start gap-3 mb-3">
-                                    <img
-                                        src={selectedLawyer.profile_image || `https://ui-avatars.com/api/?name=${encodeURIComponent(selectedLawyer.name)}&background=3b82f6&color=fff`}
-                                        alt={selectedLawyer.name}
-                                        className="w-12 h-12 rounded-full object-cover"
-                                    />
-                                    <div className="flex-1">
-                                        <h4 className="font-bold text-gray-900 dark:text-white text-base mb-1">
-                                            {selectedLawyer.name}
-                                        </h4>
-                                        {selectedLawyer.average_rating > 0 && (
-                                            <div className="flex items-center gap-1 text-sm">
-                                                <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
-                                                <span className="font-semibold text-gray-700 dark:text-gray-300">
-                                                    {parseFloat(selectedLawyer.average_rating).toFixed(1)}
-                                                </span>
-                                            </div>
-                                        )}
+                {validLawyers.map((lawyer) => (
+                    <Marker
+                        key={lawyer.id || lawyer._id}
+                        position={[parseFloat(lawyer.latitude), parseFloat(lawyer.longitude)]}
+                        eventHandlers={{
+                            click: () => {
+                                if (onMarkerClick) {
+                                    onMarkerClick(lawyer);
+                                }
+                            },
+                        }}
+                    >
+                        <Popup className="rounded-xl custom-popup">
+                            <div className="p-1 min-w-[200px]">
+                                <div className="flex items-center gap-3 mb-2">
+                                    <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-lg flex-shrink-0">
+                                        {lawyer.name?.charAt(0) || 'L'}
                                     </div>
-                                </div>
-
-                                {selectedLawyer.address_line1 && (
-                                    <div className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400 mb-2">
-                                        <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                                        <p className="line-clamp-2">
-                                            {selectedLawyer.address_line1}, {selectedLawyer.city}
+                                    <div>
+                                        <h3 className="font-bold text-slate-900 m-0 leading-tight">{lawyer.name}</h3>
+                                        <p className="text-xs text-slate-500 flex items-center gap-1 m-0 mt-1">
+                                            <Briefcase className="w-3 h-3" />
+                                            {lawyer.experience_years} years exp.
                                         </p>
                                     </div>
-                                )}
+                                </div>
+                                
+                                <div className="flex items-center gap-1 text-sm text-yellow-500 mb-2 font-semibold">
+                                    <Star className="w-4 h-4 fill-current" />
+                                    <span>{lawyer.rating?.toFixed(1) || '4.0'}</span>
+                                    <span className="text-slate-400 text-xs ml-1 font-normal">
+                                        ({lawyer.reviews_count || 0} reviews)
+                                    </span>
+                                </div>
+                                
+                                <div className="text-xs text-slate-600 mb-3 line-clamp-2">
+                                    <span className="font-semibold text-slate-700">Expertise:</span>{' '}
+                                    {Array.isArray(lawyer.practice_areas) ? lawyer.practice_areas.join(', ') : lawyer.practice_areas || 'General Law'}
+                                </div>
 
-                                {selectedLawyer.practice_areas && (
-                                    <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-2">
-                                        <Briefcase className="w-4 h-4 flex-shrink-0" />
-                                        <p className="line-clamp-1">{selectedLawyer.practice_areas}</p>
-                                    </div>
-                                )}
-
-                                {selectedLawyer.phone && (
-                                    <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 mb-3">
-                                        <Phone className="w-4 h-4 flex-shrink-0" />
-                                        <p>{selectedLawyer.phone}</p>
-                                    </div>
-                                )}
-
-                                <button
-                                    onClick={() => window.location.href = `/lawyer/${selectedLawyer.id}`}
-                                    className="w-full px-4 py-2 bg-blue-600 text-white text-sm font-bold rounded-lg hover:bg-blue-700 transition-colors"
+                                <button 
+                                    onClick={() => {
+                                        if (onMarkerClick) onMarkerClick(lawyer);
+                                    }}
+                                    className="w-full py-1.5 bg-blue-600 text-white rounded text-xs font-semibold hover:bg-blue-700 transition-colors"
                                 >
-                                    Book Consultation
+                                    View Profile
                                 </button>
                             </div>
-                        </InfoWindow>
-                    )}
-                </GoogleMap>
-            </LoadScript>
+                        </Popup>
+                    </Marker>
+                ))}
+            </MapContainer>
         </div>
     );
 };

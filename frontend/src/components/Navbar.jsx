@@ -58,6 +58,19 @@ const Navbar = () => {
 
     const isActive = (path) => location.pathname === path;
 
+    const dashboardPath = isAdminUser ? '/admin/dashboard' : isLawyerUser ? '/lawyer/dashboard' : '/dashboard';
+    const isDashboardActive = location.pathname === dashboardPath;
+    const isProfileActive = location.pathname === '/profile';
+    const isBookingsActive = location.pathname === '/my-bookings';
+
+    const getDropdownLinkClass = (active) => {
+        return `flex items-center gap-2 px-4 py-2 text-sm transition-colors ${
+            active 
+                ? 'font-semibold text-blue-600 bg-blue-50/70 dark:bg-blue-950/30 dark:text-blue-400' 
+                : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+        }`;
+    };
+
     return (
         <nav
             className={`fixed top-0 left-0 right-0 z-50 border-b transition-all duration-300 ${scrolled
@@ -86,7 +99,7 @@ const Navbar = () => {
                                     to={link.path}
                                     className={`rounded-lg px-3 py-2 text-sm font-medium transition-colors ${isActive(link.path)
                                         ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400'
-                                        : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:bg-slate-800 hover:text-slate-900 dark:text-white dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white'
+                                        : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 hover:text-slate-900 dark:hover:bg-slate-800 dark:hover:text-white'
                                         }`}
                                 >
                                     {link.name}
@@ -114,7 +127,7 @@ const Navbar = () => {
                         {/* Theme Toggle Button */}
                         <button
                             onClick={toggleTheme}
-                            className="rounded-lg p-2 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-800 transition-colors"
+                            className="rounded-lg p-2 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                             aria-label="Toggle Theme"
                         >
                             {theme === 'dark' ? (
@@ -184,10 +197,21 @@ const Navbar = () => {
                                                 )}
                                             </div>
                                             <div className="py-1">
+                                                {/* Dashboard Button - role-aware */}
+                                                <Link
+                                                    to={isAdminUser ? '/admin/dashboard' : isLawyerUser ? '/lawyer/dashboard' : '/dashboard'}
+                                                    className={getDropdownLinkClass(isDashboardActive)}
+                                                >
+                                                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                                                    </svg>
+                                                    Dashboard
+                                                </Link>
+
                                                 {!isAdminUser && (
                                                     <Link
                                                         to="/profile"
-                                                        className="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+                                                        className={getDropdownLinkClass(isProfileActive)}
                                                     >
                                                         <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -200,24 +224,12 @@ const Navbar = () => {
                                                 {!isAdminUser && !isLawyerUser && (
                                                     <Link
                                                         to="/my-bookings"
-                                                        className="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+                                                        className={getDropdownLinkClass(isBookingsActive)}
                                                     >
                                                         <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                                         </svg>
                                                         My Bookings
-                                                    </Link>
-                                                )}
-
-                                                {isAdminUser && (
-                                                    <Link
-                                                        to="/admin/dashboard"
-                                                        className="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
-                                                    >
-                                                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                                                        </svg>
-                                                        Admin Dashboard
                                                     </Link>
                                                 )}
 
@@ -231,6 +243,7 @@ const Navbar = () => {
                                                     Sign Out
                                                 </button>
                                             </div>
+
                                         </div>
                                     </>
                                 )}
@@ -281,7 +294,7 @@ const Navbar = () => {
                                 to={link.path}
                                 className={`block rounded-lg px-3 py-2 text-sm font-medium transition-colors ${isActive(link.path)
                                     ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400'
-                                    : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:bg-slate-800 hover:text-slate-900 dark:text-white dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white'
+                                    : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 hover:text-slate-900 dark:hover:bg-slate-800 dark:hover:text-white'
                                     }`}
                             >
                                 {link.name}
@@ -291,7 +304,7 @@ const Navbar = () => {
                             <div className="mt-4 flex flex-col gap-2 border-t border-slate-100 dark:border-slate-800 pt-4 dark:border-slate-800">
                                 <Link
                                     to="/login"
-                                    className="block rounded-lg px-3 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-800"
+                                    className="block rounded-lg px-3 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
                                 >
                                     Sign In
                                 </Link>

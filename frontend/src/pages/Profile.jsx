@@ -19,6 +19,9 @@ const Profile = () => {
     const [profileImage, setProfileImage] = useState(null);
     const [previewImage, setPreviewImage] = useState(null);
 
+    const [emailNotifications, setEmailNotifications] = useState(true);
+    const [twoFactorAuth, setTwoFactorAuth] = useState(false);
+
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -43,6 +46,18 @@ const Profile = () => {
                         created_at: data.user.created_at || '',
                         profile_image: data.user.profile_image || ''
                     });
+                    if (data.user.email_notifications !== undefined) {
+                        setEmailNotifications(data.user.email_notifications);
+                    } else {
+                        const localEmail = localStorage.getItem(`casexpert_pref_email_${data.user._id || data.user.id}`);
+                        if (localEmail !== null) setEmailNotifications(localEmail === 'true');
+                    }
+                    if (data.user.two_factor_auth !== undefined) {
+                        setTwoFactorAuth(data.user.two_factor_auth);
+                    } else {
+                        const local2fa = localStorage.getItem(`casexpert_pref_2fa_${data.user._id || data.user.id}`);
+                        if (local2fa !== null) setTwoFactorAuth(local2fa === 'true');
+                    }
                     // Sync context if needed
                     updateUser(data.user);
                 }
@@ -61,6 +76,36 @@ const Profile = () => {
     const showNotification = (type, message) => {
         setNotification({ type, message });
         setTimeout(() => setNotification(null), 3000);
+    };
+
+    const handleToggleEmailNotifications = async () => {
+        const newValue = !emailNotifications;
+        setEmailNotifications(newValue);
+        const userId = user._id || user.id;
+        if (userId) {
+            localStorage.setItem(`casexpert_pref_email_${userId}`, String(newValue));
+        }
+        try {
+            await api.put('/auth/preferences', { email_notifications: newValue });
+            showNotification('success', `Email notifications turned ${newValue ? 'ON' : 'OFF'}`);
+        } catch (error) {
+            console.error('Failed to update email preferences:', error);
+        }
+    };
+
+    const handleToggleTwoFactorAuth = async () => {
+        const newValue = !twoFactorAuth;
+        setTwoFactorAuth(newValue);
+        const userId = user._id || user.id;
+        if (userId) {
+            localStorage.setItem(`casexpert_pref_2fa_${userId}`, String(newValue));
+        }
+        try {
+            await api.put('/auth/preferences', { two_factor_auth: newValue });
+            showNotification('success', `Two-Factor Authentication turned ${newValue ? 'ON' : 'OFF'}`);
+        } catch (error) {
+            console.error('Failed to update 2FA preferences:', error);
+        }
     };
 
     const handleChange = (e) => {
@@ -386,14 +431,28 @@ const Profile = () => {
                     <div className="space-y-4">
                         <div className="flex items-center justify-between">
                             <span className="text-sm text-slate-700 dark:text-slate-300 dark:text-slate-300">Email Notifications</span>
-                            <button className="relative inline-flex h-6 w-11 items-center rounded-full bg-primary-600 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2">
-                                <span className="translate-x-6 inline-block h-4 w-4 transform rounded-full bg-white dark:bg-slate-900 transition-transform" />
+                            <button 
+                                onClick={handleToggleEmailNotifications}
+                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 ${
+                                    emailNotifications ? 'bg-primary-600' : 'bg-slate-200 dark:bg-slate-700'
+                                }`}
+                            >
+                                <span className={`inline-block h-4 w-4 transform rounded-full bg-white dark:bg-slate-900 transition-transform ${
+                                    emailNotifications ? 'translate-x-6' : 'translate-x-1'
+                                }`} />
                             </button>
                         </div>
                         <div className="flex items-center justify-between">
                             <span className="text-sm text-slate-700 dark:text-slate-300 dark:text-slate-300">Two-Factor Auth</span>
-                            <button className="relative inline-flex h-6 w-11 items-center rounded-full bg-slate-200 dark:bg-slate-700 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2">
-                                <span className="translate-x-1 inline-block h-4 w-4 transform rounded-full bg-white dark:bg-slate-900 transition-transform" />
+                            <button 
+                                onClick={handleToggleTwoFactorAuth}
+                                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 ${
+                                    twoFactorAuth ? 'bg-primary-600' : 'bg-slate-200 dark:bg-slate-700'
+                                }`}
+                            >
+                                <span className={`inline-block h-4 w-4 transform rounded-full bg-white dark:bg-slate-900 transition-transform ${
+                                    twoFactorAuth ? 'translate-x-6' : 'translate-x-1'
+                                }`} />
                             </button>
                         </div>
                     </div>

@@ -8,7 +8,7 @@ import { API_BASE_URL } from '../config/api.js';
 const API_URL = API_BASE_URL.replace('/api', ''); // Remove /api because routes below append it
 
 const MapViewToggle = () => {
-    const [viewMode, setViewMode] = useState('list'); // 'list' or 'map'
+    const [viewMode, setViewMode] = useState('map'); // 'list' or 'map'
     const [lawyers, setLawyers] = useState([]);
     const [filteredLawyers, setFilteredLawyers] = useState([]);
     const [loading, setLoading] = useState(true);

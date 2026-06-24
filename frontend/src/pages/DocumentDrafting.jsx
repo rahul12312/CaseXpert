@@ -309,7 +309,7 @@ const DocumentDrafting = () => {
                     id="documentType"
                     value={documentType}
                     onChange={(e) => setDocumentType(e.target.value)}
-                    className="w-full rounded-lg border border-slate-300 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-white px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 [color-scheme:light] dark:[color-scheme:dark]"
                   >
                     {documentTypes.length > 0 ? (
                       documentTypes.map((type) => (
@@ -331,15 +331,15 @@ const DocumentDrafting = () => {
                     value={details}
                     onChange={(e) => setDetails(e.target.value)}
                     placeholder="Describe parties, dates, amounts, etc. Or ask AI to fill the template on the right."
-                    className="w-full resize-none rounded-lg border border-slate-300 px-4 py-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full resize-none rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-slate-900 dark:text-white px-4 py-3 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
 
-                {error && <div className="text-sm text-red-600 bg-red-50 p-3 rounded">{error}</div>}
-                {success && <div className="text-sm text-green-600 bg-green-50 p-3 rounded">{success}</div>}
+                {error && <div className="text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 p-3 rounded border border-red-100 dark:border-red-900/30">{error}</div>}
+                {success && <div className="text-sm text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 p-3 rounded border border-green-100 dark:border-green-900/30">{success}</div>}
 
-                <div className="p-3 bg-blue-50 text-blue-800 text-xs rounded border border-blue-100">
-                  <strong>Tip:</strong> You can edit the draft on the right manually, or click Generate to let AI rewrite/complete it based on your facts.
+                <div className="p-3 bg-blue-50 dark:bg-blue-900/20 text-blue-800 dark:text-blue-300 text-xs rounded border border-blue-100 dark:border-blue-900/30">
+                  <strong className="text-blue-900 dark:text-blue-200">Tip:</strong> You can edit the draft on the right manually, or click Generate to let AI rewrite/complete it based on your facts.
                 </div>
 
                 <button

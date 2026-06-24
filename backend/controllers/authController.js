@@ -105,10 +105,20 @@ exports.sendOTP = async (req, res) => {
 
     // Respond immediately — don't wait for email delivery
     console.log(`✅ OTP saved for ${email} — sending email in background`);
+
+    // 🔧 DEV MODE: Print OTP to console so you can register without email
+    if (process.env.NODE_ENV !== 'production') {
+      console.log(`\n${'='.repeat(50)}`);
+      console.log(`🔑 DEV MODE — OTP for ${email}: ${otp}`);
+      console.log(`${'='.repeat(50)}\n`);
+    }
+
     res.status(200).json({
       success: true,
       message: `Verification code sent to ${email}`,
       email: email.toLowerCase(),
+      // Return OTP directly in dev mode so frontend can show it
+      devOtp: process.env.NODE_ENV !== 'production' ? otp : undefined,
     });
 
     // Send OTP email asynchronously (fire-and-forget)
@@ -212,6 +222,8 @@ exports.verifyOTPAndRegister = async (req, res) => {
         role: user.user_type,
         user_type: user.user_type,
         is_verified: true,
+        email_notifications: user.email_notifications,
+        two_factor_auth: user.two_factor_auth,
         profile_image: user.profile_image,
       },
       token,
@@ -268,7 +280,20 @@ exports.resendOTP = async (req, res) => {
 
     // Respond immediately — send email in background
     console.log(`✅ OTP resaved for ${email} — resending email in background`);
-    res.status(200).json({ success: true, message: `New verification code sent to ${email}` });
+
+    // 🔧 DEV MODE: Print OTP to console so you can register without email
+    if (process.env.NODE_ENV !== 'production') {
+      console.log(`\n${'='.repeat(50)}`);
+      console.log(`🔑 DEV MODE — Resent OTP for ${email}: ${otp}`);
+      console.log(`${'='.repeat(50)}\n`);
+    }
+
+    res.status(200).json({
+      success: true,
+      message: `New verification code sent to ${email}`,
+      // Return OTP directly in dev mode so frontend can show it
+      devOtp: process.env.NODE_ENV !== 'production' ? otp : undefined,
+    });
 
     sendOTPEmail({ userEmail: email, userName: user.name, otp })
       .then((result) => {
@@ -388,6 +413,8 @@ exports.loginUser = async (req, res) => {
         role: user.user_type,
         user_type: user.user_type,
         is_verified: user.is_verified,
+        email_notifications: user.email_notifications,
+        two_factor_auth: user.two_factor_auth,
         profile_image: user.profile_image,
       },
       token,
@@ -571,5 +598,38 @@ exports.resetPassword = async (req, res) => {
     return res.json({ success: true, message: "Password reset successful" });
   } catch (error) {
     return res.status(500).json({ success: false, message: "Error in reset password", error: error.message });
+  }
+};
+
+// ============================================================
+// UPDATE USER PREFERENCES
+// ============================================================
+exports.updatePreferences = async (req, res) => {
+  try {
+    const { email_notifications, two_factor_auth } = req.body;
+    const update = {};
+    if (email_notifications !== undefined) update.email_notifications = email_notifications;
+    if (two_factor_auth !== undefined) update.two_factor_auth = two_factor_auth;
+
+    const user = await User.findByIdAndUpdate(req.user.id, update, { new: true });
+    if (!user) return res.status(404).json({ success: false, message: "User not found" });
+
+    return res.json({
+      success: true,
+      message: "Preferences updated successfully",
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        role: user.user_type,
+        user_type: user.user_type,
+        email_notifications: user.email_notifications,
+        two_factor_auth: user.two_factor_auth,
+        profile_image: user.profile_image,
+      }
+    });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: "Error updating preferences", error: error.message });
   }
 };

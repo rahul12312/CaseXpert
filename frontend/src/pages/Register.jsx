@@ -74,7 +74,7 @@ const STATE_LANGUAGES_MAP = {
 };
 
 const Register = () => {
-  const { sendOTP, verifyOTP, resendOTP } = useAuth();
+  const { sendOTP, verifyOTP, resendOTP, isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
   // OTP step state
@@ -85,7 +85,15 @@ const Register = () => {
   const [otpError, setOtpError] = useState('');
   const [otpLoading, setOtpLoading] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(0);
+  const [devOtpMessage, setDevOtpMessage] = useState(''); // DEV: shows OTP on screen
   const otpRefs = useRef([]);
+
+  useEffect(() => {
+    // If already logged in, go straight to home
+    if (isAuthenticated) {
+      navigate('/', { replace: true });
+    }
+  }, [isAuthenticated]);
 
   useEffect(() => {
     if (resendCooldown > 0) {
@@ -355,11 +363,17 @@ const Register = () => {
           barIdNumber: form.barIdNumber.trim(),
         }),
       };
-      await sendOTP(payload);
+      const result = await sendOTP(payload);
       setPendingEmail(form.email.toLowerCase());
       setPendingPayload(payload);
       setResendCooldown(60);
       setStep(2);
+      // DEV MODE: auto-fill OTP if backend returns it
+      if (result?.devOtp) {
+        const digits = result.devOtp.toString().split('');
+        setOtpDigits(digits);
+        setDevOtpMessage(`🔧 Dev Mode OTP: ${result.devOtp} (auto-filled)`);
+      }
     } catch (err) {
       setError(err.response?.data?.message || err.message || 'Failed to send OTP. Please try again.');
     } finally {
@@ -387,8 +401,7 @@ const Register = () => {
     setOtpLoading(true); setOtpError('');
     try {
       await verifyOTP(pendingEmail, otp, pendingPayload);
-      const role = pendingPayload?.role || 'user';
-      navigate(role === 'lawyer' ? '/lawyer-dashboard' : '/dashboard');
+      navigate('/');
     } catch (err) {
       setOtpError(err.response?.data?.message || 'Invalid OTP. Please try again.');
       setOtpDigits(['', '', '', '', '', '']);
@@ -399,14 +412,21 @@ const Register = () => {
   const handleResendOTP = async () => {
     if (resendCooldown > 0) return;
     try {
-      await resendOTP(pendingEmail);
+      const result = await resendOTP(pendingEmail);
       setResendCooldown(60);
       setOtpError('');
       setOtpDigits(['', '', '', '', '', '']);
+      // DEV MODE: auto-fill new OTP if backend returns it
+      if (result?.devOtp) {
+        const digits = result.devOtp.toString().split('');
+        setOtpDigits(digits);
+        setDevOtpMessage(`🔧 Dev Mode OTP: ${result.devOtp} (auto-filled)`);
+      }
     } catch (err) {
       setOtpError(err.response?.data?.message || 'Failed to resend OTP');
     }
   };
+
 
   // ========================================
   // RENDER COMPONENT
@@ -425,7 +445,15 @@ const Register = () => {
             </p>
           </div>
 
-          {/* OTP Digit Boxes */}
+          {/* DEV MODE: Show OTP on screen when email isn't configured */}
+          {devOtpMessage && (
+            <div className="mb-4 rounded-xl border-2 border-yellow-400 bg-yellow-50 dark:bg-yellow-900/20 p-3 text-center">
+              <p className="text-sm font-bold text-yellow-700 dark:text-yellow-300">{devOtpMessage}</p>
+              <p className="text-xs text-yellow-600 dark:text-yellow-400 mt-1">Check backend console for the OTP code too</p>
+            </div>
+          )}
+
+
           <div className="flex justify-center gap-3 mb-6">
             {otpDigits.map((digit, i) => (
               <input
