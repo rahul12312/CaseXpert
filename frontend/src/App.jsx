@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 
@@ -9,7 +9,7 @@ import ProtectedRoute from './components/ProtectedRoute.jsx';
 import BackButton from './components/BackButton.jsx';
 import VideoNotificationListener from './components/VideoNotificationListener.jsx';
 
-// Public Pages
+// Public Pages (statically imported for fast initial load)
 import Home from './pages/Home.jsx';
 import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
@@ -24,7 +24,6 @@ import Blog from './pages/Blog.jsx';
 // Private Pages - Common
 import Profile from './pages/Profile.jsx';
 import Messages from './pages/Messages.jsx';
-import DocumentAnalyzer from './pages/DocumentAnalyzer.jsx';
 
 // Private Pages - Client
 import CaseTracker from './pages/CaseTracker.jsx';
@@ -33,8 +32,6 @@ import DocumentDrafting from './pages/DocumentDrafting.jsx';
 import ReportsDashboard from './pages/ReportsDashboard.jsx';
 import UserBookings from './pages/UserBookings.jsx';
 import AIInsights from './pages/AIInsights.jsx';
-import VideoHub from './pages/VideoHub.jsx';
-import VideoConsultation from './pages/VideoConsultation.jsx';
 import ClientDashboard from './pages/ClientDashboard.jsx';
 
 // Footer Pages
@@ -50,8 +47,25 @@ import AdminDashboard from './pages/AdminDashboard.jsx';
 import LawyerDashboard from './pages/LawyerDashboard.jsx';
 import LawyerConsultations from './pages/LawyerConsultations.jsx';
 
-// AI Assistant
-import AILegalAssistantChat from './pages/AILegalAssistantChat.jsx';
+// ─── Lazy-loaded pages ────────────────────────────────────────────────────────
+// VideoConsultation and VideoHub import twilio-video (a CJS package with
+// circular dependencies). Static imports cause a TDZ crash in the minified
+// main bundle: "Cannot access 'w' before initialization". Using React.lazy
+// splits them into separate chunks loaded only when the user navigates there.
+const VideoConsultation = React.lazy(() => import('./pages/VideoConsultation.jsx'));
+const VideoHub = React.lazy(() => import('./pages/VideoHub.jsx'));
+
+// Also lazy-load heavy AI/doc pages to improve initial load performance
+const DocumentAnalyzer = React.lazy(() => import('./pages/DocumentAnalyzer.jsx'));
+const AILegalAssistantChat = React.lazy(() => import('./pages/AILegalAssistantChat.jsx'));
+// ─────────────────────────────────────────────────────────────────────────────
+
+// Lightweight full-screen loading spinner shown during lazy-load
+const PageLoader = () => (
+  <div className="flex min-h-screen items-center justify-center bg-slate-50 dark:bg-slate-950">
+    <div className="h-10 w-10 animate-spin rounded-full border-4 border-blue-500 border-t-transparent" />
+  </div>
+);
 
 const App = () => {
   const location = useLocation();
@@ -85,6 +99,7 @@ const App = () => {
       {!hideNavbar && <Navbar />}
       <main className={`flex flex-1 flex-col ${!fullScreen ? 'pt-16 md:pt-24 pb-8 sm:px-6 lg:px-8 mx-auto w-full max-w-7xl px-4' : 'pt-0 w-full px-0 overflow-hidden'}`}>
         {!fullScreen && <BackButton />}
+        <Suspense fallback={<PageLoader />}>
         <Routes>
           {/* ── PUBLIC ROUTES (no login required) ── */}
           <Route path="/" element={<Home />} />
@@ -157,6 +172,7 @@ const App = () => {
           {/* Catch-all: redirect any unknown URL to Home */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
+        </Suspense>
       </main>
       {!hideFooter && <FooterModern />}
     </div>
