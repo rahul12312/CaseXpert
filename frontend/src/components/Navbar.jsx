@@ -4,7 +4,6 @@ import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import api from '../lib/api';
 import { API_BASE_URL } from '../config/api';
-import { io } from 'socket.io-client';
 
 const Navbar = () => {
     const { user, isAuthenticated, logout, isLawyer, isAdmin } = useAuth();
@@ -40,27 +39,35 @@ const Navbar = () => {
         fetchUnreadCount();
 
         // Setup socket for real-time unread updates
-        try {
-            const socketUrl = API_BASE_URL.replace('/api', '');
-            socket = io(socketUrl, { transports: ['websocket', 'polling'] });
+        let isMounted = true;
+        
+        import('socket.io-client').then(({ io }) => {
+            if (!isMounted) return;
             
-            socket.on('connect', () => {
-                socket.emit('register-user', { userId: user?.id || user?._id });
-            });
+            try {
+                const socketUrl = API_BASE_URL.replace('/api', '');
+                socket = io(socketUrl, { transports: ['websocket', 'polling'] });
+                
+                socket.on('connect', () => {
+                    socket.emit('register-user', { userId: user?.id || user?._id });
+                });
 
-            socket.on('conversation-updated', () => {
-                fetchUnreadCount(); // Refetch to get accurate total
-            });
-            
-            socket.on('new-message', () => {
-                // In case we don't catch the conversation-updated event
-                fetchUnreadCount();
-            });
-        } catch (err) {
-            console.error('Failed to connect socket in Navbar', err);
-        }
+                socket.on('conversation-updated', () => {
+                    if (isMounted) fetchUnreadCount();
+                });
+                
+                socket.on('new-message', () => {
+                    if (isMounted) fetchUnreadCount();
+                });
+            } catch (err) {
+                console.error('Failed to connect socket in Navbar', err);
+            }
+        }).catch(err => {
+            console.error('Failed to load socket.io-client', err);
+        });
 
         return () => {
+            isMounted = false;
             if (socket) socket.disconnect();
         };
     }, [isAuthenticated, isAdminUser, user]);
