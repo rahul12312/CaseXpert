@@ -15,6 +15,9 @@ const Navbar = () => {
     const [scrolled, setScrolled] = useState(false);
     const [unreadCount, setUnreadCount] = useState(0);
 
+    const isAdminUser = isAdmin();
+    const isLawyerUser = isLawyer();
+
     // Fetch and listen for unread messages
     useEffect(() => {
         if (!isAuthenticated || isAdminUser) return;
@@ -91,9 +94,6 @@ const Navbar = () => {
         logout();
         navigate('/login');
     };
-
-    const isAdminUser = isAdmin();
-    const isLawyerUser = isLawyer();
 
     const lawyerNavLinks = [
         { name: 'Dashboard', path: '/lawyer/dashboard', icon: '📊' },
