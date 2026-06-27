@@ -88,10 +88,10 @@ const ClientDashboard = () => {
     }
 
     return (
-        <div className="flex h-screen bg-slate-50 dark:bg-[#020617] text-slate-700 dark:text-slate-300 overflow-hidden font-sans">
+        <div className="flex min-h-screen pt-16 bg-slate-50 dark:bg-[#020617] text-slate-700 dark:text-slate-300 overflow-hidden font-sans">
 
             {/* Main Content Area */}
-            <main className="flex-1 h-screen overflow-y-auto overflow-x-hidden bg-[radial-gradient(circle_at_top_right,rgba(241,245,249,1),rgba(248,250,252,1))] dark:bg-[radial-gradient(circle_at_top_right,rgba(30,41,59,0.3),rgba(2,6,23,1))] relative min-w-0">
+            <main className="flex-1 h-full overflow-y-auto overflow-x-hidden bg-[radial-gradient(circle_at_top_right,rgba(241,245,249,1),rgba(248,250,252,1))] dark:bg-[radial-gradient(circle_at_top_right,rgba(30,41,59,0.3),rgba(2,6,23,1))] relative min-w-0">
                 {/* Background Decorations */}
                 <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-600/5 rounded-full blur-[120px] pointer-events-none"></div>
                 <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-purple-600/5 rounded-full blur-[100px] pointer-events-none"></div>

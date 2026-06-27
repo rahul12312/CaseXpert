@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import api from '../lib/api.js';
 import { useAuth } from '../context/AuthContext.jsx';
 import { Link, useNavigate } from 'react-router-dom';
@@ -17,7 +19,17 @@ import {
     ChevronRight,
     MessageSquare,
     Home,
-    ArrowLeft
+    ArrowLeft,
+    Copy,
+    Check,
+    Edit2,
+    Paperclip,
+    Image as ImageIcon,
+    Search,
+    Telescope,
+    FileText,
+    X,
+    Loader2
 } from 'lucide-react';
 
 const AILegalAssistantChat = () => {
@@ -31,9 +43,15 @@ const AILegalAssistantChat = () => {
     const [currentSessionId, setCurrentSessionId] = useState(null);
     const [chatSessions, setChatSessions] = useState([]);
     const [groupedSessions, setGroupedSessions] = useState({});
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [sidebarOpen, setSidebarOpen] = useState(true);
     const [language, setLanguage] = useState('en');
     const [isListening, setIsListening] = useState(false);
+    const [copiedIndex, setCopiedIndex] = useState(null);
+    const [showAttachmentMenu, setShowAttachmentMenu] = useState(false);
+    const attachmentMenuRef = useRef(null);
+    const [selectedFile, setSelectedFile] = useState(null);
+    const fileInputRef = useRef(null);
 
     // Maps our language codes to BCP-47 tags for Web Speech API
     const SPEECH_LANGUAGE_MAP = {
@@ -78,6 +96,19 @@ const AILegalAssistantChat = () => {
         scrollToBottom();
     }, [messages]);
 
+    const handleCopy = (text, idx) => {
+        navigator.clipboard.writeText(text);
+        setCopiedIndex(idx);
+        setTimeout(() => setCopiedIndex(null), 2000);
+    };
+
+    const handleEdit = (text) => {
+        setInput(text);
+        if (inputRef.current) {
+            inputRef.current.focus();
+        }
+    };
+
     // Stop recognition when component unmounts
     useEffect(() => {
         return () => {
@@ -85,6 +116,17 @@ const AILegalAssistantChat = () => {
                 recognitionRef.current.stop();
             }
         };
+    }, []);
+
+    // Close attachment menu when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (attachmentMenuRef.current && !attachmentMenuRef.current.contains(event.target)) {
+                setShowAttachmentMenu(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
     // Load chat sessions on mount
@@ -138,8 +180,42 @@ const AILegalAssistantChat = () => {
         setMessages([]);
         setCurrentSessionId(null);
         setInput('');
+        setSelectedFile(null);
         if (window.innerWidth < 768) {
             setSidebarOpen(false);
+        }
+    };
+
+    /**
+     * File Selection Handler
+     */
+    const handleFileSelect = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setSelectedFile(file);
+        }
+    };
+
+    /**
+     * Upload Document Function
+     */
+    const uploadDocument = async (sessionId) => {
+        if (!selectedFile) return null;
+
+        const formData = new FormData();
+        formData.append('document', selectedFile);
+        if (sessionId) {
+            formData.append('sessionId', sessionId);
+        }
+
+        try {
+            const { data } = await api.post('/chat/upload-document', formData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
+            return data;
+        } catch (error) {
+            console.error('Document upload failed:', error);
+            return null;
         }
     };
 
@@ -148,9 +224,9 @@ const AILegalAssistantChat = () => {
      */
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!input.trim() || loading) return;
+        if ((!input.trim() && !selectedFile) || loading) return;
 
-        const userMessage = input.trim();
+        const userMessage = input.trim() || `Please analyze the uploaded document (${selectedFile.name}) and summarize its key legal points.`;
 
         // Optimistic UI update - show user message immediately
         const tempUserMsg = {
@@ -163,16 +239,48 @@ const AILegalAssistantChat = () => {
         setInput('');
         setLoading(true);
 
+        let activeSessionId = currentSessionId;
+
         try {
+            // Upload document if selected
+            if (selectedFile) {
+                setMessages(prev => [...prev, {
+                    role: 'system',
+                    message: `📎 Uploading ${selectedFile.name}...`,
+                    created_at: new Date().toISOString()
+                }]);
+
+                const uploadResult = await uploadDocument(activeSessionId);
+                
+                if (uploadResult && uploadResult.sessionId) {
+                    activeSessionId = uploadResult.sessionId;
+                    setCurrentSessionId(activeSessionId);
+
+                    setMessages(prev => {
+                        const newMsgs = [...prev];
+                        newMsgs.pop();
+                        return [...newMsgs, {
+                            role: 'system',
+                            message: `✅ Analyzed ${selectedFile.name}`,
+                            created_at: new Date().toISOString()
+                        }];
+                    });
+                } else {
+                    throw new Error("Document upload failed");
+                }
+
+                setSelectedFile(null);
+                if (fileInputRef.current) fileInputRef.current.value = '';
+            }
+
             const { data } = await api.post('/chat/send', {
-                sessionId: currentSessionId,
+                sessionId: activeSessionId,
                 message: userMessage,
                 task: 'general_legal',
                 language: language
             });
 
             if (data.success) {
-                // Update session ID for new chats
                 if (!currentSessionId && data.sessionId) {
                     setCurrentSessionId(data.sessionId);
                 }
@@ -216,9 +324,7 @@ const AILegalAssistantChat = () => {
      * Delete a chat session
      */
     const deleteSession = async (sessionId, e) => {
-        e.stopPropagation();
-
-        if (!confirm('Are you sure you want to delete this chat?')) return;
+        if (e) e.stopPropagation();
 
         // Optimistic UI Update: Remove immediately before API call
         const previousGroups = { ...groupedSessions };
@@ -417,6 +523,14 @@ const AILegalAssistantChat = () => {
                 <div className="flex items-center justify-between border-b border-slate-200 dark:border-white/10 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md px-6 py-4 sticky top-0 z-30">
                     <div className="flex items-center gap-4">
 
+                        <button
+                            onClick={() => navigate(-1)}
+                            className="rounded-lg p-2 hover:bg-slate-100 dark:hover:bg-white/10 text-slate-500 transition-colors"
+                            title="Go Back"
+                        >
+                            <ArrowLeft size={20} />
+                        </button>
+
                         {!sidebarOpen && (
                             <button
                                 onClick={() => setSidebarOpen(true)}
@@ -427,10 +541,10 @@ const AILegalAssistantChat = () => {
                         )}
                         
                         <div className="flex items-center gap-3">
-                            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-white shadow-blue-500/20 shadow-lg">
+                            <div className="hidden sm:flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-white shadow-blue-500/20 shadow-lg">
                                 <Scale size={20} />
                             </div>
-                            <div>
+                            <div className="hidden sm:block">
                                 <h1 className="text-sm font-bold text-slate-900 dark:text-white">
                                     AI Legal Assistant
                                 </h1>
@@ -447,12 +561,13 @@ const AILegalAssistantChat = () => {
                     {/* Action Buttons */}
                     <div className="flex items-center gap-3">
                         {/* Language Selector */}
-                        <div className="flex items-center gap-3 bg-slate-100 dark:bg-white/5 rounded-full px-3 py-1.5 border border-transparent hover:border-slate-200 dark:hover:border-white/10 transition-all">
-                            <Globe size={14} className="text-slate-400" />
+                        <div className="relative flex items-center justify-center h-8 w-8 bg-slate-100 dark:bg-white/5 rounded-full border border-transparent hover:border-slate-200 dark:hover:border-white/10 transition-all cursor-pointer">
+                            <Globe size={16} className="text-slate-500 dark:text-slate-400" />
                             <select
                                 value={language}
                                 onChange={(e) => setLanguage(e.target.value)}
-                                className="bg-transparent text-xs font-semibold text-slate-700 dark:text-slate-300 focus:outline-none cursor-pointer"
+                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                title="Change Language"
                             >
                                 {LANGUAGES.map(lang => (
                                     <option key={lang.code} value={lang.code} className="dark:bg-slate-900 text-slate-900 dark:text-white">
@@ -503,7 +618,17 @@ const AILegalAssistantChat = () => {
                         ) : (
                             // Messages
                             <div className="space-y-6">
-                                {messages.map((msg, idx) => (
+                                {messages.map((msg, idx) => {
+                                    if (msg.role === 'system') {
+                                        return (
+                                            <div key={idx} className="flex justify-center my-2 animate-in fade-in slide-in-from-bottom-2">
+                                                <div className="bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-xs px-3 py-1 rounded-full border border-slate-200 dark:border-slate-700">
+                                                    {msg.message}
+                                                </div>
+                                            </div>
+                                        );
+                                    }
+                                    return (
                                     <div
                                         key={idx}
                                         className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
@@ -515,16 +640,34 @@ const AILegalAssistantChat = () => {
                                         )}
 
                                         <div
-                                            className={`max-w-[85%] rounded-2xl px-5 py-3 shadow-sm ${msg.role === 'user'
+                                            className={`group max-w-[85%] rounded-2xl px-5 py-3 shadow-sm ${msg.role === 'user'
                                                 ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white'
-                                                : 'border border-slate-200 dark:border-slate-700 dark:border-slate-700 bg-white dark:bg-slate-900 dark:bg-slate-800 text-slate-900 dark:text-white dark:text-white'
+                                                : 'border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white'
                                                 }`}
                                         >
-                                            <div className="whitespace-pre-wrap text-sm leading-relaxed">
-                                                {msg.message}
-                                            </div>
-                                            <div className={`mt-2 text-xs ${msg.role === 'user' ? 'text-blue-100' : 'text-slate-400'}`}>
-                                                {formatDate(msg.created_at)}
+                                            {msg.role === 'assistant' ? (
+                                                <div className="prose prose-sm dark:prose-invert max-w-none prose-p:leading-relaxed prose-pre:bg-slate-100 dark:prose-pre:bg-slate-800 marker:text-slate-400">
+                                                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                                        {msg.message}
+                                                    </ReactMarkdown>
+                                                </div>
+                                            ) : (
+                                                <div className="whitespace-pre-wrap text-sm leading-relaxed">
+                                                    {msg.message}
+                                                </div>
+                                            )}
+                                            <div className={`mt-2 flex items-center justify-between text-xs ${msg.role === 'user' ? 'text-blue-100' : 'text-slate-400'}`}>
+                                                <span>{formatDate(msg.created_at)}</span>
+                                                <div className="flex gap-3 opacity-0 transition-opacity group-hover:opacity-100">
+                                                    {msg.role === 'user' && (
+                                                        <button onClick={() => handleEdit(msg.message)} title="Edit Message" className="hover:text-white transition-colors">
+                                                            <Edit2 size={14} />
+                                                        </button>
+                                                    )}
+                                                    <button onClick={() => handleCopy(msg.message, idx)} title="Copy Message" className="hover:text-blue-500 transition-colors">
+                                                        {copiedIndex === idx ? <Check size={14} className="text-green-400" /> : <Copy size={14} />}
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
 
@@ -534,7 +677,7 @@ const AILegalAssistantChat = () => {
                                             </div>
                                         )}
                                     </div>
-                                ))}
+                                )})}
 
                                 {/* Loading Indicator */}
                                 {loading && (
@@ -562,7 +705,61 @@ const AILegalAssistantChat = () => {
                 {/* Input Area */}
                 <div className="border-t border-slate-200 dark:border-slate-700 dark:border-slate-800 bg-white dark:bg-slate-900 dark:bg-slate-900 px-4 py-4">
                     <div className="mx-auto max-w-3xl">
-                        <form onSubmit={handleSubmit} className="flex items-end gap-2 rounded-3xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 p-1.5 pl-4 shadow-sm focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500 transition-all">
+                        
+                        {/* Selected File Chip */}
+                        {selectedFile && (
+                            <div className="mb-3 animate-fade-in flex items-center gap-2 bg-slate-100 dark:bg-slate-800 px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 w-fit shadow-sm ml-4">
+                                <div className="p-1.5 bg-white dark:bg-slate-700 rounded-lg">
+                                    <FileText className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                                </div>
+                                <div className="flex flex-col pr-2">
+                                    <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 truncate max-w-[200px]">{selectedFile.name}</span>
+                                    <span className="text-[10px] text-slate-500">{(selectedFile.size / 1024).toFixed(0)} KB</span>
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={() => setSelectedFile(null)}
+                                    className="ml-1 p-1 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-full text-slate-400 hover:text-red-500 transition-colors"
+                                >
+                                    <X className="w-3.5 h-3.5" />
+                                </button>
+                            </div>
+                        )}
+
+                        <form onSubmit={handleSubmit} className="flex items-end gap-2 rounded-3xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 p-1.5 pl-2 shadow-sm focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500 transition-all relative">
+                            {/* Hidden File Input */}
+                            <input
+                                type="file"
+                                ref={fileInputRef}
+                                onChange={handleFileSelect}
+                                accept=".pdf,.txt,.doc,.docx,.jpg,.jpeg,.png"
+                                className="hidden"
+                            />
+
+                            {/* Attachment Button & Menu */}
+                            <div className="relative flex items-center justify-center h-full mb-1" ref={attachmentMenuRef}>
+                                <button
+                                    type="button"
+                                    onClick={() => setShowAttachmentMenu(!showAttachmentMenu)}
+                                    className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-700 dark:hover:text-slate-300 rounded-full transition-colors"
+                                    title="Add attachments"
+                                >
+                                    <Plus size={20} className={`transition-transform duration-200 ${showAttachmentMenu ? 'rotate-45' : ''}`} />
+                                </button>
+                                
+                                {/* Attachment Menu Popover */}
+                                {showAttachmentMenu && (
+                                    <div className="absolute bottom-12 left-0 w-64 bg-slate-800 rounded-2xl p-2 shadow-xl border border-slate-700 animate-in fade-in zoom-in-95 duration-200 z-50">
+                                        <button type="button" onClick={() => { fileInputRef.current?.click(); setShowAttachmentMenu(false); }} className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-slate-700 rounded-xl transition-colors text-slate-200 text-sm font-medium">
+                                            <div className="bg-slate-700/50 p-1.5 rounded-lg text-slate-300">
+                                                <Paperclip size={16} />
+                                            </div>
+                                            <span>Add photos & files</span>
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+
                             <textarea
                                 ref={inputRef}
                                 value={input}
@@ -570,10 +767,10 @@ const AILegalAssistantChat = () => {
                                 onKeyDown={(e) => {
                                     if (e.key === 'Enter' && !e.shiftKey) {
                                         e.preventDefault();
-                                        handleSubmit();
+                                        handleSubmit(e);
                                     }
                                 }}
-                                placeholder="Ask about Indian law, rights, or procedures..."
+                                placeholder={selectedFile ? "Ask a question about this document..." : "Ask about Indian law, rights, or procedures..."}
                                 rows={1}
                                 className="flex-1 max-h-48 py-2.5 bg-transparent border-none focus:ring-0 outline-none text-sm text-slate-900 dark:text-white resize-none scroll-smooth"
                                 style={{ height: 'auto' }}
@@ -599,9 +796,9 @@ const AILegalAssistantChat = () => {
                             {/* Send Button */}
                             <button
                                 type="submit"
-                                disabled={!input.trim() || loading}
+                                disabled={(!input.trim() && !selectedFile) || loading}
                                 className={`p-2.5 rounded-full shadow-md transition-all ${
-                                    input.trim() && !loading
+                                    (input.trim() || selectedFile) && !loading
                                     ? 'bg-blue-600 text-white hover:scale-105 hover:bg-blue-700'
                                     : 'bg-slate-100 dark:bg-slate-700 text-slate-400 cursor-not-allowed'
                                 }`}
@@ -629,6 +826,8 @@ const AILegalAssistantChat = () => {
  * Session Item Component for Sidebar
  */
 const SessionItem = ({ session, isActive, onClick, onDelete }) => {
+    const [showConfirm, setShowConfirm] = useState(false);
+
     // Format date local
     const displayDate = () => {
         if (!session.last_activity_at) return '';
@@ -662,7 +861,7 @@ const SessionItem = ({ session, isActive, onClick, onDelete }) => {
                     </div>
                     <div className="mt-1 flex items-center justify-between">
                         <span className="text-[10px] font-medium text-slate-400">
-                            {session.message_count} messages
+                            {session.messages?.length || 0} messages
                         </span>
                         <span className="text-[10px] text-slate-400">
                             {displayDate()}
@@ -670,16 +869,33 @@ const SessionItem = ({ session, isActive, onClick, onDelete }) => {
                     </div>
                 </div>
 
-                <button
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        onDelete(e);
-                    }}
-                    className="opacity-0 group-hover:opacity-100 rounded-lg p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-all"
-                    title="Delete chat"
-                >
-                    <Trash2 size={14} />
-                </button>
+                {showConfirm ? (
+                    <div className="flex items-center gap-2">
+                        <button 
+                            onClick={(e) => { e.stopPropagation(); onDelete(e); setShowConfirm(false); }}
+                            className="rounded px-2 py-1 text-xs font-semibold text-white bg-red-500 hover:bg-red-600 transition-colors"
+                        >
+                            Delete
+                        </button>
+                        <button 
+                            onClick={(e) => { e.stopPropagation(); setShowConfirm(false); }}
+                            className="rounded px-2 py-1 text-xs font-semibold text-slate-600 bg-slate-200 hover:bg-slate-300 dark:text-slate-300 dark:bg-slate-700 transition-colors"
+                        >
+                            Cancel
+                        </button>
+                    </div>
+                ) : (
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            setShowConfirm(true);
+                        }}
+                        className="opacity-0 group-hover:opacity-100 rounded-lg p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-all"
+                        title="Delete chat"
+                    >
+                        <Trash2 size={14} />
+                    </button>
+                )}
             </div>
         </div>
     );

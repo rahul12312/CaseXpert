@@ -30,7 +30,7 @@ router.post("/reset-password/:token", require("../controllers/authController").r
 
 // ── Protected routes ──────────────────────────────────────
 router.get("/profile", verifyToken, getUserProfile);
-router.put("/profile", verifyToken, upload.single("profileImage"), updateUserProfile);
+router.put("/profile", verifyToken, upload.fields([{ name: "profileImage", maxCount: 1 }, { name: "identityProof", maxCount: 1 }]), updateUserProfile);
 router.put("/change-password", verifyToken, changePassword);
 router.put("/update-language", verifyToken, updateLanguagePreference);
 router.put("/preferences", verifyToken, updatePreferences);

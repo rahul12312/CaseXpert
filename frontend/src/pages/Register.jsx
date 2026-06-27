@@ -37,40 +37,46 @@ const INDIAN_STATES_CITIES = {
 };
 
 const INDIAN_LANGUAGES = [
-  'Hindi', 'English', 'Bengali', 'Telugu', 'Marathi',
-  'Tamil', 'Gujarati', 'Urdu', 'Kannada', 'Odia',
-  'Malayalam', 'Punjabi', 'Assamese', 'Maithili', 'Sanskrit'
+  // 22 Scheduled Languages (8th Schedule of the Indian Constitution)
+  'Assamese', 'Bengali', 'Bodo', 'Dogri', 'Gujarati',
+  'Hindi', 'Kannada', 'Kashmiri', 'Konkani', 'Maithili',
+  'Malayalam', 'Manipuri', 'Marathi', 'Nepali', 'Odia',
+  'Punjabi', 'Sanskrit', 'Santali', 'Sindhi', 'Tamil',
+  'Telugu', 'Urdu',
+  // Other widely spoken languages
+  'English', 'Bhojpuri', 'Chhattisgarhi', 'Garhwali', 'Kumaoni',
+  'Magahi', 'Mizo', 'Rajasthani', 'Tulu'
 ];
 
 const STATE_LANGUAGES_MAP = {
-  'Andhra Pradesh': ['English', 'Hindi', 'Telugu', 'Urdu'],
-  'Arunachal Pradesh': ['English', 'Hindi', 'Assamese'],
-  'Assam': ['English', 'Hindi', 'Assamese', 'Bengali'],
-  'Bihar': ['English', 'Hindi', 'Maithili', 'Bhojpuri'],
-  'Chhattisgarh': ['English', 'Hindi', 'Marathi', 'Odia'],
-  'Goa': ['English', 'Hindi', 'Marathi', 'Kannada'],
-  'Gujarat': ['English', 'Hindi', 'Gujarati'],
+  'Andhra Pradesh': ['English', 'Hindi', 'Telugu', 'Urdu', 'Tamil', 'Kannada', 'Odia'],
+  'Arunachal Pradesh': ['English', 'Hindi', 'Assamese', 'Bengali', 'Nepali'],
+  'Assam': ['English', 'Hindi', 'Assamese', 'Bengali', 'Bodo', 'Nepali', 'Manipuri'],
+  'Bihar': ['English', 'Hindi', 'Maithili', 'Bhojpuri', 'Magahi', 'Urdu', 'Bengali'],
+  'Chhattisgarh': ['English', 'Hindi', 'Chhattisgarhi', 'Marathi', 'Odia', 'Telugu'],
+  'Goa': ['English', 'Hindi', 'Konkani', 'Marathi', 'Kannada', 'Urdu'],
+  'Gujarat': ['English', 'Hindi', 'Gujarati', 'Sindhi', 'Urdu', 'Marathi'],
   'Haryana': ['English', 'Hindi', 'Punjabi', 'Urdu'],
-  'Himachal Pradesh': ['English', 'Hindi', 'Punjabi'],
-  'Jharkhand': ['English', 'Hindi', 'Maithili', 'Bengali', 'Odia'],
-  'Karnataka': ['English', 'Hindi', 'Kannada', 'Telugu', 'Marathi', 'Tamil'],
-  'Kerala': ['English', 'Hindi', 'Malayalam', 'Tamil'],
-  'Madhya Pradesh': ['English', 'Hindi', 'Marathi'],
-  'Maharashtra': ['English', 'Hindi', 'Marathi', 'Gujarati'],
-  'Manipur': ['English', 'Hindi', 'Bengali'],
-  'Meghalaya': ['English', 'Hindi', 'Assamese', 'Bengali'],
-  'Mizoram': ['English', 'Hindi', 'Bengali'],
-  'Nagaland': ['English', 'Hindi', 'Assamese'],
-  'Odisha': ['English', 'Hindi', 'Odia', 'Telugu', 'Bengali'],
-  'Punjab': ['English', 'Hindi', 'Punjabi'],
-  'Rajasthan': ['English', 'Hindi', 'Punjabi', 'Gujarati'],
-  'Sikkim': ['English', 'Hindi', 'Bengali'],
-  'Tamil Nadu': ['English', 'Hindi', 'Tamil', 'Telugu', 'Malayalam'],
-  'Telangana': ['English', 'Hindi', 'Telugu', 'Urdu', 'Marathi'],
-  'Tripura': ['English', 'Hindi', 'Bengali'],
-  'Uttar Pradesh': ['English', 'Hindi','Bhojpuri',],
-  'Uttarakhand': ['English', 'Hindi', 'Urdu', 'Sanskrit', ],
-  'West Bengal': ['English', 'Hindi', 'Bengali', 'Odia']
+  'Himachal Pradesh': ['English', 'Hindi', 'Punjabi', 'Nepali', 'Garhwali'],
+  'Jharkhand': ['English', 'Hindi', 'Santali', 'Maithili', 'Bengali', 'Odia', 'Urdu', 'Bhojpuri'],
+  'Karnataka': ['English', 'Hindi', 'Kannada', 'Telugu', 'Marathi', 'Tamil', 'Urdu', 'Tulu', 'Konkani'],
+  'Kerala': ['English', 'Hindi', 'Malayalam', 'Tamil', 'Kannada', 'Tulu'],
+  'Madhya Pradesh': ['English', 'Hindi', 'Marathi', 'Urdu', 'Sindhi', 'Gujarati', 'Bhojpuri'],
+  'Maharashtra': ['English', 'Hindi', 'Marathi', 'Gujarati', 'Urdu', 'Kannada', 'Sindhi', 'Konkani'],
+  'Manipur': ['English', 'Hindi', 'Manipuri', 'Bengali', 'Nepali'],
+  'Meghalaya': ['English', 'Hindi', 'Assamese', 'Bengali', 'Nepali'],
+  'Mizoram': ['English', 'Hindi', 'Mizo', 'Bengali', 'Nepali'],
+  'Nagaland': ['English', 'Hindi', 'Assamese', 'Bengali', 'Nepali'],
+  'Odisha': ['English', 'Hindi', 'Odia', 'Telugu', 'Bengali', 'Santali', 'Urdu'],
+  'Punjab': ['English', 'Hindi', 'Punjabi', 'Urdu'],
+  'Rajasthan': ['English', 'Hindi', 'Rajasthani', 'Punjabi', 'Gujarati', 'Urdu', 'Sindhi'],
+  'Sikkim': ['English', 'Hindi', 'Nepali', 'Bengali', 'Manipuri', 'Assamese'],
+  'Tamil Nadu': ['English', 'Hindi', 'Tamil', 'Telugu', 'Malayalam', 'Kannada', 'Urdu'],
+  'Telangana': ['English', 'Hindi', 'Telugu', 'Urdu', 'Marathi', 'Kannada', 'Tamil'],
+  'Tripura': ['English', 'Hindi', 'Bengali', 'Manipuri', 'Nepali'],
+  'Uttar Pradesh': ['English', 'Hindi', 'Urdu', 'Bhojpuri', 'Punjabi', 'Bengali', 'Maithili'],
+  'Uttarakhand': ['English', 'Hindi', 'Urdu', 'Sanskrit', 'Garhwali', 'Kumaoni', 'Nepali', 'Punjabi'],
+  'West Bengal': ['English', 'Hindi', 'Bengali', 'Odia', 'Urdu', 'Santali', 'Nepali', 'Rajasthani']
 };
 
 const Register = () => {
@@ -746,11 +752,11 @@ const Register = () => {
                 </label>
 
                 {/* Selected Languages Display */}
-                <div className="min-h-[42px] rounded-lg border border-slate-300 bg-white dark:bg-slate-900 px-3 py-2 flex flex-wrap gap-2 cursor-pointer"
+                <div className="min-h-[42px] rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 px-3 py-2 flex flex-wrap gap-2 cursor-pointer"
                   onClick={() => setShowLanguageDropdown(!showLanguageDropdown)}>
                   {form.selectedLanguages.length > 0 ? (
                     form.selectedLanguages.map(lang => (
-                      <span key={lang} className="inline-flex items-center gap-1 rounded-md bg-primary-100 dark:bg-primary-900/50 px-2 py-1 text-xs font-medium text-primary-700 dark:text-primary-200">
+                      <span key={lang} className="inline-flex items-center gap-1 rounded-md bg-blue-100 dark:bg-blue-900/40 px-2 py-1 text-xs font-medium text-blue-700 dark:text-blue-200">
                         {lang}
                         <button
                           type="button"
@@ -758,7 +764,7 @@ const Register = () => {
                             e.stopPropagation();
                             toggleLanguage(lang);
                           }}
-                          className="text-primary-900 dark:text-primary-300 hover:text-primary-600 dark:hover:text-primary-100"
+                          className="text-blue-900 dark:text-blue-300 hover:text-blue-600 dark:hover:text-blue-100"
                         >
                           ×
                         </button>
@@ -775,7 +781,7 @@ const Register = () => {
                     {availableLanguages.map(language => (
                       <label
                         key={language}
-                        className="flex items-center gap-3 px-4 py-2 hover:bg-slate-50 dark:bg-slate-950 cursor-pointer"
+                        className="flex items-center gap-3 px-4 py-2 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer"
                       >
                         <input
                           type="checkbox"

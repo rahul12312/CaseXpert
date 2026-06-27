@@ -76,14 +76,14 @@ const App = () => {
 
   const hideFooter = isFeaturePage;
   const hideNavbar = location.pathname.startsWith('/consultation');
-  const fullScreen = location.pathname.startsWith('/assistant') || location.pathname.startsWith('/consultation');
+  const fullScreen = location.pathname.startsWith('/assistant') || location.pathname.startsWith('/consultation') || location.pathname === '/dashboard' || location.pathname === '/profile';
 
   return (
     <div className={`flex min-h-screen flex-col bg-slate-50 dark:bg-slate-950 overflow-x-hidden`}>
       <Toaster position="top-center" reverseOrder={false} />
       <VideoNotificationListener />
       {!hideNavbar && <Navbar />}
-      <main className={`flex flex-1 flex-col ${!fullScreen ? 'pt-24 pb-8 sm:px-6 lg:px-8 mx-auto w-full max-w-7xl px-4' : 'pt-0 w-full px-0 overflow-hidden'}`}>
+      <main className={`flex flex-1 flex-col ${!fullScreen ? 'pt-16 md:pt-24 pb-8 sm:px-6 lg:px-8 mx-auto w-full max-w-7xl px-4' : 'pt-0 w-full px-0 overflow-hidden'}`}>
         {!fullScreen && <BackButton />}
         <Routes>
           {/* ── PUBLIC ROUTES (no login required) ── */}

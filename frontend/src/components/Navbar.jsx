@@ -164,15 +164,6 @@ const Navbar = () => {
                                     >
                                         {user?.name?.charAt(0)?.toUpperCase() || 'U'}
                                     </div>
-                                    <span className="hidden sm:inline">{user?.name || 'User'}</span>
-                                    <svg
-                                        className={`h-4 w-4 transition-transform ${userMenuOpen ? 'rotate-180' : ''}`}
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                                    </svg>
                                 </button>
 
                                 {/* User Dropdown Menu */}

@@ -443,19 +443,61 @@ exports.getUserProfile = async (req, res) => {
 // ============================================================
 exports.updateUserProfile = async (req, res) => {
   try {
-    const { name, phone } = req.body;
+    const { 
+      name, phone, dob, gender, occupation, nationality, marital_status, blood_group,
+      alternate_phone, emergency_contact, preferred_communication,
+      address_street, address_city, address_state, address_country, address_pin_code,
+      identity_aadhaar, identity_pan, identity_passport, identity_driving_license
+    } = req.body;
+    
     const update = { name, phone };
+    
+    // Basic Info
+    if (dob !== undefined) update.dob = dob;
+    if (gender !== undefined) update.gender = gender;
+    if (occupation !== undefined) update.occupation = occupation;
+    if (nationality !== undefined) update.nationality = nationality;
+    if (marital_status !== undefined) update.marital_status = marital_status;
+    if (blood_group !== undefined) update.blood_group = blood_group;
+    
+    // Contact Info
+    if (alternate_phone !== undefined) update.alternate_phone = alternate_phone;
+    if (emergency_contact !== undefined) update.emergency_contact = emergency_contact;
+    if (preferred_communication !== undefined) update.preferred_communication = preferred_communication;
+    
+    if (address_street !== undefined) update['address.street'] = address_street;
+    if (address_city !== undefined) update['address.city'] = address_city;
+    if (address_state !== undefined) update['address.state'] = address_state;
+    if (address_country !== undefined) update['address.country'] = address_country;
+    if (address_pin_code !== undefined) update['address.pin_code'] = address_pin_code;
+    
+    if (identity_aadhaar !== undefined) update['identity.aadhaar'] = identity_aadhaar;
+    if (identity_pan !== undefined) update['identity.pan'] = identity_pan;
+    if (identity_passport !== undefined) update['identity.passport'] = identity_passport;
+    if (identity_driving_license !== undefined) update['identity.driving_license'] = identity_driving_license;
 
+    // If using single upload (legacy support)
     if (req.file) {
-      update.profile_image = req.file.path; // Cloudinary URL
+      update.profile_image = req.file.path;
+    }
+    
+    // If using fields upload (new)
+    if (req.files) {
+      if (req.files.profileImage && req.files.profileImage[0]) {
+        update.profile_image = req.files.profileImage[0].path;
+      }
+      if (req.files.identityProof && req.files.identityProof[0]) {
+        update['identity.proof_url'] = req.files.identityProof[0].path;
+      }
     }
 
-    await User.findByIdAndUpdate(req.user.id, update);
+    const updatedUser = await User.findByIdAndUpdate(req.user.id, update, { new: true });
 
     return res.json({
       success: true,
       message: "Profile updated successfully",
       profile_image: update.profile_image || undefined,
+      user: updatedUser
     });
   } catch (error) {
     return res.status(500).json({ success: false, message: "Error updating profile", error: error.message });
