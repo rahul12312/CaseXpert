@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+import api from '../lib/api';
+import { API_BASE_URL } from '../config/api';
+import { io } from 'socket.io-client';
 
 const Navbar = () => {
     const { user, isAuthenticated, logout, isLawyer, isAdmin } = useAuth();
@@ -11,6 +14,56 @@ const Navbar = () => {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [userMenuOpen, setUserMenuOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
+    const [unreadCount, setUnreadCount] = useState(0);
+
+    // Fetch and listen for unread messages
+    useEffect(() => {
+        if (!isAuthenticated || isAdminUser) return;
+
+        let socket = null;
+
+        const fetchUnreadCount = async () => {
+            try {
+                const res = await api.get('/conversations');
+                if (res.data && res.data.success) {
+                    const totalUnread = res.data.conversations.reduce((acc, conv) => {
+                        const myId = user?.id || user?._id;
+                        return acc + (conv.unreadCounts ? (conv.unreadCounts[myId] || 0) : 0);
+                    }, 0);
+                    setUnreadCount(totalUnread);
+                }
+            } catch (err) {
+                console.error('Failed to fetch unread count', err);
+            }
+        };
+
+        fetchUnreadCount();
+
+        // Setup socket for real-time unread updates
+        try {
+            const socketUrl = API_BASE_URL.replace('/api', '');
+            socket = io(socketUrl, { transports: ['websocket', 'polling'] });
+            
+            socket.on('connect', () => {
+                socket.emit('register-user', { userId: user?.id || user?._id });
+            });
+
+            socket.on('conversation-updated', () => {
+                fetchUnreadCount(); // Refetch to get accurate total
+            });
+            
+            socket.on('new-message', () => {
+                // In case we don't catch the conversation-updated event
+                fetchUnreadCount();
+            });
+        } catch (err) {
+            console.error('Failed to connect socket in Navbar', err);
+        }
+
+        return () => {
+            if (socket) socket.disconnect();
+        };
+    }, [isAuthenticated, isAdminUser, user]);
 
     // Close mobile menu when route changes
     useEffect(() => {
@@ -120,7 +173,11 @@ const Navbar = () => {
                                 <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
                                 </svg>
-                                {/* Add a red dot badge here later if there are unread messages */}
+                                {unreadCount > 0 && (
+                                    <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white ring-2 ring-white dark:ring-slate-900">
+                                        {unreadCount > 9 ? '9+' : unreadCount}
+                                    </span>
+                                )}
                             </Link>
                         )}
 
