@@ -76,6 +76,7 @@ const App = () => {
     location.pathname.startsWith('/lawyers') ||
     location.pathname.startsWith('/cases') ||
     location.pathname.startsWith('/documents') ||
+    location.pathname.startsWith('/document-analyzer') ||
     location.pathname.startsWith('/reports') ||
     location.pathname.startsWith('/bookings') ||
     location.pathname.startsWith('/my-bookings') ||
