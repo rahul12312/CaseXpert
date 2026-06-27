@@ -6,8 +6,17 @@ const onlineUsers = new Map(); // Maps userId to socketId
 const initSocket = (server) => {
     io = new Server(server, {
         cors: {
-            origin: "*",
-            methods: ["GET", "POST"]
+            origin: [
+                "https://casexperts.netlify.app",
+                "https://casexpert.netlify.app",
+                "https://casexperts.vercel.app",
+                "https://casexpert.vercel.app",
+                "http://localhost:5173",
+                "http://localhost:3000",
+                process.env.FRONTEND_URL
+            ].filter(Boolean),
+            methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+            credentials: true
         }
     });
 

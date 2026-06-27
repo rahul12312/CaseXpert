@@ -8,7 +8,7 @@ dotenv.config({ path: path.join(__dirname, ".env") });
 
 const connectMongoDB = require("./config/mongodb");
 
-const { Server } = require("socket.io");
+const { initSocket } = require("./services/socketService");
 
 // Initialize Express app
 const app = express();
@@ -141,37 +141,8 @@ const server = app.listen(PORT, () => {
 // ============================================================================
 // SOCKET.IO CONFIGURATION
 // ============================================================================
-const io = new Server(server, {
-  cors: {
-    origin: [
-      "https://casexperts.netlify.app",
-      "https://casexpert.netlify.app",
-      "https://casexperts.vercel.app",
-      "https://casexpert.vercel.app",
-      "http://localhost:5173",
-      "http://localhost:3000",
-      process.env.FRONTEND_URL
-    ].filter(Boolean),
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
-    credentials: true
-  }
-});
-
+const io = initSocket(server);
 app.set('socketio', io);
-
-io.on("connection", (socket) => {
-  console.log(`🔗 New Socket Connection: ${socket.id}`);
-  
-  // Example: Client joining their own private room (using user ID)
-  socket.on("join_room", (userId) => {
-    socket.join(userId);
-    console.log(`User ${userId} joined room`);
-  });
-
-  socket.on("disconnect", () => {
-    console.log(`❌ Socket Disconnected: ${socket.id}`);
-  });
-});
 
 // Handle uncaught errors
 process.on("uncaughtException", (err) => {
