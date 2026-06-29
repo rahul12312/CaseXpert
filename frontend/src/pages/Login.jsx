@@ -31,8 +31,8 @@ const Login = () => {
     setLoading(true);
     try {
       await login(email, password);
-      // Always redirect to home page after login
-      navigate('/');
+      const redirectPath = location.state?.from?.pathname || '/';
+      navigate(redirectPath, { replace: true });
     } catch (err) {
       const errorMsg = err.response?.data?.message || err.response?.data?.error || (err.message === 'Network Error' ? 'Cannot connect to server. Please ensure the backend is running.' : err.message) || 'Login failed. Please check your details and try again.';
       setError(errorMsg);

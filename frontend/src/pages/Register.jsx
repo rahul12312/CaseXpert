@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 
 // ========================================
@@ -82,6 +82,7 @@ const STATE_LANGUAGES_MAP = {
 const Register = () => {
   const { sendOTP, verifyOTP, resendOTP, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   // OTP step state
   const [step, setStep] = useState(1); // 1 = form, 2 = OTP
@@ -407,7 +408,8 @@ const Register = () => {
     setOtpLoading(true); setOtpError('');
     try {
       await verifyOTP(pendingEmail, otp, pendingPayload);
-      navigate('/');
+      const redirectPath = location.state?.from?.pathname || '/';
+      navigate(redirectPath, { replace: true });
     } catch (err) {
       setOtpError(err.response?.data?.message || 'Invalid OTP. Please try again.');
       setOtpDigits(['', '', '', '', '', '']);
@@ -805,7 +807,7 @@ const Register = () => {
 
           {/* ========== LAWYER-SPECIFIC FIELDS ========== */}
           {isLawyer && (
-            <div className="space-y-4 rounded-xl border-2 border-primary-200 bg-primary-50 p-5 dark:border-primary-800 dark:bg-primary-900/20">
+            <div className="space-y-4 rounded-xl border-2 border-primary-200 bg-primary-50 p-5 dark:border-slate-700 dark:bg-slate-800/50">
               <h3 className="text-base font-semibold text-slate-900 dark:text-white dark:text-white flex items-center gap-2">
                 <span>👨‍⚖️</span> Professional Information
               </h3>

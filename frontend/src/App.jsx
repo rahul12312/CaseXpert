@@ -46,6 +46,9 @@ import AdminDashboard from './pages/AdminDashboard.jsx';
 // Lawyer Pages
 import LawyerDashboard from './pages/LawyerDashboard.jsx';
 import LawyerConsultations from './pages/LawyerConsultations.jsx';
+import LawyerProfileSettings from './pages/LawyerProfileSettings.jsx';
+import LawyerAcceptedCases from './pages/LawyerAcceptedCases.jsx';
+import LawyerCaseRequests from './pages/LawyerCaseRequests.jsx';
 
 // ─── Lazy-loaded pages ────────────────────────────────────────────────────────
 // VideoConsultation and VideoHub import twilio-video (a CJS package with
@@ -73,6 +76,7 @@ const App = () => {
   // Logic from Ajay Tipte: Identify "Feature Pages" to hide Global UI (Navbar/Footer)
   const isFeaturePage = 
     location.pathname.startsWith('/assistant') ||
+    location.pathname.startsWith('/document-analyzer') ||
     location.pathname.startsWith('/lawyers') ||
     location.pathname.startsWith('/cases') ||
     location.pathname.startsWith('/documents') ||
@@ -163,8 +167,20 @@ const App = () => {
             element={<ProtectedRoute allowedRoles={['lawyer']}><LawyerDashboard /></ProtectedRoute>} 
           />
           <Route 
+            path="/lawyer/settings" 
+            element={<ProtectedRoute allowedRoles={['lawyer']}><LawyerProfileSettings /></ProtectedRoute>} 
+          />
+          <Route 
             path="/lawyer/consultations" 
             element={<ProtectedRoute allowedRoles={['lawyer']}><LawyerConsultations /></ProtectedRoute>} 
+          />
+          <Route 
+            path="/lawyer/accepted-cases" 
+            element={<ProtectedRoute allowedRoles={['lawyer']}><LawyerAcceptedCases /></ProtectedRoute>} 
+          />
+          <Route 
+            path="/lawyer/case-requests" 
+            element={<ProtectedRoute allowedRoles={['lawyer']}><LawyerCaseRequests /></ProtectedRoute>} 
           />
 
           {/* AI Assistant - Accessible to all logged in users */}

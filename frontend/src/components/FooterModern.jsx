@@ -1,6 +1,16 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext.jsx';
 
 const FooterModern = () => {
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+
+  const handleProtectedProductClick = (e, path) => {
+    if (!isAuthenticated) {
+      e.preventDefault();
+      navigate('/login', { state: { from: { pathname: path } } });
+    }
+  };
 
   return (
     <footer className="border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
@@ -27,10 +37,10 @@ const FooterModern = () => {
               Product
             </h3>
             <ul className="space-y-1">
-              <li><Link to="/assistant" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">AI Assistant</Link></li>
-              <li><Link to="/cases" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Case Tracker</Link></li>
-              <li><Link to="/lawyers" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Find Lawyers</Link></li>
-              <li><Link to="/consultation" className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Video Consultation</Link></li>
+              <li><Link to="/assistant" onClick={(e) => handleProtectedProductClick(e, '/assistant')} className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">AI Assistant</Link></li>
+              <li><Link to="/cases" onClick={(e) => handleProtectedProductClick(e, '/cases')} className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Case Tracker</Link></li>
+              <li><Link to="/lawyers" onClick={(e) => handleProtectedProductClick(e, '/lawyers')} className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Find Lawyers</Link></li>
+              <li><Link to="/video-hub" onClick={(e) => handleProtectedProductClick(e, '/video-hub')} className="hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Video Consultation</Link></li>
             </ul>
           </div>
           <div className="space-y-2">
