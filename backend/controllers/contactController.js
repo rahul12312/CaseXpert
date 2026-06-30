@@ -17,7 +17,7 @@ exports.submitContactMessage = async (req, res) => {
       message,
     });
 
-    // Attempt to send email
+    // Attempt to send email (non-blocking with timeout)
     try {
       const smtpUser = process.env.SMTP_EMAIL || process.env.SMTP_USER;
       const smtpPass = process.env.SMTP_PASSWORD || process.env.SMTP_PASS;
@@ -29,6 +29,9 @@ exports.submitContactMessage = async (req, res) => {
             user: smtpUser,
             pass: smtpPass,
           },
+          connectionTimeout: 8000,
+          greetingTimeout: 8000,
+          socketTimeout: 8000,
         });
 
         const mailOptions = {
@@ -47,14 +50,20 @@ exports.submitContactMessage = async (req, res) => {
           `,
         };
 
-        await transporter.sendMail(mailOptions);
-        console.log("Contact email sent successfully");
+        // Race against a 10s timeout so the API never hangs
+        const sendWithTimeout = Promise.race([
+          transporter.sendMail(mailOptions),
+          new Promise((_, reject) => setTimeout(() => reject(new Error("Email send timeout")), 10000))
+        ]);
+
+        sendWithTimeout
+          .then(() => console.log("Contact email sent successfully"))
+          .catch((err) => console.error("Email send failed (non-blocking):", err.message));
       } else {
         console.warn("SMTP credentials not configured. Contact message saved to DB only.");
       }
     } catch (emailError) {
       console.error("Error sending contact email:", emailError.message);
-      // We don't fail the request here, because it was saved to DB successfully
     }
 
     res.status(201).json({
