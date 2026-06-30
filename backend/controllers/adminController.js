@@ -207,10 +207,23 @@ exports.getAllAppointmentsAdmin = async (req, res) => {
 exports.getAllClientsAdmin = async (req, res) => {
   try {
     const clients = await User.find({ user_type: "client" }).sort({ createdAt: -1 });
-    
-    // We can count cases for each client
+
     const flattened = await Promise.all(clients.map(async c => {
       const caseCount = await Case.countDocuments({ user: c._id });
+
+      // Find the most recent booking to get the assigned lawyer
+      let lawyerName = "Unassigned";
+      let lawyerId = null;
+      try {
+        const latestBooking = await Booking.findOne({ user: c._id })
+          .sort({ createdAt: -1 })
+          .populate({ path: "lawyer", populate: { path: "user", select: "name" } });
+        if (latestBooking && latestBooking.lawyer) {
+          lawyerName = latestBooking.lawyer.user?.name || "Assigned";
+          lawyerId = latestBooking.lawyer._id.toString();
+        }
+      } catch (_) {}
+
       return {
         id: c._id.toString(),
         name: c.name,
@@ -218,8 +231,17 @@ exports.getAllClientsAdmin = async (req, res) => {
         phone: c.phone || "N/A",
         cases: caseCount,
         status: c.is_verified ? "Active" : "Onboarding",
-        lawyer: caseCount > 0 ? "Assigned via Case" : "Unassigned"
+        lawyer: lawyerName,
+        lawyer_id: lawyerId,
+        joined: c.createdAt
       };
+    }));
+
+    return res.json({ success: true, clients: flattened });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: "Error fetching clients" });
+  }
+};
     }));
 
     return res.json({ success: true, clients: flattened });
