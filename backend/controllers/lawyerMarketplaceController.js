@@ -31,6 +31,24 @@ exports.getAllLawyers = async (req, res) => {
     if (language) filter.languages = new RegExp(language, "i");
     if (rating) filter.rating = { $gte: parseFloat(rating) };
 
+    // Handle search query natively in MongoDB
+    if (search || name) {
+      const term = search || name;
+      const matchingUsers = await User.find({
+        name: new RegExp(term, "i"),
+        user_type: "lawyer",
+        is_active: true
+      }).select("_id");
+      const userIds = matchingUsers.map(u => u._id);
+
+      filter.$or = [
+        { user: { $in: userIds } },
+        { city: new RegExp(term, "i") },
+        { bio: new RegExp(term, "i") },
+        { specialization: new RegExp(term, "i") }
+      ];
+    }
+
     // Build sort
     let sort = { rating: -1, experience: -1 };
     if (sort_by === "rating") sort = { rating: sort_order === "asc" ? 1 : -1 };
@@ -49,20 +67,8 @@ exports.getAllLawyers = async (req, res) => {
       .limit(parseInt(limit));
 
     let lawyers = await query;
-    // Filter out null users (inactive users)
+    // Filter out null users (inactive users) just in case
     lawyers = lawyers.filter((l) => l.user !== null);
-
-    // Apply search filter (across user name and lawyer fields)
-    if (search || name) {
-      const term = (search || name).toLowerCase();
-      lawyers = lawyers.filter(
-        (l) =>
-          l.user.name.toLowerCase().includes(term) ||
-          (l.city && l.city.toLowerCase().includes(term)) ||
-          (l.bio && l.bio.toLowerCase().includes(term)) ||
-          (l.specialization && l.specialization.toLowerCase().includes(term))
-      );
-    }
 
     const total = await Lawyer.countDocuments(filter);
 
