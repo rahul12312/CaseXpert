@@ -86,6 +86,7 @@ const insightRoutes = require("./routes/insightRoutes");
 const govDocRoutes = require("./routes/governmentDocumentSampleRoutes");
 const videoRoutes = require("./routes/videoRoutes");
 const contactRoutes = require("./routes/contactRoutes");
+const aiDocumentRoutes = require("./routes/aiDocumentRoutes");
 
 app.use("/api/auth", authRoutes);
 app.use("/api/lawyer", lawyerRoutes);
@@ -106,6 +107,7 @@ app.use("/api/insights", insightRoutes);
 app.use("/api/gov-docs", govDocRoutes);
 app.use("/api/video", videoRoutes);
 app.use("/api/contact", contactRoutes);
+app.use("/api/ai-document", aiDocumentRoutes);
 
 // Health Check
 app.get("/", (req, res) => {
