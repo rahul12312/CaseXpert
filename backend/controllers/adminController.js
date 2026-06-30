@@ -230,7 +230,7 @@ exports.getAllClientsAdmin = async (req, res) => {
         email: c.email,
         phone: c.phone || "N/A",
         cases: caseCount,
-        status: c.is_verified ? "Active" : "Onboarding",
+        status: c.is_verified ? "Active" : "Inactive",
         lawyer: lawyerName,
         lawyer_id: lawyerId,
         joined: c.createdAt

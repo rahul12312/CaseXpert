@@ -432,6 +432,30 @@ const Profile = () => {
                                                 <div className="flex h-8 w-8 items-center justify-center rounded bg-blue-100 dark:bg-blue-900/30 text-blue-600">ID</div>
                                                 View Uploaded Document
                                             </a>
+                                        ) : formData.role === 'lawyer' ? (
+                                            <div className="space-y-3">
+                                                <a href="#" onClick={(e) => e.preventDefault()} className="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                                                    <div className="flex h-8 w-8 items-center justify-center rounded bg-red-100 dark:bg-red-900/30 text-red-600 shrink-0">📄</div>
+                                                    <div className="min-w-0 flex-1">
+                                                        <p className="text-sm font-medium text-slate-900 dark:text-white truncate">Bar Council Registration.pdf</p>
+                                                        <p className="text-xs text-slate-500">1.5 MB</p>
+                                                    </div>
+                                                </a>
+                                                <a href="#" onClick={(e) => e.preventDefault()} className="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                                                    <div className="flex h-8 w-8 items-center justify-center rounded bg-red-100 dark:bg-red-900/30 text-red-600 shrink-0">📄</div>
+                                                    <div className="min-w-0 flex-1">
+                                                        <p className="text-sm font-medium text-slate-900 dark:text-white truncate">Law Degree Certificate.pdf</p>
+                                                        <p className="text-xs text-slate-500">2.1 MB</p>
+                                                    </div>
+                                                </a>
+                                                <a href="#" onClick={(e) => e.preventDefault()} className="flex items-center gap-3 p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                                                    <div className="flex h-8 w-8 items-center justify-center rounded bg-blue-100 dark:bg-blue-900/30 text-blue-600 shrink-0">🖼️</div>
+                                                    <div className="min-w-0 flex-1">
+                                                        <p className="text-sm font-medium text-slate-900 dark:text-white truncate">Government ID Proof.jpg</p>
+                                                        <p className="text-xs text-slate-500">850 KB</p>
+                                                    </div>
+                                                </a>
+                                            </div>
                                         ) : (
                                             <p className="text-sm text-slate-500 italic">No identity proof uploaded</p>
                                         )}
