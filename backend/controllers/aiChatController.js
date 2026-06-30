@@ -1,5 +1,6 @@
 const ChatSession = require("../models/ChatSession");
 const { askAiLegalAssistant } = require("../services/aiLegalAssistantGroq");
+const pdfParse = require("pdf-parse");
 
 // ============================================================================
 // SEND CHAT MESSAGE
@@ -158,11 +159,24 @@ const uploadDocument = async (req, res) => {
 
     const fs = require("fs").promises;
     const path = require("path");
-    const fileContent = await fs.readFile(file.path, "utf8").catch(() => "[Binary File]");
+    
+    let fileContent = "";
+    if (file.mimetype === "application/pdf" || file.originalname.toLowerCase().endsWith(".pdf")) {
+      try {
+        const fileBuffer = await fs.readFile(file.path);
+        const pdfData = await pdfParse(fileBuffer);
+        fileContent = pdfData.text || "[Empty PDF]";
+      } catch (pdfErr) {
+        console.error("PDF parse failed:", pdfErr);
+        fileContent = "[Error reading PDF content]";
+      }
+    } else {
+      fileContent = await fs.readFile(file.path, "utf8").catch(() => "[Binary File]");
+    }
     
     session.messages.push({
       role: "system",
-      message: `[DOCUMENT UPLOADED]\nFilename: ${file.originalname}\nContent:\n${fileContent.substring(0, 10000)}`,
+      message: `[DOCUMENT UPLOADED]\nFilename: ${file.originalname}\nContent:\n${fileContent.substring(0, 15000)}`,
     });
     await session.save();
 
