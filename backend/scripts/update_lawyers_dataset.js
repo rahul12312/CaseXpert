@@ -3,10 +3,10 @@ const path = require("path");
 const dotenv = require("dotenv");
 
 // Load env vars
-dotenv.config({ path: path.join(__dirname, ".env") });
+dotenv.config({ path: path.join(__dirname, "../.env") });
 
-const User = require("./models/User");
-const connectMongoDB = require("./config/mongodb");
+const User = require("../models/User");
+const connectMongoDB = require("../config/mongodb");
 
 const updateLawyerPictures = async () => {
   try {
@@ -16,7 +16,7 @@ const updateLawyerPictures = async () => {
     console.log(`Found ${users.length} lawyers to update pictures for.`);
 
     const fs = require('fs');
-    const profilesDir = path.join(__dirname, '../frontend/public/uploads/profiles');
+    const profilesDir = path.join(__dirname, '../../frontend/public/uploads/profiles');
     const files = fs.readdirSync(profilesDir);
     
     const maleImages = files.filter(f => f.startsWith('m') && f.endsWith('.png')).map(f => `/uploads/profiles/${f}`);
