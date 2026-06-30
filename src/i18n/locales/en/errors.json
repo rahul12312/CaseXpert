@@ -1,0 +1,146 @@
+{
+    "general": {
+        "unknown": "An unknown error occurred",
+        "tryAgain": "Something went wrong. Please try again.",
+        "contactSupport": "If the problem persists, please contact support",
+        "temporaryIssue": "We're experiencing technical difficulties. Please try again later."
+    },
+    "network": {
+        "offline": "You are currently offline. Please check your internet connection.",
+        "timeout": "Request timed out. Please try again.",
+        "slowConnection": "Slow internet connection detected",
+        "requestFailed": "Request failed. Please check your connection.",
+        "serverUnreachable": "Unable to reach server. Please try again later."
+    },
+    "authentication": {
+        "sessionExpired": "Your session has expired. Please login again.",
+        "tokenInvalid": "Invalid authentication token. Please login again.",
+        "tokenExpired": "Authentication token has expired",
+        "unauthorized": "You are not authorized to perform this action",
+        "loginRequired": "Please login to continue",
+        "accessDenied": "Access denied. You don't have permission to access this resource.",
+        "invalidCredentials": "Invalid email or password",
+        "accountLocked": "Your account has been locked. Please contact support.",
+        "accountDeactivated": "Your account has been deactivated"
+    },
+    "validation": {
+        "invalidInput": "Invalid input. Please check your data.",
+        "missingFields": "Please fill all required fields",
+        "invalidFormat": "Invalid format. Please check your input.",
+        "valueTooLong": "Value is too long",
+        "valueTooShort": "Value is too short",
+        "invalidEmail": "Invalid email address",
+        "invalidPhone": "Invalid phone number",
+        "invalidDate": "Invalid date",
+        "futureDate": "Date cannot be in the future",
+        "pastDate": "Date cannot be in the past"
+    },
+    "server": {
+        "internalError": "Internal server error. Please try again later.",
+        "serviceUnavailable": "Service temporarily unavailable",
+        "maintenance": "Server is under maintenance. Please try again later.",
+        "badRequest": "Bad request. Please check your input.",
+        "notFound": "Requested resource not found",
+        "conflict": "A conflict occurred. The resource already exists.",
+        "forbidden": "You don't have permission to access this resource",
+        "methodNotAllowed": "This action is not allowed",
+        "tooManyRequests": "Too many requests. Please slow down and try again later."
+    },
+    "database": {
+        "connectionError": "Database connection error",
+        "queryError": "Database query failed",
+        "recordNotFound": "Record not found",
+        "duplicateEntry": "Duplicate entry. This record already exists.",
+        "foreignKeyConstraint": "Cannot delete. This record is referenced by other records.",
+        "transactionFailed": "Transaction failed. Please try again."
+    },
+    "file": {
+        "uploadFailed": "File upload failed",
+        "sizeTooLarge": "File size is too large. Maximum allowed: {{max}}MB",
+        "invalidType": "Invalid file type. Allowed types: {{types}}",
+        "corruptedFile": "File is corrupted or unreadable",
+        "notFound": "File not found",
+        "deleteFailed": "Failed to delete file",
+        "downloadFailed": "Failed to download file"
+    },
+    "payment": {
+        "failed": "Payment failed. Please try again.",
+        "declined": "Payment declined by your bank",
+        "insufficientFunds": "Insufficient funds",
+        "invalidCard": "Invalid card details",
+        "expired": "Your card has expired",
+        "processingError": "Error processing payment",
+        "gatewayError": "Payment gateway error",
+        "refundFailed": "Refund processing failed"
+    },
+    "form": {
+        "submitFailed": "Failed to submit form",
+        "validationFailed": "Form validation failed",
+        "incompleteForm": "Please complete all required fields",
+        "saveFailed": "Failed to save changes",
+        "updateFailed": "Failed to update. Please try again."
+    },
+    "resource": {
+        "notFound": "Resource not found",
+        "alreadyExists": "Resource already exists",
+        "deleteFailed": "Failed to delete resource",
+        "createFailed": "Failed to create resource",
+        "updateFailed": "Failed to update resource",
+        "loadFailed": "Failed to load resource"
+    },
+    "booking": {
+        "slotUnavailable": "This time slot is no longer available",
+        "bookingFailed": "Failed to create booking",
+        "alreadyBooked": "You already have a booking at this time",
+        "cancelFailed": "Failed to cancel booking",
+        "rescheduleUnavailable": "Rescheduling is not available for this booking",
+        "pastDate": "Cannot book for past dates"
+    },
+    "case": {
+        "createFailed": "Failed to create case",
+        "updateFailed": "Failed to update case",
+        "deleteFailed": "Failed to delete case",
+        "notFound": "Case not found",
+        "accessDenied": "You don't have access to this case",
+        "invalidStatus": "Invalid case status",
+        "cannotClose": "Cannot close case at this stage"
+    },
+    "lawyer": {
+        "notFound": "Lawyer not found",
+        "unavailable": "Lawyer is currently unavailable",
+        "notVerified": "Lawyer profile is not verified",
+        "bookingClosed": "Lawyer is not accepting bookings at the moment"
+    },
+    "notification": {
+        "sendFailed": "Failed to send notification",
+        "loadFailed": "Failed to load notifications",
+        "markReadFailed": "Failed to mark as read",
+        "deleteFailed": "Failed to delete notification"
+    },
+    "search": {
+        "noResults": "No results found",
+        "searchFailed": "Search failed. Please try again.",
+        "invalidQuery": "Invalid search query"
+    },
+    "external": {
+        "apiError": "External API error",
+        "googleMapsError": "Google Maps error",
+        "paymentGatewayError": "Payment gateway error",
+        "smsServiceError": "SMS service error",
+        "emailServiceError": "Email service error"
+    },
+    "code": {
+        "400": "Bad Request",
+        "401": "Unauthorized",
+        "403": "Forbidden",
+        "404": "Not Found",
+        "405": "Method Not Allowed",
+        "408": "Request Timeout",
+        "409": "Conflict",
+        "429": "Too Many Requests",
+        "500": "Internal Server Error",
+        "502": "Bad Gateway",
+        "503": "Service Unavailable",
+        "504": "Gateway Timeout"
+    }
+}

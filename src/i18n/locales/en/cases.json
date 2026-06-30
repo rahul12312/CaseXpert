@@ -1,0 +1,191 @@
+{
+    "list": {
+        "title": "My Cases",
+        "newCase": "Create New Case",
+        "searchPlaceholder": "Search cases...",
+        "filters": "Filters",
+        "noCases": "No cases found",
+        "showing": "Showing {{count}} cases"
+    },
+    "create": {
+        "title": "Create New Case",
+        "stepInfo": "Case Information",
+        "stepDocuments": "Upload Documents",
+        "stepReview": "Review & Submit",
+        "caseTitle": "Case Title",
+        "caseNumber": "Case Number",
+        "caseType": "Case Type",
+        "description": "Case Description",
+        "dateOfIncident": "Date of Incident",
+        "court": "Court Name",
+        "judge": "Judge Name",
+        "assignLawyer": "Assign Lawyer",
+        "uploadDocuments": "Upload Documents",
+        "submit": "Create Case",
+        "success": "Case created successfully"
+    },
+    "details": {
+        "title": "Case Details",
+        "overview": "Overview",
+        "documents": "Documents",
+        "timeline": "Timeline",
+        "hearings": "Hearings",
+        "parties": "Parties Involved",
+        "updates": "Case Updates",
+        "notes": "Notes",
+        "relatedCases": "Related Cases"
+    },
+    "status": {
+        "draft": "Draft",
+        "filed": "Filed",
+        "inProgress": "In Progress",
+        "underReview": "Under Review",
+        "hearing": "Hearing Scheduled",
+        "judgement": "Judgement Pending",
+        "closed": "Closed",
+        "won": "Won",
+        "lost": "Lost",
+        "settled": "Settled",
+        "withdrawn": "Withdrawn",
+        "dismissed": "Dismissed",
+        "appealed": "Appealed"
+    },
+    "types": {
+        "criminal": "Criminal Case",
+        "civil": "Civil Case",
+        "family": "Family Case",
+        "property": "Property Dispute",
+        "corporate": "Corporate Case",
+        "tax": "Tax Case",
+        "labor": "Labor Dispute",
+        "consumer": "Consumer Case",
+        "other": "Other"
+    },
+    "priority": {
+        "high": "High Priority",
+        "medium": "Medium Priority",
+        "low": "Low Priority",
+        "urgent": "Urgent"
+    },
+    "documents": {
+        "title": "Case Documents",
+        "upload": "Upload Document",
+        "download": "Download",
+        "delete": "Delete Document",
+        "view": "View Document",
+        "noDocuments": "No documents uploaded",
+        "types": {
+            "petition": "Petition",
+            "evidence": "Evidence",
+            "affidavit": "Affidavit",
+            "order": "Court Order",
+            "notice": "Notice",
+            "agreement": "Agreement",
+            "contract": "Contract",
+            "other": "Other"
+        },
+        "uploadSuccess": "Document uploaded successfully",
+        "uploadFailed": "Failed to upload document",
+        "deleteConfirm": "Are you sure you want to delete this document?"
+    },
+    "hearings": {
+        "title": "Hearings",
+        "schedule": "Schedule Hearing",
+        "nextHearing": "Next Hearing",
+        "previousHearings": "Previous Hearings",
+        "noHearings": "No hearings scheduled",
+        "date": "Hearing Date",
+        "time": "Hearing Time",
+        "court": "Court Room",
+        "judge": "Presiding Judge",
+        "purpose": "Purpose",
+        "outcome": "Outcome",
+        "notes": "Hearing Notes",
+        "addNote": "Add Note",
+        "reschedule": "Reschedule",
+        "cancel": "Cancel Hearing",
+        "scheduled": "Hearing scheduled successfully"
+    },
+    "timeline": {
+        "title": "Case Timeline",
+        "events": {
+            "created": "Case Created",
+            "filed": "Case Filed",
+            "documentAdded": "Document Added",
+            "hearingScheduled": "Hearing Scheduled",
+            "hearingCompleted": "Hearing Completed",
+            "statusChanged": "Status Changed",
+            "noteAdded": "Note Added",
+            "assigned": "Lawyer Assigned",
+            "closed": "Case Closed"
+        }
+    },
+    "parties": {
+        "plaintiff": "Plaintiff",
+        "defendant": "Defendant",
+        "witness": "Witness",
+        "lawyer": "Lawyer",
+        "prosecutor": "Prosecutor",
+        "addParty": "Add Party",
+        "removeParty": "Remove Party",
+        "role": "Role",
+        "contact": "Contact Information"
+    },
+    "updates": {
+        "title": "Case Updates",
+        "addUpdate": "Add Update",
+        "noUpdates": "No updates yet",
+        "postedBy": "Posted by",
+        "attachments": "Attachments"
+    },
+    "notes": {
+        "title": "Case Notes",
+        "addNote": "Add Note",
+        "privateNote": "Private Note",
+        "sharedNote": "Shared Note",
+        "noNotes": "No notes added",
+        "visibility": "Note Visibility",
+        "internal": "Internal (only visible to lawyer and client)",
+        "public": "Public (visible to all parties)"
+    },
+    "tracking": {
+        "title": "Case Tracking",
+        "caseNumber": "Track by Case Number",
+        "search": "Search Case",
+        "status": "Current Status",
+        "lastUpdate": "Last Updated",
+        "nextHearing": "Next Hearing Date",
+        "notFound": "Case not found with this case number"
+    },
+    "filters": {
+        "status": "Status",
+        "type": "Case Type",
+        "date": "Date Range",
+        "lawyer": "Assigned Lawyer",
+        "court": "Court",
+        "priority": "Priority"
+    },
+    "actions": {
+        "edit": "Edit Case",
+        "delete": "Delete Case",
+        "duplicate": "Duplicate Case",
+        "export": "Export Case",
+        "print": "Print Case",
+        "share": "Share Case",
+        "archive": "Archive Case",
+        "restore": "Restore Case",
+        "close": "Close Case",
+        "reopen": "Reopen Case"
+    },
+    "messages": {
+        "created": "Case created successfully",
+        "updated": "Case updated successfully",
+        "deleted": "Case deleted successfully",
+        "archived": "Case archived successfully",
+        "closed": "Case closed successfully",
+        "reopened": "Case reopened successfully",
+        "deleteConfirm": "Are you sure you want to delete this case?",
+        "closeConfirm": "Are you sure you want to close this case?",
+        "archiveConfirm": "Are you sure you want to archive this case?"
+    }
+}

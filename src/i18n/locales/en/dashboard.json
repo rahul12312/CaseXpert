@@ -1,0 +1,76 @@
+{
+    "title": "Dashboard",
+    "welcome": "Welcome back, {{name}}!",
+    "overview": "Overview",
+    "stats": {
+        "totalCases": "Total Cases",
+        "activeCases": "Active Cases",
+        "completedCases": "Completed Cases",
+        "pendingTasks": "Pending Tasks",
+        "upcomingHearings": "Upcoming Hearings",
+        "totalClients": "Total Clients",
+        "revenue": "Revenue",
+        "growth": "Growth"
+    },
+    "quickActions": {
+        "title": "Quick Actions",
+        "newCase": "New Case",
+        "findLawyer": "Find Lawyer",
+        "bookConsultation": "Book Consultation",
+        "viewCalendar": "View Calendar",
+        "uploadDocument": "Upload Document",
+        "sendMessage": "Send Message"
+    },
+    "recentActivity": {
+        "title": "Recent Activity",
+        "viewAll": "View All Activity",
+        "noActivity": "No recent activity",
+        "types": {
+            "caseCreated": "New case created",
+            "documentUploaded": "Document uploaded",
+            "hearingScheduled": "Hearing scheduled",
+            "messageReceived": "New message received",
+            "statusUpdated": "Status updated"
+        }
+    },
+    "upcomingHearings": {
+        "title": "Upcoming Hearings",
+        "today": "Today's Hearings",
+        "thisWeek": "This Week",
+        "noHearings": "No upcoming hearings",
+        "viewCalendar": "View Full Calendar"
+    },
+    "notifications": {
+        "title": "Notifications",
+        "markAllRead": "Mark all as read",
+        "noNotifications": "No new notifications",
+        "viewAll": "View All Notifications",
+        "types": {
+            "casé_update": "Case Update",
+            "document_uploaded": "Document Uploaded",
+            "hearing_reminder": "Hearing Reminder",
+            "message_received": "New Message",
+            "payment_received": "Payment Received",
+            "booking_confirmed": "Booking Confirmed"
+        }
+    },
+    "tasks": {
+        "title": "My Tasks",
+        "addTask": "Add Task",
+        "noTasks": "No pending tasks",
+        "completed": "Completed",
+        "pending": "Pending",
+        "overdue": "Overdue",
+        "dueToday": "Due Today",
+        "viewAll": "View All Tasks"
+    },
+    "calendar": {
+        "title": "Calendar",
+        "month": "Month",
+        "week": "Week",
+        "day": "Day",
+        "agenda": "Agenda",
+        "addEvent": "Add Event",
+        "noEvents": "No events scheduled"
+    }
+}

@@ -1,0 +1,14 @@
+{
+    "title": "डैशबोर्ड",
+    "welcome": "स्वागत है, {{name}}!",
+    "overview": "अवलोकन",
+    "stats": {
+        "totalCases": "कुल केस",
+        "activeCases": "सक्रिय केस",
+        "completedCases": "पूर्ण केस"
+    },
+    "quickActions": {
+        "title": "त्वरित कार्य",
+        "newCase": "नया केस"
+    }
+}

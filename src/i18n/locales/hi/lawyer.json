@@ -1,0 +1,15 @@
+{
+    "profile": {
+        "title": "वकील प्रोफ़ाइल",
+        "viewProfile": "प्रोफ़ाइल देखें",
+        "specialization": "विशेषज्ञता"
+    },
+    "marketplace": {
+        "title": "वकील खोजें",
+        "searchPlaceholder": "नाम, विशेषज्ञता, या स्थान से खोजें"
+    },
+    "booking": {
+        "title": "परामर्श बुक करें",
+        "confirmBooking": "बुकिंग की पुष्टि करें"
+    }
+}

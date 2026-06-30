@@ -2,6 +2,7 @@ const Lawyer = require("../models/Lawyer");
 const Booking = require("../models/Booking");
 const User = require("../models/User");
 const Document = require("../models/Document");
+const Case = require("../models/Case");
 const s3Service = require("../services/s3Service");
 
 // ============================================================================
@@ -110,13 +111,32 @@ exports.getDashboardStats = async (req, res) => {
       { $project: { lawyer_name: "$user.name", specialization: "$lawyer.specialization", case_count: 1 } },
     ]);
 
+    const [totalCases, pendingCases, activeCases, closedCases] = await Promise.all([
+      Case.countDocuments(),
+      Case.countDocuments({ status: "pending" }),
+      Case.countDocuments({ status: "active" }),
+      Case.countDocuments({ status: "closed" })
+    ]);
+
+    // Simple monthly data mock (could be aggregated from Cases/Payments in the future)
+    const monthlyData = [
+      { name: 'Jan', cases: 10, revenue: 2400 },
+      { name: 'Feb', cases: 15, revenue: 1398 },
+      { name: 'Mar', cases: 8, revenue: 9800 },
+      { name: 'Apr', cases: 20, revenue: 3908 },
+      { name: 'May', cases: 25, revenue: 4800 },
+      { name: 'Jun', cases: Math.floor(totalCases / 2) + 1, revenue: 3800 },
+      { name: 'Jul', cases: totalCases, revenue: 4300 },
+    ];
+
     return res.json({
       success: true,
       stats: {
         lawyers: { total: totalLawyers, verified: verifiedLawyers, pending: pendingLawyers, rejected: rejectedLawyers },
         consultations: { total: totalBookings, pending: pendingBookings, confirmed: confirmedBookings },
-        cases: { total: 0, pending: 0, active: 0 },
+        cases: { total: totalCases, pending: pendingCases, active: activeCases, closed: closedCases },
         topLawyers,
+        monthlyData
       },
     });
   } catch (error) {
@@ -129,10 +149,82 @@ exports.getDashboardStats = async (req, res) => {
 // ============================================================================
 exports.getAllCasesAdmin = async (req, res) => {
   try {
-    // Return empty for now – LegalCase controller handles its own routes
-    return res.json({ success: true, cases: [] });
+    const cases = await Case.find()
+      .populate("user", "name email")
+      .populate({
+        path: "lawyer",
+        populate: { path: "user", select: "name" }
+      })
+      .sort({ createdAt: -1 });
+
+    const flattened = cases.map(c => ({
+      id: c._id.toString(),
+      title: c.title,
+      client_name: c.user?.name || "Unknown Client",
+      lawyer_name: c.lawyer?.user?.name || "",
+      status: c.status,
+      created_at: c.createdAt
+    }));
+
+    return res.json({ success: true, cases: flattened });
   } catch (error) {
     return res.status(500).json({ success: false, message: "Error fetching cases" });
+  }
+};
+
+// ============================================================================
+// GET ALL APPOINTMENTS ADMIN
+// ============================================================================
+exports.getAllAppointmentsAdmin = async (req, res) => {
+  try {
+    const bookings = await Booking.find()
+      .populate("user", "name email")
+      .populate({
+        path: "lawyer",
+        populate: { path: "user", select: "name" }
+      })
+      .sort({ date: -1, time: -1 });
+
+    const flattened = bookings.map(b => ({
+      id: b._id.toString(),
+      client: b.user?.name || "Unknown Client",
+      lawyer: b.lawyer?.user?.name || "Unknown Lawyer",
+      date: new Date(b.date).toLocaleDateString(),
+      time: b.time,
+      type: b.type === "video" ? "Video" : "In-person",
+      status: b.status.charAt(0).toUpperCase() + b.status.slice(1)
+    }));
+
+    return res.json({ success: true, appointments: flattened });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: "Error fetching appointments" });
+  }
+};
+
+// ============================================================================
+// GET ALL CLIENTS ADMIN
+// ============================================================================
+exports.getAllClientsAdmin = async (req, res) => {
+  try {
+    const clients = await User.find({ user_type: "client" }).sort({ createdAt: -1 });
+    
+    // We can count cases for each client
+    const flattened = await Promise.all(clients.map(async c => {
+      const caseCount = await Case.countDocuments({ user: c._id });
+      return {
+        id: c._id.toString(),
+        name: c.name,
+        email: c.email,
+        phone: c.phone || "N/A",
+        cases: caseCount,
+        status: c.is_verified ? "Active" : "Onboarding",
+        lawyer: caseCount > 0 ? "Assigned via Case" : "Unassigned"
+      };
+    }));
+
+    return res.json({ success: true, clients: flattened });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: "Error fetching clients" });
   }
 };
 

@@ -430,8 +430,16 @@ exports.loginUser = async (req, res) => {
 // ============================================================
 exports.getUserProfile = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).select("-password -reset_password_token -reset_password_expires -otp -otp_expires -otp_last_sent");
+    let user = await User.findById(req.user.id).select("-password -reset_password_token -reset_password_expires -otp -otp_expires -otp_last_sent").lean();
     if (!user) return res.status(404).json({ success: false, message: "User not found" });
+
+    if (user.user_type === 'lawyer') {
+      const lawyerData = await Lawyer.findOne({ user: user._id }).lean();
+      if (lawyerData) {
+        user.lawyer_profile = lawyerData;
+      }
+    }
+
     return res.json({ success: true, user });
   } catch (error) {
     return res.status(500).json({ success: false, message: "Error fetching profile", error: error.message });
@@ -491,7 +499,34 @@ exports.updateUserProfile = async (req, res) => {
       }
     }
 
-    const updatedUser = await User.findByIdAndUpdate(req.user.id, update, { new: true });
+    const updatedUser = await User.findByIdAndUpdate(req.user.id, update, { new: true }).lean();
+
+    if (updatedUser.user_type === 'lawyer') {
+      const {
+        specialization, experience, consultation_fee, bio, lawyer_city, lawyer_state,
+        languages, bar_council_id, bar_council_state, enrollment_year
+      } = req.body;
+      
+      const lawyerUpdate = {};
+      if (specialization !== undefined) lawyerUpdate.specialization = specialization;
+      if (experience !== undefined) lawyerUpdate.experience = experience;
+      if (consultation_fee !== undefined) lawyerUpdate.consultation_fee = consultation_fee;
+      if (bio !== undefined) lawyerUpdate.bio = bio;
+      if (lawyer_city !== undefined) lawyerUpdate.city = lawyer_city;
+      if (lawyer_state !== undefined) lawyerUpdate.state = lawyer_state;
+      if (languages !== undefined) lawyerUpdate.languages = Array.isArray(languages) ? languages : languages.split(',').map(l => l.trim());
+      if (bar_council_id !== undefined) lawyerUpdate.bar_council_id = bar_council_id;
+      if (bar_council_state !== undefined) lawyerUpdate.bar_council_state = bar_council_state;
+      if (enrollment_year !== undefined) lawyerUpdate.enrollment_year = enrollment_year;
+      
+      if (Object.keys(lawyerUpdate).length > 0) {
+        const lawyerData = await Lawyer.findOneAndUpdate({ user: updatedUser._id }, lawyerUpdate, { new: true, upsert: true }).lean();
+        updatedUser.lawyer_profile = lawyerData;
+      } else {
+        const lawyerData = await Lawyer.findOne({ user: updatedUser._id }).lean();
+        updatedUser.lawyer_profile = lawyerData;
+      }
+    }
 
     return res.json({
       success: true,
