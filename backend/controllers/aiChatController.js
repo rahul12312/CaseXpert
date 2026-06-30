@@ -1,6 +1,7 @@
 const ChatSession = require("../models/ChatSession");
 const { askAiLegalAssistant } = require("../services/aiLegalAssistantGroq");
 const pdfParse = require("pdf-parse");
+const Tesseract = require("tesseract.js");
 
 // ============================================================================
 // SEND CHAT MESSAGE
@@ -169,6 +170,14 @@ const uploadDocument = async (req, res) => {
       } catch (pdfErr) {
         console.error("PDF parse failed:", pdfErr);
         fileContent = "[Error reading PDF content]";
+      }
+    } else if (file.mimetype.startsWith("image/") || [".png", ".jpg", ".jpeg", ".webp"].some(ext => file.originalname.toLowerCase().endsWith(ext))) {
+      try {
+        const { data: { text } } = await Tesseract.recognize(file.path, "eng");
+        fileContent = text || "[Empty Image]";
+      } catch (ocrErr) {
+        console.error("OCR parse failed:", ocrErr);
+        fileContent = "[Error reading text from image file]";
       }
     } else {
       fileContent = await fs.readFile(file.path, "utf8").catch(() => "[Binary File]");
