@@ -45,8 +45,7 @@ const Contact = () => {
                                     </div>
                                     <div>
                                         <p className="font-semibold text-slate-900 dark:text-white">Email Us</p>
-                                        <p className="text-slate-600 dark:text-slate-400">support@casexpert.com</p>
-                                        <p className="text-slate-600 dark:text-slate-400">sales@casexpert.com</p>
+                                        <p className="text-slate-600 dark:text-slate-400">casexpert.support@gmail.com</p>
                                     </div>
                                 </div>
                                 <div className="flex items-start gap-4">
