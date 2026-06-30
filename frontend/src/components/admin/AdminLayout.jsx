@@ -3,7 +3,7 @@ import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, Users, UsersRound, Scale, Calendar, 
   FileText, CreditCard, PieChart, Settings, ShieldCheck,
-  Search, Bell, LogOut, Menu, X, Sun, Moon
+  Search, Bell, LogOut, Menu, X, Sun, Moon, ArrowLeft
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
@@ -74,6 +74,13 @@ const AdminLayout = () => {
         
         <div className="flex-1 overflow-y-auto py-4 px-3 custom-scrollbar">
           <nav className="space-y-1">
+            <button
+              onClick={() => navigate('/')}
+              className="flex w-full items-center gap-3 px-3 py-2.5 mb-4 rounded-lg text-sm font-medium text-blue-100 hover:bg-blue-800 hover:text-white transition-colors border border-blue-800/50"
+            >
+              <ArrowLeft className="w-5 h-5" />
+              Back to Home
+            </button>
             {NAV_ITEMS.map((item) => (
               <NavLink
                 key={item.name}
@@ -126,6 +133,16 @@ const AdminLayout = () => {
         
         <div className="flex-1 overflow-y-auto py-4 px-3">
           <nav className="space-y-1">
+            <button
+              onClick={() => {
+                navigate('/');
+                setIsMobileMenuOpen(false);
+              }}
+              className="flex w-full items-center gap-3 px-3 py-2.5 mb-4 rounded-lg text-sm font-medium text-blue-100 hover:bg-blue-800 hover:text-white transition-colors border border-blue-800/50"
+            >
+              <ArrowLeft className="w-5 h-5" />
+              Back to Home
+            </button>
             {NAV_ITEMS.map((item) => (
               <NavLink
                 key={item.name}
@@ -266,6 +283,14 @@ const AdminLayout = () => {
 
         {/* MAIN OUTLET (Scrollable) */}
         <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 bg-slate-50 dark:bg-slate-950">
+          <div className="md:hidden mb-4">
+            <button
+              onClick={() => navigate('/')}
+              className="inline-flex items-center gap-2 px-3 py-2 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-lg shadow-sm text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+            >
+              <ArrowLeft className="w-4 h-4" /> Back to Home
+            </button>
+          </div>
           <Outlet />
         </main>
       </div>

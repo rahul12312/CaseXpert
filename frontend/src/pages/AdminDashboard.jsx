@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import {
   Eye, X, CheckCircle, XCircle, FileText,
   MapPin, User, Mail, Phone, Shield,
-  Award, BookOpen, Calendar, Download
+  Award, BookOpen, Calendar, Download, ArrowLeft
 } from 'lucide-react';
 
 const AdminDashboard = () => {
@@ -132,10 +132,18 @@ const AdminDashboard = () => {
       )}
 
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-3">
-          <Shield className="w-8 h-8 text-primary-600" />
-          Admin Dashboard
-        </h1>
+        <div className="mb-6 flex flex-col items-start gap-4">
+          <button 
+            onClick={() => navigate('/')} 
+            className="px-4 py-2 bg-white dark:bg-slate-800 hover:bg-gray-100 dark:hover:bg-slate-700 text-gray-800 dark:text-white rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 flex items-center gap-2 transition-all font-medium text-sm"
+          >
+            <ArrowLeft className="w-4 h-4" /> Back to Home
+          </button>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
+            <Shield className="w-8 h-8 text-primary-600" />
+            Admin Dashboard
+          </h1>
+        </div>
 
         {/* STATS GRID */}
         {stats && (
