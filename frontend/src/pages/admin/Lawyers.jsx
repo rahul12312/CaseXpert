@@ -340,13 +340,14 @@ const AdminLawyers = () => {
                     <h3 className="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider mb-3 flex items-center gap-2">
                       <FileText className="w-4 h-4 text-[#1E3A8A]" /> Verification Documents
                     </h3>                    {(() => {
-                      const docs = selectedLawyer.documents && selectedLawyer.documents.length > 0 
-                        ? selectedLawyer.documents 
-                        : [
-                            { title: 'Bar Council Registration', file_type: 'pdf', file_size: 1024 * 1500, url: '#' },
-                            { title: 'Law Degree Certificate', file_type: 'pdf', file_size: 1024 * 2100, url: '#' },
-                            { title: 'Government ID Proof', file_type: 'image', file_size: 1024 * 850, url: '#' }
-                          ];
+                          const samplePdfUrl = 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf';
+                          const docs = selectedLawyer.documents && selectedLawyer.documents.length > 0 
+                            ? selectedLawyer.documents 
+                            : [
+                                { title: 'Bar Council Registration', file_type: 'pdf', file_size: 1024 * 1500, url: samplePdfUrl },
+                                { title: 'Law Degree Certificate', file_type: 'pdf', file_size: 1024 * 2100, url: samplePdfUrl },
+                                { title: 'Government ID Proof', file_type: 'image', file_size: 1024 * 850, url: samplePdfUrl }
+                              ];
                       
                       return (
                         <div className="space-y-3">
