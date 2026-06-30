@@ -19,17 +19,20 @@ exports.submitContactMessage = async (req, res) => {
 
     // Attempt to send email
     try {
-      if (process.env.SMTP_USER && process.env.SMTP_PASS) {
+      const smtpUser = process.env.SMTP_EMAIL || process.env.SMTP_USER;
+      const smtpPass = process.env.SMTP_PASSWORD || process.env.SMTP_PASS;
+
+      if (smtpUser && smtpPass) {
         const transporter = nodemailer.createTransport({
           service: 'gmail',
           auth: {
-            user: process.env.SMTP_USER,
-            pass: process.env.SMTP_PASS,
+            user: smtpUser,
+            pass: smtpPass,
           },
         });
 
         const mailOptions = {
-          from: process.env.SMTP_USER,
+          from: smtpUser,
           to: "casexpert.support@gmail.com",
           replyTo: email,
           subject: `New Contact Form Submission: ${subject}`,
