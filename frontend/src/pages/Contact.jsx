@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Mail, Phone, MapPin, Send } from 'lucide-react';
+import api from '../lib/api';
 
 const Contact = () => {
     const [formData, setFormData] = useState({
@@ -19,22 +20,13 @@ const Contact = () => {
         e.preventDefault();
         setLoading(true);
         try {
-            const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
-            const response = await fetch(`${API_URL}/api/contact`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formData),
-            });
+            const response = await api.post('/contact', formData);
             
-            const data = await response.json();
-            
-            if (response.ok) {
+            if (response.data.success) {
                 setSubmitted(true);
                 setFormData({ name: '', email: '', subject: '', message: '' });
             } else {
-                alert(data.message || 'Something went wrong. Please try again.');
+                alert(response.data.message || 'Something went wrong. Please try again.');
             }
         } catch (error) {
             console.error('Error submitting form:', error);
