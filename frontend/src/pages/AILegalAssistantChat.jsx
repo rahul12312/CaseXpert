@@ -52,6 +52,31 @@ const AILegalAssistantChat = () => {
     const attachmentMenuRef = useRef(null);
     const [selectedFile, setSelectedFile] = useState(null);
     const fileInputRef = useRef(null);
+    const [isDragging, setIsDragging] = useState(false);
+
+    const handleDragOver = (e) => {
+        e.preventDefault();
+        setIsDragging(true);
+    };
+
+    const handleDragLeave = () => {
+        setIsDragging(false);
+    };
+
+    const handleDrop = (e) => {
+        e.preventDefault();
+        setIsDragging(false);
+        const file = e.dataTransfer.files[0];
+        if (file) {
+            const allowed = ['.pdf', '.doc', '.docx', '.jpg', '.jpeg', '.png', '.webp', '.txt'];
+            const ext = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+            if (allowed.includes(ext)) {
+                setSelectedFile(file);
+            } else {
+                alert(`Invalid file type. Supported: PDF, DOC, DOCX, JPG, PNG, WEBP, TXT`);
+            }
+        }
+    };
 
     // Maps our language codes to BCP-47 tags for Web Speech API
     const SPEECH_LANGUAGE_MAP = {
@@ -434,7 +459,21 @@ const AILegalAssistantChat = () => {
 
 
     return (
-        <div className="flex h-[calc(100vh-64px)] mt-16 w-full bg-slate-50 dark:bg-slate-950 overflow-hidden">
+        <div 
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+            className="flex h-[calc(100vh-64px)] mt-16 w-full bg-slate-50 dark:bg-slate-950 overflow-hidden relative"
+        >
+            {isDragging && (
+                <div className="absolute inset-0 bg-blue-500/10 backdrop-blur-[2px] border-2 border-dashed border-blue-500 flex flex-col items-center justify-center z-50 pointer-events-none animate-in fade-in duration-200">
+                    <div className="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-xl flex flex-col items-center gap-3">
+                        <Plus className="w-12 h-12 text-blue-600 animate-bounce" />
+                        <span className="text-sm font-bold text-slate-800 dark:text-slate-200">Drop your document or photo here</span>
+                        <span className="text-xs text-slate-500">Supports PDF, TXT, DOC, DOCX, PNG, JPG, WEBP</span>
+                    </div>
+                </div>
+            )}
             {/* ============================================ */}
             {/* LEFT SIDEBAR - Chat History */}
             {/* ============================================ */}

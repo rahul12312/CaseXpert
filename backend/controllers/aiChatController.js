@@ -2,6 +2,7 @@ const ChatSession = require("../models/ChatSession");
 const { askAiLegalAssistant } = require("../services/aiLegalAssistantGroq");
 const pdfParse = require("pdf-parse");
 const Tesseract = require("tesseract.js");
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 // ============================================================================
 // SEND CHAT MESSAGE
@@ -172,16 +173,43 @@ const uploadDocument = async (req, res) => {
         fileContent = "[Error reading PDF content]";
       }
     } else if (file.mimetype.startsWith("image/") || [".png", ".jpg", ".jpeg", ".webp"].some(ext => file.originalname.toLowerCase().endsWith(ext))) {
-      try {
-        const { data: { text } } = await Tesseract.recognize(file.path, "eng", {
-          langPath: path.join(__dirname, "../tessdata"),
-          cachePath: path.join(__dirname, "../tessdata"),
-          gzip: false
-        });
-        fileContent = text || "[Empty Image]";
-      } catch (ocrErr) {
-        console.error("OCR parse failed:", ocrErr);
-        fileContent = "[Error reading text from image file]";
+      // 1. Try Gemini Vision API for high-precision cloud OCR first
+      if (process.env.GEMINI_API_KEY) {
+        try {
+          console.log("🤖 Attempting high-precision Gemini OCR...");
+          const fileBuffer = await fs.readFile(file.path);
+          const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+          const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+          const imagePart = {
+            inlineData: {
+              data: fileBuffer.toString("base64"),
+              mimeType: file.mimetype || "image/png"
+            }
+          };
+          const prompt = "Extract all text present in this image verbatim. Do not summarize it. Return only the extracted text.";
+          const result = await model.generateContent([prompt, imagePart]);
+          fileContent = result.response.text() || "[Empty Image]";
+          console.log("✅ Gemini OCR extraction successful!");
+        } catch (geminiErr) {
+          console.error("❌ Gemini OCR failed, falling back to local Tesseract:", geminiErr);
+        }
+      }
+
+      // 2. Fall back to local Tesseract OCR if Gemini fails or is not configured
+      if (!fileContent) {
+        try {
+          console.log("🤖 Attempting local Tesseract OCR...");
+          const { data: { text } } = await Tesseract.recognize(file.path, "eng", {
+            langPath: path.join(__dirname, "../tessdata"),
+            cachePath: path.join(__dirname, "../tessdata"),
+            gzip: false
+          });
+          fileContent = text || "[Empty Image]";
+          console.log("✅ Tesseract OCR extraction successful!");
+        } catch (ocrErr) {
+          console.error("❌ Tesseract OCR failed:", ocrErr);
+          fileContent = "[Error reading text from image file]";
+        }
       }
     } else {
       fileContent = await fs.readFile(file.path, "utf8").catch(() => "[Binary File]");
