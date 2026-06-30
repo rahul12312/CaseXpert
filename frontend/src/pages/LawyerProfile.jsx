@@ -195,11 +195,16 @@ const LawyerProfile = () => {
 
                                 <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 break-words">{lawyer.name}</h1>
 
-                                {lawyer.bar_council_id && (
-                                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 break-all">
-                                        Bar Council ID: {lawyer.bar_council_id}
-                                    </p>
-                                )}
+                                <div className="flex flex-wrap justify-center items-center gap-2 mb-3">
+                                  <span className="text-xs font-mono text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2.5 py-1 rounded-lg border border-blue-100 dark:border-blue-800">
+                                    ID: #{lawyer.id?.slice(-8).toUpperCase() || 'N/A'}
+                                  </span>
+                                  {lawyer.bar_council_id && (
+                                    <span className="text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 px-2.5 py-1 rounded-lg border border-gray-200 dark:border-gray-700">
+                                      Bar: {lawyer.bar_council_id}
+                                    </span>
+                                  )}
+                                </div>
 
                                 {lawyer.average_rating > 0 && (
                                     <div className="flex items-center justify-center gap-2 mb-4">

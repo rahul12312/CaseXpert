@@ -69,11 +69,16 @@ const LawyerCard = ({ lawyer, onBook }) => {
                 <h3 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white mb-1 truncate">
                   {lawyer.name}
                 </h3>
-                {lawyer.bar_council_id && (
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
-                    Bar ID: {lawyer.bar_council_id}
-                  </p>
-                )}
+                <div className="flex flex-wrap items-center gap-2 mb-2">
+                  <span className="text-xs font-mono text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded">
+                    ID: #{lawyer.id?.slice(-8).toUpperCase() || 'N/A'}
+                  </span>
+                  {lawyer.bar_council_id && (
+                    <span className="text-xs text-gray-500 dark:text-gray-400">
+                      Bar: {lawyer.bar_council_id}
+                    </span>
+                  )}
+                </div>
               </div>
 
               {/* Rating Badge */}

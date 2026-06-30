@@ -160,7 +160,8 @@ const AdminLawyers = () => {
                         </div>
                         <div>
                           <div className="font-semibold text-slate-900 dark:text-white text-sm">{l.name}</div>
-                          <div className="text-xs text-slate-500">ID: {l.bar_council_id || 'N/A'}</div>
+                          <div className="text-xs text-slate-400 font-mono">ID: #{l.id?.slice(-8).toUpperCase() || 'N/A'}</div>
+                          {l.bar_council_id && <div className="text-xs text-slate-500">Bar: {l.bar_council_id}</div>}
                         </div>
                       </div>
                     </td>

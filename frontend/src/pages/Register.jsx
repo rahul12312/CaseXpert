@@ -145,6 +145,7 @@ const Register = () => {
   const [availableCities, setAvailableCities] = useState([]);
   const [availableLanguages, setAvailableLanguages] = useState(['Hindi', 'English']);
   const [showLanguageDropdown, setShowLanguageDropdown] = useState(false);
+  const [documentFiles, setDocumentFiles] = useState([]); // Lawyer document uploads
 
   const isLawyer = form.role === 'lawyer';
 
@@ -858,6 +859,65 @@ const Register = () => {
                     className="w-full rounded-lg border border-slate-600 bg-slate-900 px-4 py-2.5 text-sm text-white focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500"
                     placeholder="Enter your Bar Council registration number"
                   />
+                </div>
+
+                {/* Document Upload */}
+                <div className="space-y-3 md:col-span-2">
+                  <label className="block text-sm font-medium text-slate-300">
+                    📎 Verification Documents
+                    <span className="text-slate-400 font-normal text-xs ml-1">(Bar certificate, Degree, ID proof)</span>
+                  </label>
+                  <div
+                    className="relative border-2 border-dashed border-slate-600 hover:border-blue-500 bg-slate-900 rounded-xl p-5 text-center transition-colors cursor-pointer"
+                    onClick={() => document.getElementById('lawyer-docs').click()}
+                    onDragOver={(e) => e.preventDefault()}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      const dropped = Array.from(e.dataTransfer.files).filter(f =>
+                        f.type.startsWith('image/') || f.type === 'application/pdf'
+                      );
+                      setDocumentFiles(prev => [...prev, ...dropped].slice(0, 5));
+                    }}
+                  >
+                    <input
+                      id="lawyer-docs"
+                      type="file"
+                      accept="image/*,application/pdf"
+                      multiple
+                      className="hidden"
+                      onChange={(e) => {
+                        const selected = Array.from(e.target.files);
+                        setDocumentFiles(prev => [...prev, ...selected].slice(0, 5));
+                        e.target.value = '';
+                      }}
+                    />
+                    <div className="text-3xl mb-2">📄</div>
+                    <p className="text-sm text-slate-300 font-medium">Click or drag files here</p>
+                    <p className="text-xs text-slate-500 mt-1">PDF or images • Max 5 files • 10MB each</p>
+                  </div>
+
+                  {documentFiles.length > 0 && (
+                    <div className="space-y-2">
+                      {documentFiles.map((file, idx) => (
+                        <div key={idx} className="flex items-center justify-between bg-slate-800 rounded-lg px-3 py-2 border border-slate-700">
+                          <div className="flex items-center gap-2 min-w-0">
+                            <span className="text-lg shrink-0">{file.type === 'application/pdf' ? '📄' : '🖼️'}</span>
+                            <div className="min-w-0">
+                              <p className="text-xs text-white font-medium truncate">{file.name}</p>
+                              <p className="text-xs text-slate-400">{(file.size / 1024).toFixed(0)} KB</p>
+                            </div>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => setDocumentFiles(prev => prev.filter((_, i) => i !== idx))}
+                            className="text-slate-400 hover:text-red-400 ml-2 shrink-0 text-lg leading-none"
+                          >
+                            ×
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
