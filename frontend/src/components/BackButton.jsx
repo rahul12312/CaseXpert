@@ -6,8 +6,9 @@ const BackButton = () => {
     const navigate = useNavigate();
     const location = useLocation();
 
-    // Do not show on home page
-    if (location.pathname === '/') {
+    // Do not show on home page or top-level dashboards
+    const hiddenPaths = ['/', '/admin/dashboard', '/lawyer/dashboard', '/dashboard'];
+    if (hiddenPaths.includes(location.pathname)) {
         return null;
     }
 
