@@ -1,8 +1,6 @@
 const ChatSession = require("../models/ChatSession");
 const { askAiLegalAssistant } = require("../services/aiLegalAssistantGroq");
 const pdfParse = require("pdf-parse");
-const Tesseract = require("tesseract.js");
-const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 // ============================================================================
 // SEND CHAT MESSAGE
@@ -141,6 +139,39 @@ const deleteSession = async (req, res) => {
 };
 
 // ============================================================================
+// IMAGE OCR USING GROQ VISION API (llama-3.2-11b-vision-preview)
+// ============================================================================
+const extractTextFromImageWithGroq = async (imageBuffer, mimeType) => {
+  const Groq = require("groq-sdk");
+  const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+
+  const base64Image = imageBuffer.toString("base64");
+  const dataUrl = `data:${mimeType};base64,${base64Image}`;
+
+  const response = await groq.chat.completions.create({
+    model: "llama-3.2-11b-vision-preview",
+    messages: [
+      {
+        role: "user",
+        content: [
+          {
+            type: "image_url",
+            image_url: { url: dataUrl },
+          },
+          {
+            type: "text",
+            text: "Extract ALL text visible in this image verbatim. Include every word, number, date, heading, and paragraph exactly as it appears. Do not summarize or skip any text. Return only the raw extracted text.",
+          },
+        ],
+      },
+    ],
+    max_tokens: 4096,
+  });
+
+  return response.choices[0]?.message?.content || "";
+};
+
+// ============================================================================
 // UPLOAD DOCUMENT FOR CHAT
 // ============================================================================
 const uploadDocument = async (req, res) => {
@@ -149,80 +180,86 @@ const uploadDocument = async (req, res) => {
     const file = req.file;
     let { sessionId } = req.body;
 
-    if (!file) return res.status(400).json({ success: false, message: "No file" });
+    if (!file) return res.status(400).json({ success: false, message: "No file uploaded" });
 
     let session;
     if (!sessionId || sessionId === "null") {
-      session = await ChatSession.create({ user: userId, title: `Chat about ${file.originalname}`, session_type: "document_analysis" });
+      session = await ChatSession.create({
+        user: userId,
+        title: `Chat about ${file.originalname}`,
+        session_type: "document_analysis",
+      });
       sessionId = session._id;
     } else {
       session = await ChatSession.findOne({ _id: sessionId, user: userId });
+      if (!session) return res.status(403).json({ success: false, message: "Session not found" });
     }
 
-    const fs = require("fs").promises;
-    const path = require("path");
-    
+    // Get file buffer — supports both memory storage (file.buffer) and disk storage (file.path)
+    let fileBuffer;
+    if (file.buffer) {
+      fileBuffer = file.buffer;
+    } else if (file.path) {
+      const fs = require("fs").promises;
+      fileBuffer = await fs.readFile(file.path);
+    } else {
+      return res.status(400).json({ success: false, message: "Could not read uploaded file" });
+    }
+
+    const ext = file.originalname.toLowerCase();
+    const isImage = file.mimetype.startsWith("image/") || [".png", ".jpg", ".jpeg", ".webp", ".gif"].some(e => ext.endsWith(e));
+    const isPdf = file.mimetype === "application/pdf" || ext.endsWith(".pdf");
+
     let fileContent = "";
-    if (file.mimetype === "application/pdf" || file.originalname.toLowerCase().endsWith(".pdf")) {
+
+    // ── PDF: extract text with pdf-parse ────────────────────────────────────
+    if (isPdf) {
       try {
-        const fileBuffer = await fs.readFile(file.path);
+        console.log("📄 Parsing PDF...");
         const pdfData = await pdfParse(fileBuffer);
-        fileContent = pdfData.text || "[Empty PDF]";
+        fileContent = pdfData.text?.trim() || "";
+        if (!fileContent) fileContent = "[PDF appears to be empty or image-only — try uploading as an image for OCR]";
+        console.log(`✅ PDF parsed: ${fileContent.length} chars extracted`);
       } catch (pdfErr) {
-        console.error("PDF parse failed:", pdfErr);
         fileContent = "[Error reading PDF content]";
       }
-    } else if (file.mimetype.startsWith("image/") || [".png", ".jpg", ".jpeg", ".webp"].some(ext => file.originalname.toLowerCase().endsWith(ext))) {
-      // 1. Try Gemini Vision API for high-precision cloud OCR first
-      if (process.env.GEMINI_API_KEY) {
-        try {
-          console.log("🤖 Attempting high-precision Gemini OCR...");
-          const fileBuffer = await fs.readFile(file.path);
-          const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-          const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-          const imagePart = {
-            inlineData: {
-              data: fileBuffer.toString("base64"),
-              mimeType: file.mimetype || "image/png"
-            }
-          };
-          const prompt = "Extract all text present in this image verbatim. Do not summarize it. Return only the extracted text.";
-          const result = await model.generateContent([prompt, imagePart]);
-          fileContent = result.response.text() || "[Empty Image]";
-          console.log("✅ Gemini OCR extraction successful!");
-        } catch (geminiErr) {
-          console.error("❌ Gemini OCR failed, falling back to local Tesseract:", geminiErr);
-        }
+    // ── IMAGE: use Groq Vision OCR ──────────────────────────────────────────
+    } else if (isImage) {
+      try {
+        console.log(`🔍 Running Groq Vision OCR on ${file.originalname}...`);
+        const mimeType = file.mimetype || "image/png";
+        fileContent = await extractTextFromImageWithGroq(fileBuffer, mimeType);
+        fileContent = fileContent?.trim() || "";
+        if (!fileContent) fileContent = "[No text found in this image]";
+        console.log(`✅ Groq OCR complete: ${fileContent.length} characters extracted`);
+      } catch (ocrErr) {
+        console.error("❌ Groq Vision OCR failed:", ocrErr.message);
+        fileContent = `[OCR failed: ${ocrErr.message}]`;
       }
-
-      // 2. Fall back to local Tesseract OCR if Gemini fails or is not configured
-      if (!fileContent) {
-        try {
-          console.log("🤖 Attempting local Tesseract OCR...");
-          const { data: { text } } = await Tesseract.recognize(file.path, "eng", {
-            langPath: path.join(__dirname, "../tessdata"),
-            cachePath: path.join(__dirname, "../tessdata"),
-            gzip: false
-          });
-          fileContent = text || "[Empty Image]";
-          console.log("✅ Tesseract OCR extraction successful!");
-        } catch (ocrErr) {
-          console.error("❌ Tesseract OCR failed:", ocrErr);
-          fileContent = "[Error reading text from image file]";
-        }
-      }
-    } else {
-      fileContent = await fs.readFile(file.path, "utf8").catch(() => "[Binary File]");
     }
-    
+
+    // ── Plain text files ────────────────────────────────────────────────────
+    else {
+      fileContent = fileBuffer.toString("utf8").trim() || "[Empty file]";
+    }
+
+    // Save extracted content into the chat session as context
     session.messages.push({
       role: "system",
       message: `[DOCUMENT UPLOADED]\nFilename: ${file.originalname}\nContent:\n${fileContent.substring(0, 15000)}`,
     });
+    session.last_activity_at = new Date();
     await session.save();
 
-    return res.json({ success: true, message: "Uploaded", sessionId, filename: file.originalname });
+    return res.json({
+      success: true,
+      message: "Document uploaded and text extracted successfully",
+      sessionId,
+      filename: file.originalname,
+      extractedLength: fileContent.length,
+    });
   } catch (err) {
+    console.error("uploadDocument error:", err);
     return res.status(500).json({ success: false, message: err.message });
   }
 };
