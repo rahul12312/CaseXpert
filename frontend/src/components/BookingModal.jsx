@@ -11,9 +11,17 @@ const BookingModal = ({ isOpen, onClose, lawyerId, lawyerName, consultationFee, 
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
+    const getLocalDateString = () => {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
+
     const [formData, setFormData] = useState({
         consultationType: initialType || 'video_call',
-        date: new Date().toISOString().split('T')[0],
+        date: getLocalDateString(),
         timeSlot: initialTime || (() => {
             const now = new Date();
             return `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
@@ -161,7 +169,7 @@ const BookingModal = ({ isOpen, onClose, lawyerId, lawyerName, consultationFee, 
                                             type="date"
                                             name="date"
                                             required
-                                            min={new Date().toISOString().split('T')[0]}
+                                            min={getLocalDateString()}
                                             value={formData.date}
                                             onChange={handleChange}
                                             className="w-full pl-9 pr-3 py-2.5 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-slate-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none text-sm"
@@ -244,7 +252,7 @@ const BookingModal = ({ isOpen, onClose, lawyerId, lawyerName, consultationFee, 
                             </p>
                             <div className="flex flex-col gap-3">
                                 <button
-                                    onClick={() => navigate('/bookings')} // Or to bookings page
+                                    onClick={() => navigate('/my-bookings')} // Or to bookings page
                                     className="w-full px-4 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700"
                                 >
                                     View My Bookings
