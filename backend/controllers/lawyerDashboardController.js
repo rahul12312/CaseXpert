@@ -37,8 +37,8 @@ exports.getDashboardStats = async (req, res) => {
     if (resolvedCases > 0) {
       successRate = Math.round((completedBookings / resolvedCases) * 100);
     } else if (lawyer.total_cases > 0) {
-      // Use stable deterministic success rate to match marketplace
-      successRate = Math.min(98, Math.max(75, 80 + (parseInt(lawyer._id.toString().slice(-4), 16) % 18)));
+      // Use stable deterministic success rate to match marketplace (55% to 97%)
+      successRate = 55 + (parseInt(lawyer._id.toString().slice(-4), 16) % 43);
     }
 
     return res.json({

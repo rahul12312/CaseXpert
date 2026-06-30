@@ -68,7 +68,7 @@ exports.getAllLawyers = async (req, res) => {
 
     const formatted = lawyers.map((l) => {
       const totalReviews = l.reviews ? l.reviews.length : 0;
-      const successRate = l.total_cases > 0 ? Math.min(98, Math.max(75, 80 + (parseInt(l._id.toString().slice(-4), 16) % 18))) : 0;
+      const successRate = l.total_cases > 0 ? (55 + (parseInt(l._id.toString().slice(-4), 16) % 43)) : 0;
 
       return {
         id: l._id,
