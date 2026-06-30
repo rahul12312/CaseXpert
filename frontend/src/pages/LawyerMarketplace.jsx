@@ -343,7 +343,7 @@ const LawyerMarketplace = () => {
                         <div className="mt-6 overflow-x-auto pb-2 scrollbar-hide">
                             <div className="flex items-center justify-center gap-3 text-sm text-blue-100/80 font-medium whitespace-nowrap px-4">
                                 <span className="shrink-0">Popular Areas:</span>
-                                {['Property Laws', 'Divorce', 'Corporate Tax', 'Cyber Crime'].map(tag => (
+                                {['Property Law', 'Family Law', 'Tax Law', 'Cyber Law'].map(tag => (
                                     <button
                                         key={tag}
                                         onClick={() => {
