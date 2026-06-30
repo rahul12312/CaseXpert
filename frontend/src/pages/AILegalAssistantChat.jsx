@@ -809,6 +809,7 @@ const AILegalAssistantChat = () => {
                                         handleSubmit(e);
                                     }
                                 }}
+                                enterKeyHint="send"
                                 placeholder={selectedFile ? "Ask a question about this document..." : "Ask about Indian law, rights, or procedures..."}
                                 rows={1}
                                 className="flex-1 max-h-48 py-2.5 bg-transparent border-none focus:ring-0 outline-none text-sm text-slate-900 dark:text-white resize-none scroll-smooth"
