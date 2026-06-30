@@ -15,16 +15,14 @@ const updateLawyerPictures = async () => {
     const users = await User.find({ user_type: "lawyer" });
     console.log(`Found ${users.length} lawyers to update pictures for.`);
 
-    let maleCount = 50; // start higher just to be safe and different
-    let femaleCount = 50;
+    const maleImages = ['/uploads/profiles/m1.png', '/uploads/profiles/m2.png', '/uploads/profiles/m3.png'];
+    const femaleImages = ['/uploads/profiles/f1.png', '/uploads/profiles/f2.png', '/uploads/profiles/f3.png'];
 
     for (let user of users) {
       if (user.gender === "Female") {
-        user.profile_image = `https://randomuser.me/api/portraits/women/${femaleCount}.jpg`;
-        femaleCount++;
+        user.profile_image = femaleImages[Math.floor(Math.random() * femaleImages.length)];
       } else {
-        user.profile_image = `https://randomuser.me/api/portraits/men/${maleCount}.jpg`;
-        maleCount++;
+        user.profile_image = maleImages[Math.floor(Math.random() * maleImages.length)];
       }
 
       await user.save();
