@@ -65,7 +65,8 @@ const DocumentAnalyzer = () => {
 
         try {
             const response = await api.post('/ai-document/analyze', formData, {
-                headers: { 'Content-Type': 'multipart/form-data' }
+                headers: { 'Content-Type': 'multipart/form-data' },
+                timeout: 90000 // 90 seconds timeout for document analysis
             });
 
             if (response.data.success) {
@@ -100,6 +101,8 @@ const DocumentAnalyzer = () => {
                 documentText: rawText,
                 question: userMsg,
                 history: chatHistory
+            }, {
+                timeout: 60000 // 60 seconds timeout for document chat
             });
 
             if (response.data.success) {
