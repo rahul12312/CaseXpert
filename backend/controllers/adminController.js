@@ -242,15 +242,10 @@ exports.getAllClientsAdmin = async (req, res) => {
     return res.status(500).json({ success: false, message: "Error fetching clients" });
   }
 };
-    }));
-
-    return res.json({ success: true, clients: flattened });
-  } catch (error) {
-    return res.status(500).json({ success: false, message: "Error fetching clients" });
-  }
-};
 
 // ============================================================================
+
+
 // VERIFY LAWYER
 // ============================================================================
 exports.verifyLawyer = async (req, res) => {
