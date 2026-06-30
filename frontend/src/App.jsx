@@ -1,6 +1,7 @@
 import React from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
+import { useAuth } from './context/AuthContext.jsx';
 
 // Layout Components
 import Navbar from './components/Navbar.jsx';
@@ -66,6 +67,15 @@ import LawyerClientQueries from './pages/LawyerClientQueries.jsx';
 // AI Assistant
 import AILegalAssistantChat from './pages/AILegalAssistantChat.jsx';
 
+// Guard: redirect logged-in admin/lawyer away from the public home page
+const HomeRoute = () => {
+  const { user } = useAuth();
+  const role = user?.role || user?.user_type;
+  if (role === 'admin') return <Navigate to="/admin/dashboard" replace />;
+  if (role === 'lawyer') return <Navigate to="/lawyer/dashboard" replace />;
+  return <Home />;
+};
+
 const App = () => {
   const location = useLocation();
 
@@ -103,7 +113,7 @@ const App = () => {
         {!fullScreen && <BackButton />}
         <Routes>
           {/* ── PUBLIC ROUTES (no login required) ── */}
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<HomeRoute />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
