@@ -77,14 +77,16 @@ async function askAiLegalAssistant(messages, task = 'DEFAULT_CHAT', language = '
 
         // Format history
         messages.forEach(msg => {
-            // Map 'model' role from Gemini to 'assistant' for Groq/OpenAI compatible format
-            const role = (msg.role === 'model' || msg.role === 'assistant') ? 'assistant' : 'user';
-            if (msg.role !== 'system') {
-                groqMessages.push({
-                    role: role,
-                    content: msg.content || ""
-                });
+            let role = 'user';
+            if (msg.role === 'model' || msg.role === 'assistant') {
+                role = 'assistant';
+            } else if (msg.role === 'system') {
+                role = 'user'; // Treat system document context as user input so the AI can read it
             }
+            groqMessages.push({
+                role: role,
+                content: msg.content || ""
+            });
         });
 
         console.log(`   📤 Sending to Groq LLaMA 3 (${groqMessages.length} messages)...`);
