@@ -98,7 +98,7 @@ const Careers = () => {
                     If you share our passion for technology and justice, we want to hear from you.
                 </p>
                 <div className="flex flex-col sm:flex-row justify-center gap-4">
-                    <a href="mailto:careers@casexpert.com" className="inline-flex items-center justify-center rounded-full bg-blue-600 px-8 py-3 text-base font-semibold text-white hover:bg-blue-700 transition-all">
+                    <a href="mailto:casexpert.support@gmail.com" className="inline-flex items-center justify-center rounded-full bg-blue-600 px-8 py-3 text-base font-semibold text-white hover:bg-blue-700 transition-all">
                         Email Your Resume
                     </a>
                     <Link to="/about" className="inline-flex items-center justify-center rounded-full border border-slate-600 bg-transparent px-8 py-3 text-base font-semibold text-white hover:bg-slate-800 transition-all">

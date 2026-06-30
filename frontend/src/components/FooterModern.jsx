@@ -19,7 +19,7 @@ const FooterModern = () => {
               AI-powered legal assistance platform connecting clients with verified lawyers across India.
             </p>
             <p className="text-[11px] text-slate-500 dark:text-slate-400">
-              contact@casexpert.com
+              casexpert.support@gmail.com
             </p>
           </div>
           <div className="space-y-2">
