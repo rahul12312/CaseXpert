@@ -83,9 +83,9 @@ const LawyerCard = ({ lawyer, onBook }) => {
 
               {/* Rating Badge */}
               {lawyer.average_rating > 0 && (
-                <div className="flex items-center gap-1 bg-yellow-50 px-2 py-1 rounded-lg shrink-0">
+                <div className="flex items-center gap-1 bg-yellow-50 dark:bg-yellow-500/10 px-2 py-1 rounded-lg shrink-0 border border-yellow-100 dark:border-yellow-500/20">
                   <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-                  <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                  <span className="text-sm font-semibold text-yellow-700 dark:text-yellow-400">
                     {parseFloat(lawyer.average_rating).toFixed(1)}
                   </span>
                 </div>
