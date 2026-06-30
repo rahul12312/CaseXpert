@@ -15,14 +15,18 @@ const updateLawyerPictures = async () => {
     const users = await User.find({ user_type: "lawyer" });
     console.log(`Found ${users.length} lawyers to update pictures for.`);
 
-    const maleImages = ['/uploads/profiles/m1.png', '/uploads/profiles/m2.png', '/uploads/profiles/m3.png'];
-    const femaleImages = ['/uploads/profiles/f1.png', '/uploads/profiles/f2.png', '/uploads/profiles/f3.png'];
+    const fs = require('fs');
+    const profilesDir = path.join(__dirname, '../frontend/public/uploads/profiles');
+    const files = fs.readdirSync(profilesDir);
+    
+    const maleImages = files.filter(f => f.startsWith('m') && f.endsWith('.png')).map(f => `/uploads/profiles/${f}`);
+    const femaleImages = files.filter(f => f.startsWith('f') && f.endsWith('.png')).map(f => `/uploads/profiles/${f}`);
 
     for (let user of users) {
       if (user.gender === "Female") {
-        user.profile_image = femaleImages[Math.floor(Math.random() * femaleImages.length)];
+        user.profile_image = femaleImages[Math.floor(Math.random() * femaleImages.length)] || '/default-lawyer.png';
       } else {
-        user.profile_image = maleImages[Math.floor(Math.random() * maleImages.length)];
+        user.profile_image = maleImages[Math.floor(Math.random() * maleImages.length)] || '/default-lawyer.png';
       }
 
       await user.save();
