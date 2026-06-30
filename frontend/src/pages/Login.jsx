@@ -3,7 +3,15 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext.jsx';
 
 const Login = () => {
-  const { login, isAuthenticated } = useAuth();
+  const { login, isAuthenticated, user } = useAuth();
+
+  // Helper: pick the correct landing route based on role
+  const getDashboardRoute = (u) => {
+    const role = u?.role || u?.user_type;
+    if (role === 'admin') return '/admin/dashboard';
+    if (role === 'lawyer') return '/lawyer/dashboard';
+    return '/dashboard';
+  };
   const navigate = useNavigate();
   const location = useLocation();
   const [email, setEmail] = useState('');
@@ -14,9 +22,9 @@ const Login = () => {
   const [successMessage, setSuccessMessage] = useState('');
 
   useEffect(() => {
-    // If already logged in, go straight to home
-    if (isAuthenticated) {
-      navigate('/', { replace: true });
+    // If already logged in, redirect to the appropriate dashboard
+    if (isAuthenticated && user) {
+      navigate(getDashboardRoute(user), { replace: true });
       return;
     }
     if (location.state?.message) {
@@ -30,9 +38,9 @@ const Login = () => {
     setError('');
     setLoading(true);
     try {
-      await login(email, password);
-      // Always redirect to home page after login
-      navigate('/');
+      const loggedInUser = await login(email, password);
+      // Redirect based on user role
+      navigate(getDashboardRoute(loggedInUser), { replace: true });
     } catch (err) {
       const errorMsg = err.response?.data?.message || err.response?.data?.error || (err.message === 'Network Error' ? 'Cannot connect to server. Please ensure the backend is running.' : err.message) || 'Login failed. Please check your details and try again.';
       setError(errorMsg);
