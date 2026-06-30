@@ -1,5 +1,4 @@
 const ContactMessage = require("../models/ContactMessage");
-const nodemailer = require("nodemailer");
 
 exports.submitContactMessage = async (req, res) => {
   try {
@@ -17,26 +16,19 @@ exports.submitContactMessage = async (req, res) => {
       message,
     });
 
-    // Attempt to send email (non-blocking with timeout)
+    // Attempt to send email (non-blocking)
     try {
-      const smtpUser = process.env.SMTP_EMAIL || process.env.SMTP_USER;
-      const smtpPass = process.env.SMTP_PASSWORD || process.env.SMTP_PASS;
+      const sendGridApiKey = process.env.SENDGRID_API_KEY;
+      const fromEmail = process.env.SENDGRID_FROM_EMAIL || process.env.SMTP_EMAIL || "casexpert.support@gmail.com";
 
-      if (smtpUser && smtpPass) {
-        const transporter = nodemailer.createTransport({
-          service: 'gmail',
-          auth: {
-            user: smtpUser,
-            pass: smtpPass,
-          },
-          connectionTimeout: 8000,
-          greetingTimeout: 8000,
-          socketTimeout: 8000,
-        });
+      if (sendGridApiKey) {
+        // Use SendGrid (works on Render — uses HTTPS, not SMTP)
+        const sgMail = require("@sendgrid/mail");
+        sgMail.setApiKey(sendGridApiKey);
 
-        const mailOptions = {
-          from: smtpUser,
+        const msg = {
           to: "casexpert.support@gmail.com",
+          from: fromEmail,
           replyTo: email,
           subject: `New Contact Form Submission: ${subject}`,
           html: `
@@ -50,17 +42,12 @@ exports.submitContactMessage = async (req, res) => {
           `,
         };
 
-        // Race against a 10s timeout so the API never hangs
-        const sendWithTimeout = Promise.race([
-          transporter.sendMail(mailOptions),
-          new Promise((_, reject) => setTimeout(() => reject(new Error("Email send timeout")), 10000))
-        ]);
-
-        sendWithTimeout
-          .then(() => console.log("Contact email sent successfully"))
-          .catch((err) => console.error("Email send failed (non-blocking):", err.message));
+        // Fire and forget — don't await so the API responds instantly
+        sgMail.send(msg)
+          .then(() => console.log("✅ Contact email sent via SendGrid"))
+          .catch((err) => console.error("❌ SendGrid email failed:", err.message));
       } else {
-        console.warn("SMTP credentials not configured. Contact message saved to DB only.");
+        console.warn("SendGrid API key not configured. Contact message saved to DB only.");
       }
     } catch (emailError) {
       console.error("Error sending contact email:", emailError.message);
