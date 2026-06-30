@@ -79,9 +79,14 @@ const ClientDashboard = () => {
     if (loading) {
         return (
             <div className="flex min-h-screen items-center justify-center bg-slate-50 dark:bg-[#020617]">
-                <div className="relative">
-                    <div className="h-20 w-20 animate-spin rounded-full border-b-4 border-indigo-500" />
-                    <div className="absolute inset-0 flex items-center justify-center font-bold text-slate-900 dark:text-white text-xs">AI</div>
+                <div className="flex flex-col items-center gap-4">
+                    <div className="relative">
+                        <div className="h-20 w-20 animate-spin rounded-full border-b-4 border-indigo-500" />
+                        <div className="absolute inset-0 flex items-center justify-center text-indigo-500">
+                            <Gavel className="h-7 w-7" />
+                        </div>
+                    </div>
+                    <p className="text-sm font-semibold text-slate-400 animate-pulse">Loading Dashboard...</p>
                 </div>
             </div>
         );
