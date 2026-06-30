@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import BookingModal from '../components/BookingModal';
 import LeafletLawyerMap from '../components/LeafletLawyerMap';
@@ -24,18 +24,80 @@ import {
     Navigation,
     X,
     PenTool,
-    Video
+    Video,
+    LogIn,
+    UserPlus,
+    Shield
 } from 'lucide-react';
+
+const AuthGateModal = ({ lawyerName }) => {
+    const navigate = useNavigate();
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
+            <div className="relative w-full max-w-md bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
+                {/* Top decorative bar */}
+                <div className="h-2 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600" />
+                
+                <div className="p-8 text-center">
+                    {/* Icon */}
+                    <div className="mx-auto mb-6 w-20 h-20 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center">
+                        <Shield className="w-10 h-10 text-blue-600" />
+                    </div>
+
+                    {/* Heading */}
+                    <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
+                        Sign In Required
+                    </h2>
+                    <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed mb-8">
+                        Please sign in or create an account to view{' '}
+                        <span className="font-semibold text-slate-700 dark:text-slate-200">
+                            {lawyerName ? `${lawyerName}'s` : "this lawyer's"}
+                        </span>{' '}
+                        full profile, book consultations, and send messages.
+                    </p>
+
+                    {/* Buttons */}
+                    <div className="space-y-3">
+                        <button
+                            onClick={() => navigate('/login')}
+                            className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-700 transition-all shadow-lg shadow-blue-500/20 active:scale-[0.98]"
+                        >
+                            <LogIn className="w-5 h-5" />
+                            Sign In
+                        </button>
+                        <button
+                            onClick={() => navigate('/register')}
+                            className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl border-2 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-semibold hover:bg-slate-50 dark:hover:bg-slate-800 transition-all active:scale-[0.98]"
+                        >
+                            <UserPlus className="w-5 h-5" />
+                            Create Account
+                        </button>
+                    </div>
+
+                    {/* Back link */}
+                    <button
+                        onClick={() => navigate('/lawyers')}
+                        className="mt-6 text-sm text-slate-400 hover:text-blue-600 transition-colors flex items-center justify-center gap-1 mx-auto"
+                    >
+                        <ArrowLeft className="w-4 h-4" />
+                        Back to Lawyers
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
 
 const LawyerProfile = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const { user, token } = useAuth();
+    const { user, token, isAuthenticated } = useAuth();
     const [lawyer, setLawyer] = useState(null);
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState('about');
     const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
     const [bookingType, setBookingType] = useState('video_call');
+    const [showAuthGate, setShowAuthGate] = useState(false);
 
     // Review State
     const [isReviewOpen, setIsReviewOpen] = useState(false);
@@ -43,8 +105,19 @@ const LawyerProfile = () => {
     const [reviewSubmitting, setReviewSubmitting] = useState(false);
 
     useEffect(() => {
+        // If user is not authenticated, show the auth gate
+        if (!isAuthenticated) {
+            setShowAuthGate(true);
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'unset';
+        }
         fetchLawyerProfile();
-    }, [id]);
+
+        return () => {
+            document.body.style.overflow = 'unset';
+        };
+    }, [id, isAuthenticated]);
 
     const fetchLawyerProfile = async () => {
         setLoading(true);
@@ -156,6 +229,7 @@ const LawyerProfile = () => {
 
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+            {showAuthGate && <AuthGateModal lawyerName={lawyer?.name} />}
             {/* Header */}
             <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-8">
                 <div className="container mx-auto px-4">
