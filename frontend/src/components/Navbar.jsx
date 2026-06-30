@@ -328,12 +328,7 @@ const Navbar = () => {
                             </div>
                         ) : (
                             <div className="hidden md:flex items-center gap-2">
-                                <Link
-                                    to="/admin/dashboard"
-                                    className="rounded-lg px-3 lg:px-4 py-2 text-sm font-medium text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 whitespace-nowrap transition-colors"
-                                >
-                                    Admin Dashboard
-                                </Link>
+
                                 <Link
                                     to="/login"
                                     className="rounded-lg px-3 lg:px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:bg-slate-800 dark:hover:bg-slate-800 whitespace-nowrap transition-colors"
@@ -386,12 +381,7 @@ const Navbar = () => {
                         ))}
                         {!isAuthenticated && (
                             <div className="mt-4 flex flex-col gap-2 border-t border-slate-100 dark:border-slate-800 pt-4 dark:border-slate-800">
-                                <Link
-                                    to="/admin/dashboard"
-                                    className="block rounded-lg px-3 py-2 text-sm font-medium text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20"
-                                >
-                                    Admin Dashboard
-                                </Link>
+
                                 <Link
                                     to="/login"
                                     className="block rounded-lg px-3 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
