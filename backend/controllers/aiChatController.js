@@ -173,7 +173,11 @@ const uploadDocument = async (req, res) => {
       }
     } else if (file.mimetype.startsWith("image/") || [".png", ".jpg", ".jpeg", ".webp"].some(ext => file.originalname.toLowerCase().endsWith(ext))) {
       try {
-        const { data: { text } } = await Tesseract.recognize(file.path, "eng");
+        const { data: { text } } = await Tesseract.recognize(file.path, "eng", {
+          langPath: path.join(__dirname, "../tessdata"),
+          cachePath: path.join(__dirname, "../tessdata"),
+          gzip: false
+        });
         fileContent = text || "[Empty Image]";
       } catch (ocrErr) {
         console.error("OCR parse failed:", ocrErr);
