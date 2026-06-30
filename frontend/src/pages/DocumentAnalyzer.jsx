@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { UploadCloud, FileText, AlertTriangle, CheckCircle, Info, Send, Bot, FileWarning, ArrowRight, Loader } from 'lucide-react';
 import api from '../lib/api';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 const DocumentAnalyzer = () => {
     const [file, setFile] = useState(null);
@@ -319,10 +321,14 @@ const DocumentAnalyzer = () => {
                                             </div>
                                             <div className={`rounded-2xl px-4 py-3 text-sm ${
                                                 isAi 
-                                                    ? 'rounded-tl-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200' 
+                                                    ? 'rounded-tl-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 prose prose-sm dark:prose-invert max-w-none' 
                                                     : 'rounded-tr-sm bg-blue-600 text-white'
                                             }`}>
-                                                <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
+                                                {isAi ? (
+                                                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content}</ReactMarkdown>
+                                                ) : (
+                                                    <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
+                                                )}
                                             </div>
                                         </div>
                                     </div>
