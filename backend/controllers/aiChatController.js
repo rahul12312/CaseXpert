@@ -149,7 +149,7 @@ const extractTextFromImageWithGroq = async (imageBuffer, mimeType) => {
   const dataUrl = `data:${mimeType};base64,${base64Image}`;
 
   const response = await groq.chat.completions.create({
-    model: "llama-3.2-11b-vision-preview",
+    model: "meta-llama/llama-4-scout-17b-16e-instruct",
     messages: [
       {
         role: "user",
@@ -233,8 +233,8 @@ const uploadDocument = async (req, res) => {
         if (!fileContent) fileContent = "[No text found in this image]";
         console.log(`✅ Groq OCR complete: ${fileContent.length} characters extracted`);
       } catch (ocrErr) {
-        console.error("❌ Groq Vision OCR failed:", ocrErr.message);
-        fileContent = `[OCR failed: ${ocrErr.message}]`;
+        console.error("❌ Groq Vision OCR failed:", JSON.stringify(ocrErr?.error || ocrErr?.message || ocrErr));
+        fileContent = `[OCR failed: ${ocrErr?.error?.message || ocrErr?.message || "Unknown error"}]`;
       }
     }
 
