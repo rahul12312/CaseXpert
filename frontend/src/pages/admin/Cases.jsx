@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import api from '../../lib/api';
 import { 
   Search, Filter, Plus, FileText, Calendar, Download, Eye, Edit
@@ -144,8 +145,12 @@ const AdminCases = () => {
                     </td>
                     <td className="px-6 py-4 text-right">
                       <div className="flex justify-end gap-2">
-                        <button className="p-1.5 text-blue-600 hover:bg-blue-50 dark:hover:bg-slate-800 rounded"><Eye className="w-4 h-4" /></button>
-                        <button className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:bg-slate-800 rounded"><Edit className="w-4 h-4" /></button>
+                        <Link to={`/cases/${c.id}`} className="p-1.5 text-blue-600 hover:bg-blue-50 dark:hover:bg-slate-800 rounded inline-flex" title="View Case">
+                          <Eye className="w-4 h-4" />
+                        </Link>
+                        <button onClick={() => alert("Edit functionality coming soon")} className="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:bg-slate-800 rounded" title="Edit Case">
+                          <Edit className="w-4 h-4" />
+                        </button>
                       </div>
                     </td>
                   </tr>

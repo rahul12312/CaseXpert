@@ -142,7 +142,7 @@ const App = () => {
           {/* Case Tracking Routes - Client Only */}
           <Route path="/cases" element={<ProtectedRoute allowedRoles={['client', 'user']}><CaseTracker /></ProtectedRoute>} />
           <Route path="/cases/create" element={<ProtectedRoute allowedRoles={['client', 'user']}><CreateCase /></ProtectedRoute>} />
-          <Route path="/cases/:id" element={<ProtectedRoute allowedRoles={['client', 'user']}><CaseDetails /></ProtectedRoute>} />
+          <Route path="/cases/:id" element={<ProtectedRoute allowedRoles={['client', 'user', 'admin']}><CaseDetails /></ProtectedRoute>} />
           
           {/* Document Management - Client Only */}
           <Route path="/documents" element={<ProtectedRoute allowedRoles={['client', 'user']}><DocumentDrafting /></ProtectedRoute>} />
