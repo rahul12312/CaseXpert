@@ -30,6 +30,7 @@ import DocumentAnalyzer from './pages/DocumentAnalyzer.jsx';
 // Private Pages - Client
 import CaseTracker from './pages/CaseTracker.jsx';
 import CreateCase from './pages/CreateCase.jsx';
+import CaseDetails from './pages/CaseDetails.jsx';
 import DocumentDrafting from './pages/DocumentDrafting.jsx';
 import ReportsDashboard from './pages/ReportsDashboard.jsx';
 import UserBookings from './pages/UserBookings.jsx';
@@ -141,6 +142,7 @@ const App = () => {
           {/* Case Tracking Routes - Client Only */}
           <Route path="/cases" element={<ProtectedRoute allowedRoles={['client', 'user']}><CaseTracker /></ProtectedRoute>} />
           <Route path="/cases/create" element={<ProtectedRoute allowedRoles={['client', 'user']}><CreateCase /></ProtectedRoute>} />
+          <Route path="/cases/:id" element={<ProtectedRoute allowedRoles={['client', 'user']}><CaseDetails /></ProtectedRoute>} />
           
           {/* Document Management - Client Only */}
           <Route path="/documents" element={<ProtectedRoute allowedRoles={['client', 'user']}><DocumentDrafting /></ProtectedRoute>} />

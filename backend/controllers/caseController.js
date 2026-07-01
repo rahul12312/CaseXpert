@@ -553,6 +553,66 @@ exports.seedSampleCases = async (req, res) => {
         opponent_lawyer: "Adv. Rekha Sharma",
         timeline: [{ event_title: "Suit Filed", event_description: "Civil suit filed for breach of contract", event_type: "case-created" }, { event_title: "Interim Stay Granted", event_description: "Court granted temporary injunction on defendant", event_type: "other" }],
         activities: [{ activity: "Case created via seeder", actor_name: "System", actor_role: "system", activity_type: "create" }]
+      },
+      {
+        user: userId,
+        title: "Medical Negligence Claim — Verma vs. City Hospital",
+        case_number: `CX-${ts}-007`,
+        description: "Claim for compensation due to medical negligence during orthopedic surgery resulting in permanent disability.",
+        case_type: "civil",
+        priority: "urgent",
+        status: "hearing-scheduled",
+        court_name: "State Consumer Disputes Redressal Commission",
+        filing_date: new Date("2025-10-05"),
+        opponent_name: "City Hospital",
+        opponent_lawyer: "Adv. Vikram Singh",
+        timeline: [{ event_title: "Claim Petition Filed", event_description: "Filed for 50 Lakhs compensation", event_type: "case-created" }, { event_title: "Next Hearing", event_description: "Hearing scheduled for medical expert testimony", event_type: "hearing", event_date: new Date("2026-08-20") }],
+        activities: [{ activity: "Case created via seeder", actor_name: "System", actor_role: "system", activity_type: "create" }]
+      },
+      {
+        user: userId,
+        title: "Copyright Infringement — Apex Designs vs. CopyCat Inc.",
+        case_number: `CX-${ts}-008`,
+        description: "Suit for copyright infringement of software UI/UX designs and seeking damages.",
+        case_type: "corporate",
+        priority: "medium",
+        status: "open",
+        court_name: "Commercial Court, Delhi",
+        filing_date: new Date("2026-05-20"),
+        opponent_name: "CopyCat Inc.",
+        opponent_lawyer: "Adv. Shweta Menon",
+        timeline: [{ event_title: "Suit Instituted", event_description: "Commercial suit filed in Delhi", event_type: "case-created" }],
+        activities: [{ activity: "Case created via seeder", actor_name: "System", actor_role: "system", activity_type: "create" }]
+      },
+      {
+        user: userId,
+        title: "Defamation Suit — Dr. Rathi vs. The Daily News",
+        case_number: `CX-${ts}-009`,
+        description: "Civil defamation suit seeking damages of Rs.2 Crores for publishing false allegations.",
+        case_type: "civil",
+        priority: "high",
+        status: "pending",
+        court_name: "District Court, Hyderabad",
+        filing_date: new Date("2026-01-10"),
+        opponent_name: "The Daily News",
+        opponent_lawyer: "Adv. K. Reddy",
+        timeline: [{ event_title: "Suit Filed", event_description: "Defamation suit filed", event_type: "case-created" }, { event_title: "Notice Issued", event_description: "Notice issued to the publication", event_type: "other" }],
+        activities: [{ activity: "Case created via seeder", actor_name: "System", actor_role: "system", activity_type: "create" }]
+      },
+      {
+        user: userId,
+        title: "Domestic Violence Petition — Mrs. Anita vs. Mr. Raj",
+        case_number: `CX-${ts}-010`,
+        description: "Petition under Protection of Women from Domestic Violence Act seeking protection orders and residence rights.",
+        case_type: "family",
+        priority: "urgent",
+        status: "in-progress",
+        court_name: "Magistrate Court, Pune",
+        filing_date: new Date("2026-06-01"),
+        opponent_name: "Mr. Raj",
+        opponent_lawyer: "Adv. Neha Kapoor",
+        timeline: [{ event_title: "Petition Filed", event_description: "DV Petition filed under PWDVA", event_type: "case-created" }, { event_title: "Interim Protection Granted", event_description: "Court granted interim protection order", event_type: "other" }],
+        activities: [{ activity: "Case created via seeder", actor_name: "System", actor_role: "system", activity_type: "create" }]
       }
     ];
     const created = await Case.insertMany(sampleCases);
