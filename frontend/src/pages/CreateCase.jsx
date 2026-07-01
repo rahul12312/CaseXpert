@@ -24,15 +24,15 @@ const caseSchema = z.object({
   description: z.string().optional(),
 
   // Section 2: Client Info
-  client_name: z.string().optional(),
-  client_email: z.string().email("Invalid email").optional().or(z.literal("")),
-  client_phone: z.string().optional(),
-  client_address: z.string().optional(),
+  client_name: z.string().min(2, "Client name must be at least 2 characters").nonempty("Client name is required"),
+  client_email: z.string().email("Please enter a valid email address").nonempty("Client email is required"),
+  client_phone: z.string().regex(/^\d{10}$/, "Mobile number must be exactly 10 digits").nonempty("Client phone is required"),
+  client_address: z.string().min(5, "Address must be at least 5 characters").optional().or(z.literal("")),
 
   // Section 3: Advocate Info
   lawyer_id: z.string().optional(),
-  lawyer_email: z.string().optional(),
-  lawyer_phone: z.string().optional(),
+  lawyer_email: z.string().email("Invalid lawyer email address").optional().or(z.literal("")),
+  lawyer_phone: z.string().regex(/^\d{10}$/, "Lawyer mobile number must be exactly 10 digits").optional().or(z.literal("")),
   team_members: z.string().optional(),
 
   // Section 4: Court Details
@@ -290,21 +290,24 @@ export default function CreateCase() {
             <SectionHeader icon={User} title="2. Client Information" description="Contact details of the primary client." />
             <div className="grid gap-6 sm:grid-cols-2">
               <div>
-                <Label>Client Name</Label>
+                <Label required>Client Name</Label>
                 <input {...register('client_name')} placeholder="Full Name" className={inputClass} />
+                <InputError error={errors.client_name} />
               </div>
               <div>
-                <Label>Email Address</Label>
+                <Label required>Email Address</Label>
                 <input type="email" {...register('client_email')} placeholder="client@example.com" className={inputClass} />
                 <InputError error={errors.client_email} />
               </div>
               <div>
-                <Label>Phone Number</Label>
-                <input type="tel" {...register('client_phone')} placeholder="+91 98765 43210" className={inputClass} />
+                <Label required>Phone Number</Label>
+                <input type="tel" {...register('client_phone')} placeholder="9876543210" className={inputClass} />
+                <InputError error={errors.client_phone} />
               </div>
               <div className="sm:col-span-2">
                 <Label>Address</Label>
                 <textarea {...register('client_address')} rows={2} placeholder="Residential or Corporate Address" className={inputClass} />
+                <InputError error={errors.client_address} />
               </div>
             </div>
           </Card>
@@ -316,14 +319,17 @@ export default function CreateCase() {
               <div>
                 <Label>Assigned Lawyer ID</Label>
                 <input {...register('lawyer_id')} placeholder="ID" className={inputClass} />
+                <InputError error={errors.lawyer_id} />
               </div>
               <div>
                 <Label>Lawyer Email</Label>
                 <input type="email" {...register('lawyer_email')} placeholder="advocate@lawfirm.com" className={inputClass} />
+                <InputError error={errors.lawyer_email} />
               </div>
               <div>
                 <Label>Contact Number</Label>
-                <input type="tel" {...register('lawyer_phone')} placeholder="Phone" className={inputClass} />
+                <input type="tel" {...register('lawyer_phone')} placeholder="9876543210" className={inputClass} />
+                <InputError error={errors.lawyer_phone} />
               </div>
               <div>
                 <Label>Legal Team Members</Label>
