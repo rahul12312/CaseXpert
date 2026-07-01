@@ -457,18 +457,129 @@ exports.deleteCasePermanently = async (req, res) => {
 
 exports.seedSampleCases = async (req, res) => {
   try {
-    // Basic seeder for testing
-    const sample = {
-        title: "Sample Property Dispute",
-        case_number: `CASE-${Date.now()}`,
-        description: "Automated sample case created via seeder.",
-        user: req.user.id,
+    const userId = req.user.id;
+    const existingCount = await Case.countDocuments({ user: userId });
+    if (existingCount > 0) {
+      return res.json({ success: true, message: "Cases already exist. No seeding needed.", seeded: false });
+    }
+    const ts = Date.now();
+    const sampleCases = [
+      {
+        user: userId,
+        title: "Property Boundary Dispute — Sharma vs. Gupta",
+        case_number: `CX-${ts}-001`,
+        description: "Dispute over encroachment of 800 sq ft of agricultural land along the eastern boundary.",
         case_type: "property",
+        priority: "high",
+        status: "open",
+        court_name: "District Civil Court, Pune",
+        filing_date: new Date("2026-01-15"),
+        opponent_name: "Ramesh Gupta",
+        opponent_lawyer: "Adv. Priya Mehta",
+        timeline: [{ event_title: "Case Filed", event_description: "Petition filed at District Civil Court", event_type: "case-created" }],
+        activities: [{ activity: "Case created via seeder", actor_name: "System", actor_role: "system", activity_type: "create" }]
+      },
+      {
+        user: userId,
+        title: "Matrimonial Maintenance — Kavitha vs. Suresh",
+        case_number: `CX-${ts}-002`,
+        description: "Application under Section 125 CrPC for monthly maintenance of Rs.25,000 and child support.",
+        case_type: "family",
+        priority: "urgent",
+        status: "hearing-scheduled",
+        court_name: "Family Court, Bangalore",
+        filing_date: new Date("2025-11-20"),
+        opponent_name: "Suresh Raghavan",
+        opponent_lawyer: "Adv. Deepak Nair",
+        timeline: [{ event_title: "Hearing Scheduled", event_description: "Next hearing on July 15, 2026", event_type: "hearing", event_date: new Date("2026-07-15") }],
+        activities: [{ activity: "Case created via seeder", actor_name: "System", actor_role: "system", activity_type: "create" }]
+      },
+      {
+        user: userId,
+        title: "Consumer Fraud — Patel vs. HomeBuilders Ltd.",
+        case_number: `CX-${ts}-003`,
+        description: "Complaint for deficiency of service and refund of Rs.18 lakhs paid for a flat with delayed possession.",
+        case_type: "civil",
         priority: "medium",
-        status: "open"
-    };
-    const c = await Case.create(sample);
-    return res.json({ success: true, message: "Sample case seeded", data: c });
+        status: "in-progress",
+        court_name: "Consumer Disputes Redressal Commission, Mumbai",
+        filing_date: new Date("2026-03-02"),
+        opponent_name: "HomeBuilders Pvt. Ltd.",
+        opponent_lawyer: "Adv. Anjali Desai",
+        timeline: [{ event_title: "Complaint Filed", event_description: "Consumer complaint lodged with CDRC Mumbai", event_type: "case-created" }],
+        activities: [{ activity: "Case created via seeder", actor_name: "System", actor_role: "system", activity_type: "create" }]
+      },
+      {
+        user: userId,
+        title: "Cybercrime — Identity Theft & Bank Fraud",
+        case_number: `CX-${ts}-004`,
+        description: "FIR under IT Act Sec 66C/66D and IPC 420 for fraudulent UPI transactions totalling Rs.4.2 lakhs.",
+        case_type: "criminal",
+        priority: "urgent",
+        status: "pending",
+        court_name: "Cyber Crime Cell, Delhi",
+        filing_date: new Date("2026-05-10"),
+        opponent_name: "Unknown Accused (Under Investigation)",
+        opponent_lawyer: "State Prosecution",
+        timeline: [{ event_title: "FIR Filed", event_description: "FIR no. 214/2026 registered at Cyber Crime Cell", event_type: "case-created" }],
+        activities: [{ activity: "Case created via seeder", actor_name: "System", actor_role: "system", activity_type: "create" }]
+      },
+      {
+        user: userId,
+        title: "Wrongful Termination — Industrial Dispute",
+        case_number: `CX-${ts}-005`,
+        description: "Claim for wrongful dismissal, unpaid dues, and reinstatement under Industrial Disputes Act.",
+        case_type: "civil",
+        priority: "medium",
+        status: "open",
+        court_name: "Labour Court, Chennai",
+        filing_date: new Date("2026-04-18"),
+        opponent_name: "TechSolutions India Pvt. Ltd.",
+        opponent_lawyer: "Adv. Sanjay Krishnamurthy",
+        timeline: [{ event_title: "Claim Filed", event_description: "ID claim filed under Industrial Disputes Act 1947", event_type: "case-created" }],
+        activities: [{ activity: "Case created via seeder", actor_name: "System", actor_role: "system", activity_type: "create" }]
+      },
+      {
+        user: userId,
+        title: "SaaS Contract Breach — CloudServe Technologies",
+        case_number: `CX-${ts}-006`,
+        description: "Breach of SaaS licensing agreement worth Rs.52 lakhs. Seeking injunction and damages for IP misuse.",
+        case_type: "corporate",
+        priority: "high",
+        status: "in-progress",
+        court_name: "High Court of Karnataka",
+        filing_date: new Date("2026-02-28"),
+        opponent_name: "CloudServe Technologies",
+        opponent_lawyer: "Adv. Rekha Sharma",
+        timeline: [{ event_title: "Suit Filed", event_description: "Civil suit filed for breach of contract", event_type: "case-created" }, { event_title: "Interim Stay Granted", event_description: "Court granted temporary injunction on defendant", event_type: "other" }],
+        activities: [{ activity: "Case created via seeder", actor_name: "System", actor_role: "system", activity_type: "create" }]
+      }
+    ];
+    const created = await Case.insertMany(sampleCases);
+    return res.json({ success: true, message: `${created.length} diverse sample cases seeded.`, seeded: true });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// ============================================================================
+// CLEAR SAMPLE / DUPLICATE CASES
+// ============================================================================
+exports.clearSampleCases = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const result = await Case.deleteMany({
+      user: userId,
+      $or: [
+        { case_number: /^CX-/ },
+        { title: "Sample Property Dispute", description: "Automated sample case created via seeder." }
+      ]
+    });
+    return res.json({
+      success: true,
+      message: `Cleared ${result.deletedCount} sample case(s).`,
+      deletedCount: result.deletedCount
+    });
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
   }

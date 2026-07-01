@@ -126,6 +126,7 @@ router.put('/update-hearing/:hearing_id', caseController.updateHearing);
  * Case Tracking Robust Persistence Endpoints
  */
 router.post('/seed', caseController.seedSampleCases);
+router.delete('/clear-samples', caseController.clearSampleCases);
 router.get('/all', caseController.getAllCases);
 router.delete('/:id', caseController.deleteCasePermanently);
 
