@@ -25,14 +25,14 @@ const caseSchema = z.object({
 
   // Section 2: Client Info
   client_name: z.string().min(2, "Client name must be at least 2 characters").nonempty("Client name is required"),
-  client_email: z.string().email("Please enter a valid email address").nonempty("Client email is required"),
-  client_phone: z.string().regex(/^\d{10}$/, "Mobile number must be exactly 10 digits").nonempty("Client phone is required"),
+  client_email: z.string().regex(/^[a-zA-Z0-9._%+-]+@gmail\.com$/, "Client email must be a @gmail.com address").nonempty("Client email is required"),
+  client_phone: z.string().regex(/^\d{10}$/, "Mobile number must be exactly 10 digits (no characters allowed)").nonempty("Client phone is required"),
   client_address: z.string().min(5, "Address must be at least 5 characters").optional().or(z.literal("")),
 
   // Section 3: Advocate Info
   lawyer_id: z.string().optional(),
-  lawyer_email: z.string().email("Invalid lawyer email address").optional().or(z.literal("")),
-  lawyer_phone: z.string().regex(/^\d{10}$/, "Lawyer mobile number must be exactly 10 digits").optional().or(z.literal("")),
+  lawyer_email: z.string().regex(/^[a-zA-Z0-9._%+-]+@gmail\.com$/, "Lawyer email must be a @gmail.com address").optional().or(z.literal("")),
+  lawyer_phone: z.string().regex(/^\d{10}$/, "Lawyer mobile number must be exactly 10 digits (no characters allowed)").optional().or(z.literal("")),
   team_members: z.string().optional(),
 
   // Section 4: Court Details
@@ -301,7 +301,16 @@ export default function CreateCase() {
               </div>
               <div>
                 <Label required>Phone Number</Label>
-                <input type="tel" {...register('client_phone')} placeholder="9876543210" className={inputClass} />
+                <input 
+                  type="tel" 
+                  {...register('client_phone', {
+                    onChange: (e) => {
+                      e.target.value = e.target.value.replace(/\D/g, '').slice(0, 10);
+                    }
+                  })} 
+                  placeholder="9876543210" 
+                  className={inputClass} 
+                />
                 <InputError error={errors.client_phone} />
               </div>
               <div className="sm:col-span-2">
@@ -328,7 +337,16 @@ export default function CreateCase() {
               </div>
               <div>
                 <Label>Contact Number</Label>
-                <input type="tel" {...register('lawyer_phone')} placeholder="9876543210" className={inputClass} />
+                <input 
+                  type="tel" 
+                  {...register('lawyer_phone', {
+                    onChange: (e) => {
+                      e.target.value = e.target.value.replace(/\D/g, '').slice(0, 10);
+                    }
+                  })} 
+                  placeholder="9876543210" 
+                  className={inputClass} 
+                />
                 <InputError error={errors.lawyer_phone} />
               </div>
               <div>
